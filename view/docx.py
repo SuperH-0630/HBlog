@@ -90,7 +90,7 @@ def comment_page(blog: int):
             return
 
         context = form.context.data
-        if Comment(None, blog, auth, context).create_comment():
+        if Comment(None, blog, auth, context).create():
             flash("评论成功")
         else:
             flash("评论失败")

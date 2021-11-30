@@ -35,7 +35,7 @@ def create_file_page():
             abort(403)
             return
 
-        if File(form.name.data, form.describe.data, None).create_file():
+        if File(form.name.data, form.describe.data, None).create():
             flash(f"创建归档 {form.name.data} 成功")
         else:
             flash(f"创建归档 {form.name.data} 失败")

@@ -24,7 +24,7 @@ def load_blog_by_id(blog_id) -> "Optional[BlogArticle]":
     if len(blog) == 0:
         return None
 
-    auth = core.user.User.load_user_by_id(blog[0])
+    auth = core.user.load_user_by_id(blog[0])
     if auth is None:
         return None
 

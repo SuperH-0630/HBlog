@@ -1,4 +1,4 @@
-from sql.comment import read_comment, create_comment, get_user_comment_count
+from sql.comment import read_comment, create_comment, get_user_comment_count, delete_comment
 import core.user
 
 
@@ -22,5 +22,8 @@ class Comment:
     def get_user_comment_count(auth: "core.user"):
         return get_user_comment_count(auth.get_user_id())
 
-    def create_comment(self):
+    def create(self):
         return create_comment(self.blog_id, self.auth.get_user_id(), self.context)
+
+    def delete(self):
+        return delete_comment(self.comment_id)

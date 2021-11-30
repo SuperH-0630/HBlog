@@ -49,7 +49,7 @@ def write_page():
 
         context = form.context.data
         secret = form.secret.data
-        if Message(None, auth, context, secret, None).create_msg():
+        if Message(None, auth, context, secret, None).create():
             flash("留言成功")
         else:
             flash("留言失败")

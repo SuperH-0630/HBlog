@@ -1,6 +1,6 @@
 from typing import Optional
 
-from sql.msg import read_msg, get_msg_count, create_msg, get_user_msg_count
+from sql.msg import read_msg, get_msg_count, create_msg, get_user_msg_count, delete_msg
 import core.user
 
 
@@ -26,5 +26,8 @@ class Message:
             return get_msg_count()
         return get_user_msg_count(auth.get_user_id())
 
-    def create_msg(self):
+    def create(self):
         return create_msg(self.auth.get_user_id(), self.context, self.secret)
+
+    def delete(self):
+        return delete_msg(self.msg_id)

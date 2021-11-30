@@ -4,7 +4,7 @@ from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from typing import Optional
 
 from configure import conf
-from sql.user import read_user, check_role, get_user_email, create_user, get_role_name
+from sql.user import read_user, check_role, get_user_email, create_user, get_role_name, delete_user
 import core.blog
 import core.comment
 import core.msg
@@ -120,5 +120,8 @@ class User(UserMixin):
     def check_role(self, operate: str):
         return check_role(self.role, operate)
 
-    def create_user(self):
+    def create(self):
         return create_user(self.email, self.passwd_hash)
+
+    def delete(self):
+        return delete_user(self.id)

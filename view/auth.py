@@ -93,7 +93,7 @@ def confirm_page():
         abort(404)
         return
 
-    User(token[0], token[1], None, None).create_user()
+    User(token[0], token[1], None, None).create()
     flash(f"用户{token[0]}认证完成")
     return redirect(url_for("base.index_page"))
 
