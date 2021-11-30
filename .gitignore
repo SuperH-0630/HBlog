@@ -81,7 +81,7 @@ target/
 .ipynb_checkpoints
 
 # IPython
-profile_default/
+proarchive_default/
 ipython_config.py
 
 # pyenv

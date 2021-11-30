@@ -15,8 +15,8 @@
             <div class="row">
                 <article class="col-12">
                     <h1> {{ article.title }} <small> {{ article.subtitle }} <small> {{ article.update_time}} </small> </small> </h1>
-                    {% for file in article.file %}
-                        <span class="badge badge-info"> {{ file.name }} </span>
+                    {% for archive in article.archive %}
+                        <span class="badge badge-info"> {{ archive.name }} </span>
                     {% endfor %}
                     <hr>
 

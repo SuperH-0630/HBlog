@@ -4,7 +4,7 @@
 
 {% block style %}
     {{ super() }}
-    <link href="{{ url_for('static', filename='styles/file/file.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='styles/archive/archive.css') }}" rel="stylesheet">
 {% endblock %}
 
 {% block context %}
@@ -13,7 +13,7 @@
             <div class="row">
                 <section class="col-12 col-lg-6 offset-lg-3 text-right">
                     <div class="create">
-                        <form class="writer clearfix" action="{{ url_for('file.create_file_page') }}" method="post">
+                        <form class="writer clearfix" action="{{ url_for('archive.create_archive_page') }}" method="post">
                         {{ form.hidden_tag() }}
                         <div class="form-group text-left">
                             {{ form.name.label }}
@@ -35,13 +35,13 @@
     {% endif %}
 
     <section id="base" class="d-flex mt-3 container justify-content-center flex-wrap">
-        {% for file in file_list %}
-            <div class="file mb-3 mr-2 ml-2">
-                <h3> {{ file[1] }} </h3>
+        {% for archive in archive_list %}
+            <div class="archive mb-3 mr-2 ml-2">
+                <h3> {{ archive[1] }} </h3>
                 <hr>
-                <p> {{ file[2] }} </p>
-                <p> 篇数: {{ file[3] }} </p>
-                <a class="btn btn-info" href="{{ url_for("docx.file_page", file=file[0], page=1) }}"> 进入 </a>
+                <p> {{ archive[2] }} </p>
+                <p> 篇数: {{ archive[3] }} </p>
+                <a class="btn btn-info" href="{{ url_for("docx.archive_page", archive=archive[0], page=1) }}"> 进入 </a>
             </div>
         {% endfor %}
     </section>

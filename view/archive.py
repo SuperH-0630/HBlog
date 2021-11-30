@@ -7,51 +7,51 @@ from wtforms.validators import DataRequired, Length
 
 from view.base import App
 from core.user import User
-from core.file import File
+from core.archive import Archive
 
-file = Blueprint("file", __name__)
+archive = Blueprint("archive", __name__)
 app: Optional[Flask] = None
 
 
-class CreateFileForm(FlaskForm):
+class CreateArchiveForm(FlaskForm):
     name = StringField("名字", validators=[DataRequired(), Length(1, 10)])
     describe = StringField("描述", validators=[DataRequired(), Length(1, 30)])
     submit = SubmitField("创建归档")
 
 
-@file.route('/')
-def file_page():
-    file_list = File.get_file_list()
-    return render_template("file/file.html", file_list=file_list, form=CreateFileForm())
+@archive.route('/')
+def archive_page():
+    archive_list = Archive.get_archive_list()
+    return render_template("archive/archive.html", archive_list=archive_list, form=CreateArchiveForm())
 
 
-@file.route("create-file", methods=["POST"])
+@archive.route("create-archive", methods=["POST"])
 @login_required
-def create_file_page():
-    form = CreateFileForm()
+def create_archive_page():
+    form = CreateArchiveForm()
     if form.validate_on_submit():
         auth: User = current_user
         if not auth.check_role("WriteBlog"):  # 检查相应的权限
             abort(403)
             return
 
-        if File(form.name.data, form.describe.data, None).create():
+        if Archive(form.name.data, form.describe.data, None).create():
             flash(f"创建归档 {form.name.data} 成功")
         else:
             flash(f"创建归档 {form.name.data} 失败")
-        return redirect(url_for("file.file_page"))
+        return redirect(url_for("archive.archive_page"))
     abort(404)
 
 
-@file.context_processor
-def inject_base():
+@archive.context_processor
+def inject():
     return {"top_nav": ["", "active", "", "", "", ""]}
 
 
-class FileApp(App):
+class ArchiveApp(App):
     def __init__(self, import_name):
-        super(FileApp, self).__init__(import_name)
+        super(ArchiveApp, self).__init__(import_name)
 
         global app
         app = self._app
-        app.register_blueprint(file, url_prefix="/file")
+        app.register_blueprint(archive, url_prefix="/archive")

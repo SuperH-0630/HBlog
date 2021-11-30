@@ -20,7 +20,7 @@
             body{
                 background-color: #f0fcff;
             }
-    </style>
+        </style>
     {% endblock %}
 
     <title>{% block title %} {% endblock %} - {{ blog_name }} </title>
@@ -40,7 +40,7 @@
 
                 {% if current_user.check_role("ReadBlog") %}
                 <li class="nav-item">
-                    <a href="{{ url_for('file.file_page') }}" class="nav-link {{ top_nav[1] }}">
+                    <a href="{{ url_for('archive.archive_page') }}" class="nav-link {{ top_nav[1] }}">
                         归档
                     </a>
                 </li>

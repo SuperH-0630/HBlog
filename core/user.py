@@ -51,7 +51,7 @@ class User(UserMixin):
             self.role_name = get_role_name(role)
         else:
             self.role_name = None
-        self.id = user_id
+        self.user_id = user_id
 
     def count_info(self):
         msg = core.msg.Message.get_msg_count(self)
@@ -94,7 +94,7 @@ class User(UserMixin):
         return self.email
 
     def get_user_id(self):
-        return self.id
+        return self.user_id
 
     @staticmethod
     def creat_token(email: str, passwd_hash: str):
@@ -124,4 +124,4 @@ class User(UserMixin):
         return create_user(self.email, self.passwd_hash)
 
     def delete(self):
-        return delete_user(self.id)
+        return delete_user(self.user_id)

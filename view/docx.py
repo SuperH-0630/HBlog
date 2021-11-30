@@ -14,7 +14,7 @@ from sql.base import DBBit
 from core.blog import BlogArticle, load_blog_by_id
 from core.user import User
 from core.comment import Comment
-from core.file import load_file_by_name
+from core.archive import load_archive_by_name
 
 docx = Blueprint("docx", __name__)
 app: Optional[Flask] = None
@@ -25,7 +25,7 @@ allow_tag = ['a', 'abbr', 'acronym', 'b', 'blockquote', 'code', 'em', 'i', 'li',
 class WriteBlogForm(FlaskForm):
     title = StringField("标题", validators=[DataRequired(), Length(1, 10)])
     subtitle = StringField("副标题", validators=[DataRequired(), Length(1, 10)])
-    file = StringField("归档", validators=[DataRequired(), Length(1, 10)])
+    archive = StringField("归档", validators=[DataRequired(), Length(1, 10)])
     context = PageDownField("博客内容", validators=[DataRequired()])
     submit = SubmitField("提交博客")
 
@@ -51,15 +51,15 @@ def docx_page(page: int = 1):
                            form=WriteBlogForm())
 
 
-@docx.route('/<int:file>/<int:page>')
-def file_page(file: int, page: int = 1):
+@docx.route('/<int:archive>/<int:page>')
+def archive_page(archive: int, page: int = 1):
     if page < 1:
         abort(404)
         return
 
-    blog_list = BlogArticle.get_blog_list(file_id=file, limit=20, offset=(page - 1) * 20)
-    max_page = App.get_max_page(BlogArticle.get_blog_count(file_id=file), 20)
-    page_list = App.get_page("docx.file_page", page, max_page)
+    blog_list = BlogArticle.get_blog_list(archive_id=archive, limit=20, offset=(page - 1) * 20)
+    max_page = App.get_max_page(BlogArticle.get_blog_count(archive_id=archive), 20)
+    page_list = App.get_page("docx.archive_page", page, max_page)
     return render_template("docx/docx.html",
                            blog_list=blog_list,
                            is_top=DBBit.BIT_1,
@@ -75,7 +75,7 @@ def article_page(blog_id: int):
         return
     return render_template("docx/article.html",
                            article=article,
-                           file_list=article.file,
+                           archive_list=article.archive,
                            form=WriteCommentForm())
 
 
@@ -112,18 +112,18 @@ def create_docx_page():
         title = form.title.data
         subtitle = form.subtitle.data
 
-        file = set(str(form.file.data).replace(" ", "").split(";"))
-        file_list = []
-        for f in file:
-            f_ = load_file_by_name(f)
+        archive = set(str(form.archive.data).replace(" ", "").split(";"))
+        archive_list = []
+        for f in archive:
+            f_ = load_archive_by_name(f)
             if f_ is not None:
-                file_list.append(f_)
+                archive_list.append(f_)
 
         context = bleach.linkify(
             bleach.clean(
                 markdown(form.context.data, output_format='html'), tags=allow_tag, strip=True))
 
-        if BlogArticle(None, current_user, title, subtitle, context, file=file_list).create():
+        if BlogArticle(None, current_user, title, subtitle, context, archive=archive_list).create():
             flash(f"博客 {title} 发表成功")
         else:
             flash(f"博客 {title} 发表失败")
