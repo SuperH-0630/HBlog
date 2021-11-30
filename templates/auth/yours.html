@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %} 关于你 {% endblock %}
+
+{% block style %}
+    {{ super() }}
+    <link href="{{ url_for('static', filename='styles/about_me/about_me.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block context %}
+    <section id="base" class="container mt-3">
+    <div class="row">
+        <div class="col-12 col-lg-6 offset-lg-3">
+            <div class="card mr-lg-2 mb-3">
+                <div class="card-header"> 你的 </div>
+                <div class="card-body">
+                    <h4 class="card-title mb-2"> {{ current_user.email }} </h4>
+                    <p class="card-text mb-2"> 用户组：{{ current_user.role_name }} </p>
+                    <p class="card-text mb-2"> 评论条数：{{ comment_count }} </p>
+                    <p class="card-text mb-2"> 留言条数：{{ msg_count }} </p>
+                    <p class="card-text mb-2"> 博客：{{ blog_count }} </p>
+
+                    <a class="card-link" href="{{ url_for('auth.logout_page') }}"> 退出登录 </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    </section>
+{% endblock %}

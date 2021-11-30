@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% import "macro.html" as macro %}
+
+{% block title %} 文档 {% endblock %}
+
+{% block style %}
+    {{ super() }}
+    <link href="{{ url_for('static', filename='styles/docx/article.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block context %}
+    <section id="base" class="container mt-3">
+        {% if current_user.check_role("ReadBlog") %}
+            {# 检查是否具有读取权限 #}
+            <div class="row">
+                <article class="col-12">
+                    <h1> {{ article.title }} <small> {{ article.subtitle }} <small> {{ article.update_time}} </small> </small> </h1>
+                    {% for file in article.file %}
+                        <span class="badge badge-info"> {{ file.name }} </span>
+                    {% endfor %}
+                    <hr>
+
+                    {{ article.context | safe }}
+                </article>
+            </div>
+        {% endif %}
+
+        {% if current_user.check_role("ReadComment") %}
+            <div class="row">
+                <article class="col-12">
+                    <h1 class="mt-3"> 评论 </h1>
+
+                    <section class="col-12 text-right">
+                        <form action="{{ url_for('docx.comment_page', blog=article.blog_id) }}" method="post">
+                            {{ form.hidden_tag() }}
+                            {{ form.context(class="form-control mb-2", rows="3") }}
+                            {{ form.submit(class="btn btn-info mb-2", value="评论") }}
+                        </form>
+                    </section>
+                    <hr>
+
+                    {% for comment in article.comment %}
+                        <section class="col-12">
+                            <div class="comment">
+                                <p class="comment-title h5">
+                                    {% if current_user.check_role("ReadUserInfo") %}  {# 判断是否可读取用户信息 #}
+                                        {{ comment.auth.email }}
+                                    {% else %}
+                                        {{ comment.auth.s_email }}
+                                    {% endif %}
+                                    <br>
+                                    <small> {{ comment.update_time }} </small>
+                                </p>
+                                <p> {{ comment.context.replace('\n', '<br>') | safe  }} </p>
+                            </div>
+                        </section>
+                    {% endfor %}
+                </article>
+            </div>
+        {% endif %}
+    </section>
+{% endblock %}

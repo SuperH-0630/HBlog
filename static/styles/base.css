@@ -1,0 +1,9 @@
+body {
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+#foot {
+    text-align: center;
+    padding-bottom: 10px;
+}

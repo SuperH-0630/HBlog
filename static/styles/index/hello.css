@@ -1,0 +1,106 @@
+body {
+    background-image: url("../../images/hello.jpg");
+}
+
+#base {
+    position: relative;
+}
+
+@keyframes shaking {
+    from {
+        transform: rotate(0deg);
+    }
+
+    20% {
+        transform: rotate(-3deg);
+    }
+
+    40% {
+        transform: rotate(0deg);
+    }
+
+    60% {
+        transform: rotate(3deg);
+    }
+
+    80% {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(0deg);
+    }
+}
+
+#title-1 {
+    text-decoration: none;
+    border-bottom: black solid 3px;
+    padding-bottom: 15px;
+
+    width: 96%;
+    margin: auto;
+
+    font-weight: bold;
+    text-align: center;
+    color: black;
+    font-size: 50px;
+    padding-top: 5%;
+}
+
+#title-1:hover {
+    animation: shaking 300ms linear 0s 1;
+}
+
+#btn {
+    position: relative;
+    display: block;
+    text-align: center;
+
+    border-radius: 10px;
+    border-width: 3px;
+    border-style: ridge;
+    border-color: rgb(123, 104, 238);
+
+    background-image: linear-gradient(to right, #F0FFF0 0%, #FFDC00 30%, #FFDC00 100%);
+
+    font-size: 30px;
+    height: 100px;
+
+    box-shadow: 5px 5px 2px 0 black;
+}
+
+@media all and (max-width: 992px) {
+    #btn {
+        top: 120px;
+        left: 3%;
+        width: 94%;
+    }
+}
+
+@media not all and (max-width: 992px) {
+    #btn {
+        top: 120px;
+        left: 25%;
+        width: 50%;
+        transition:
+                transform 1s,
+                background-image 1s;
+    }
+
+    #btn:hover {
+        background-image: linear-gradient(to right, #F0FFF0 0%, #F0FFF0 70%, #FFDC00 100%);
+        transform: scale(1.5);
+    }
+}
+
+#main {
+    text-align: center;
+}
+
+#title-section {
+    height: 50vh;
+    width: 50%;
+    margin: 10% auto;
+    background-color: rgb(255, 255, 255, 20%);
+    border-radius: 10px;
+}

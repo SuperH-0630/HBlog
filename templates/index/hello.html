@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %} 欢迎 {% endblock %}
+
+{% block style %}
+    {{ super() }}
+    <link href="{{ url_for('static', filename='styles/index/hello.css') }}" rel="stylesheet">
+    <style>
+        body {
+            overflow-y: hidden;
+            overflow-x: hidden;
+        }
+    </style>
+{% endblock %}
+
+{% block nav %} {% endblock %}
+
+{% block context %}
+    <section id="title-section">
+        <h1 id="title-1"> 欢迎，这里是{{ blog_name }} </h1>
+        <form method="get" action=" {{ url_for('base.index_page') }} ">
+            <input id="btn" type="submit" value="进入">
+        </form>
+    </section>
+{% endblock %}
+
+{% block footer %} {% endblock %}

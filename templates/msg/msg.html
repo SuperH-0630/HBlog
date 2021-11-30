@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% import "macro.html" as macro %}
+
+{% block title %} 留言 {% endblock %}
+
+{% block style %}
+    {{ super() }}
+    <link href="{{ url_for('static', filename='styles/msg/msg.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block context %}
+    <section id="base" class="container mt-3">
+        <div class="row">
+            <section class="col-12 text-right">
+                <form class="writer clearfix" action="{{ url_for('msg.write_page') }}" method="post">
+                    {{ form.hidden_tag() }}
+                    {{ form.context(class="form-control mb-2", rows="5") }}
+                    {{ form.secret() }} {{ form.secret.label }}
+                    {{ form.submit(class="btn btn-info mb-2", value="留言") }}
+                </form>
+            </section>
+        </div>
+        <hr>
+        {% if current_user.check_role("ReadMsg") %}  {# 检查是否具有读取权限 #}
+            <div class="row">
+                <section class="col-12">
+                    {% for msg in msg_list %}
+                        <div class="msg mr-0">
+                            <p class="msg-title h5">
+                                {% if current_user.check_role("ReadUserInfo") %}  {# 判断是否可读取用户信息 #}
+                                    {{ msg.auth.email }}
+                                {% else %}
+                                    {{ msg.auth.s_email }}
+                                {% endif %}
+                                <br>
+                                <small> {{ msg.update_time }}
+                                    {% if msg.secret == is_secret %}
+                                        <small> [私密留言] </small>
+                                    {% endif %}
+                                </small>
+                            </p>
+                            <p> {{ msg.context.replace('\n', '<br>') | safe }} </p>
+                        </div>
+                    {% endfor %}
+                </section>
+            </div>
+
+            <ul class="pagination col-12 justify-content-center">
+                {{ macro.get_page_list(page_list) }}
+            </ul>
+        {% endif %}
+    </section>
+{% endblock %}

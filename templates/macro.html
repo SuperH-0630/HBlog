@@ -1,0 +1,9 @@
+{% macro get_page_list(info_lines) %}
+    {% for line in info_lines %}
+        {% if line %}
+            <li class="page-item"><a class="page-link" href="{{ line[1] }}"> {{ line[0] }} </a></li>
+        {% else %}
+            <li class="page-item"><a class="page-link" href="#"> ... </a></li>
+        {% endif %}
+    {% endfor %}
+{% endmacro %}

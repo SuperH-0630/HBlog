@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %} 归档 {% endblock %}
+
+{% block style %}
+    {{ super() }}
+    <link href="{{ url_for('static', filename='styles/file/file.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block context %}
+    {% if form and current_user.check_role("WriteBlog") %}
+        <div class="container">
+            <div class="row">
+                <section class="col-12 col-lg-6 offset-lg-3 text-right">
+                    <div class="create">
+                        <form class="writer clearfix" action="{{ url_for('file.create_file_page') }}" method="post">
+                        {{ form.hidden_tag() }}
+                        <div class="form-group text-left">
+                            {{ form.name.label }}
+                            {{ form.name(class="form-control") }}
+                        </div>
+
+                        <div class="form-group text-left">
+                            {{ form.describe.label }}
+                            {{ form.describe(class="form-control") }}
+                        </div>
+
+                        {{ form.submit(class="btn btn-info mb-2", value="创建归档") }}
+                    </form>
+                    </div>
+                </section>
+            </div>
+            <hr>
+        </div>
+    {% endif %}
+
+    <section id="base" class="d-flex mt-3 container justify-content-center flex-wrap">
+        {% for file in file_list %}
+            <div class="file mb-3 mr-2 ml-2">
+                <h3> {{ file[1] }} </h3>
+                <hr>
+                <p> {{ file[2] }} </p>
+                <p> 篇数: {{ file[3] }} </p>
+                <a class="btn btn-info" href="{{ url_for("docx.file_page", file=file[0], page=1) }}"> 进入 </a>
+            </div>
+        {% endfor %}
+    </section>
+{% endblock %}

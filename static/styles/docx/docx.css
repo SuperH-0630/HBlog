@@ -1,0 +1,38 @@
+.docx, .docx-top {
+    margin-bottom: 20px;
+    border-radius: 10px;
+    border-width: 2px;
+    border-style: solid;
+
+    min-width: 30em;
+    height: 4em;
+    line-height: 4em;
+}
+
+.docx {
+    border-color: #0074D9;
+    background-color: white;
+}
+
+.docx-top {
+    border-color: #dc3023;
+    background-color: white;
+}
+
+.docx a, .docx-top a{
+    padding: 15px;
+    color: black;
+    text-decoration: none;
+}
+
+.docx a:hover, .docx-top a:hover {
+    color: darkblue;
+    text-decoration: none;
+}
+
+.markdown {
+    background-color: white;
+    padding: 15px;
+    border: 2px solid #0074D9;
+    border-radius: 10px;
+}

@@ -1,0 +1,12 @@
+.msg {
+    margin-bottom: 20px;
+    border-radius: 10px;
+    border: 2px solid #FFDC00;
+    padding: 15px;
+    background-color: white;
+}
+
+.msg .msg-title {
+    color: black;
+    text-decoration: none;
+}

@@ -1,0 +1,15 @@
+.file {
+    background-color: white;
+    border-radius: 10px;
+    border: 2px solid #39CCCC;
+    min-width: 30%;
+    min-height: 20%;
+    padding: 15px;
+}
+
+.create {
+    background-color: white;
+    border-radius: 10px;
+    border: 2px solid #1685a9;
+    padding: 15px;
+}

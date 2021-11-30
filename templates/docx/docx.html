@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% import "macro.html" as macro %}
+
+{% block title %} 博客 {% endblock %}
+
+{% block style %}
+    {{ super() }}
+    <link href="{{ url_for('static', filename='styles/docx/docx.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block context %}
+    <section id="base" class="container mt-3">
+        {% if form and current_user.check_role("WriteBlog") %}
+            {# 判断是否有权限写博客 #}
+            <div class="row">
+                <div class="col-12">
+                    <div class="markdown">
+                        <form action="{{ url_for('docx.create_docx_page') }}" method="post">
+                            {{ form.hidden_tag() }}
+                            <div class="form-group">
+                                {{ form.title.label }}
+                                {{ form.title(class="form-control") }}
+                            </div>
+
+                            <div class="form-group">
+                                {{ form.subtitle.label }}
+                                {{ form.subtitle(class="form-control") }}
+                            </div>
+
+                            <div class="form-group">
+                                {{ form.file.label }}
+                                {{ form.file(class="form-control") }}
+                            </div>
+
+                            {{ form.context(class="form-control mb-2", rows="15") }}
+
+                            <div class="text-right">
+                                {{ form.submit(class="btn btn-info mb-2", value="发表") }}
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <hr>
+        {% endif %}
+
+        {% if current_user.check_role("ReadBlog") %}
+            {# 检查是否具有读取权限 #}
+            <div class="row">
+                <article class="col-12">
+                {% for blog in blog_list %}
+                    {% if blog[4] == is_top %}
+                        <div class="docx-top"> <a class="h4"
+                                                          href="{{ url_for("docx.article_page", blog_id=blog[0]) }}">
+                            {{ blog[1] }}
+                                <small> {{ blog[2] }}
+                                    <small> {{ blog[3] }} </small> </small> </a></div>
+                    {% else %}
+                        <div class="docx"> <a class="h4"
+                                                      href="{{ url_for("docx.article_page", blog_id=blog[0]) }}">
+                            {{ blog[1] }}
+                                <small> {{ blog[2] }}
+                                    <small> {{ blog[3] }} </small> </small> </a></div>
+                    {% endif %}
+                {% endfor %}
+                </article>
+            </div>
+
+            <ul class="pagination col-12 justify-content-center">
+                {{ macro.get_page_list(page_list) }}
+            </ul>
+
+        {% endif %}
+    </section>
+{% endblock %}
+
+{% block javascript %}
+    {{ super() }}
+    {{ pagedown.include_pagedown() }}
+{% endblock %}

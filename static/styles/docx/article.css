@@ -1,0 +1,12 @@
+.comment {
+    margin-bottom: 20px;
+    border-radius: 10px;
+    border: 2px solid #FFDC00;
+    padding: 15px;
+    background-color: white;
+}
+
+.comment .comment-title {
+    color: black;
+    text-decoration: none;
+}
