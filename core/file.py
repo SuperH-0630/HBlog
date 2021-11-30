@@ -1,14 +1,12 @@
-from sql.file import get_file_id, create_file, get_file_list, get_blog_file
+from typing import Optional
+
+from sql.file import get_file_id_by_name, create_file, get_file_list, read_file
 
 
-class LoadFileError(Exception):
-    ...
-
-
-def load_file_by_name(name: str) -> "File":
-    file_id, describe = get_file_id(name)
+def load_file_by_name(name: str) -> "Optional[File]":
+    file_id, describe = get_file_id_by_name(name)
     if file_id is None:
-        raise LoadFileError
+        return None
     return File(name, describe, file_id)
 
 
@@ -27,7 +25,7 @@ class File:
 
     @staticmethod
     def get_blog_file(blog_id: int):
-        file = get_blog_file(blog_id)
+        file = read_file(blog_id)
         file_list = []
         for i in file:
             file_list.append(File(i[1], i[2], i[0]))

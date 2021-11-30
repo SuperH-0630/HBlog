@@ -6,7 +6,7 @@ from wtforms.validators import DataRequired, Length, EqualTo
 from typing import Optional
 
 from view.base import App
-from core.user import User, LoaderUserError, load_user_by_email
+from core.user import User, load_user_by_email
 from flask_wtf import FlaskForm
 from send_email import send_msg
 
@@ -31,11 +31,7 @@ class RegisterForm(FlaskForm):
     submit = SubmitField("注册")
 
     def validate_email(self, field):
-        try:
-            load_user_by_email(field.data)
-        except LoaderUserError:
-            return
-        else:
+        if load_user_by_email(field.data) is not None:
             raise ValidationError("Email already register")
 
 
@@ -53,11 +49,7 @@ def login_page():
 
     form = LoginForm()
     if form.validate_on_submit():
-        try:
-            user = load_user_by_email(form.email.data)
-        except LoaderUserError:
-            user = None
-
+        user = load_user_by_email(form.email.data)
         if user is not None and user.check_passwd(form.passwd.data):
             login_user(user, form.remember.data)
             next_page = request.args.get("next")
@@ -97,11 +89,7 @@ def confirm_page():
         abort(404)
         return
 
-    try:
-        load_user_by_email(token[0])
-    except LoaderUserError:
-        pass
-    else:
+    if load_user_by_email(token[0]) is not None:
         abort(404)
         return
 
@@ -134,7 +122,4 @@ class AuthApp(App):
 
         @self.login_manager.user_loader
         def user_loader(email: str):
-            try:
-                return load_user_by_email(email)
-            except LoaderUserError:
-                return None
+            return load_user_by_email(email)

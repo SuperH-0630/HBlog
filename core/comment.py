@@ -1,21 +1,18 @@
-from sql.comment import get_comment_list, write_comment, get_user_comment_count
+from sql.comment import read_comment, create_comment, get_user_comment_count
 import core.user
 
 
-class LoadCommentError(Exception):
-    pass
-
-
 def load_comment_list(blog_id: int):
-    comment_list = get_comment_list(blog_id)
+    comment_list = read_comment(blog_id)
     ret = []
     for comment in comment_list:
-        ret.append(Comment(blog_id, core.user.User(comment[1], None, None, comment[0]), comment[2], comment[3]))
+        ret.append(Comment(comment[0], blog_id, core.user.User(comment[2], None, None, comment[1]), comment[3], comment[4]))
     return ret
 
 
 class Comment:
-    def __init__(self, blog_id: int, auth: "core.user.User", context: str, update_time=None):
+    def __init__(self, comment_id, blog_id: int, auth: "core.user.User", context: str, update_time=None):
+        self.comment_id = comment_id
         self.blog_id = blog_id
         self.auth = auth
         self.context = context
@@ -26,4 +23,4 @@ class Comment:
         return get_user_comment_count(auth.get_user_id())
 
     def create_comment(self):
-        return write_comment(self.blog_id, self.auth.get_user_id(), self.context)
+        return create_comment(self.blog_id, self.auth.get_user_id(), self.context)

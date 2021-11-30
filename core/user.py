@@ -1,16 +1,13 @@
 from flask_login import UserMixin, AnonymousUserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from typing import Optional
 
 from configure import conf
-from sql.user import read_user, check_role, get_user_email, add_user, get_role_name
+from sql.user import read_user, check_role, get_user_email, create_user, get_role_name
 import core.blog
 import core.comment
 import core.msg
-
-
-class LoaderUserError(Exception):
-    pass
 
 
 class AnonymousUser(AnonymousUserMixin):
@@ -28,14 +25,21 @@ class AnonymousUser(AnonymousUserMixin):
         return 0
 
 
-def load_user_by_email(email: str) -> "User":
+def load_user_by_email(email: str) -> "Optional[User]":
     user = read_user(email)
     if len(user) == 0:
-        raise LoaderUserError
+        return None
     passwd_hash = user[0]
     role = user[1]
     user_id = user[2]
     return User(email, passwd_hash, role, user_id)
+
+
+def load_user_by_id(user_id):
+    email = get_user_email(user_id)
+    if email is None:
+        return None
+    return load_user_by_email(email)
 
 
 class User(UserMixin):
@@ -62,13 +66,6 @@ class User(UserMixin):
         else:
             email = f"{self.email[0]}****{self.email[5:]}"
             return email
-
-    @staticmethod
-    def load_user_by_id(user_id):
-        email = get_user_email(user_id)
-        if email is None:
-            raise LoaderUserError
-        return load_user_by_email(email)
 
     @property
     def comment_count(self):
@@ -124,4 +121,4 @@ class User(UserMixin):
         return check_role(self.role, operate)
 
     def create_user(self):
-        return add_user(self.email, self.passwd_hash)
+        return create_user(self.email, self.passwd_hash)

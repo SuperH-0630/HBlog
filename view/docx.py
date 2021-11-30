@@ -14,7 +14,7 @@ from sql.base import DBBit
 from core.blog import BlogArticle, load_blog_by_id
 from core.user import User
 from core.comment import Comment
-from core.file import load_file_by_name, LoadFileError
+from core.file import load_file_by_name
 
 docx = Blueprint("docx", __name__)
 app: Optional[Flask] = None
@@ -70,6 +70,9 @@ def file_page(file: int, page: int = 1):
 @docx.route('/article/<int:blog_id>')
 def article_page(blog_id: int):
     article = load_blog_by_id(blog_id)
+    if article is None:
+        abort(404)
+        return
     return render_template("docx/article.html",
                            article=article,
                            file_list=article.file,
@@ -87,7 +90,7 @@ def comment_page(blog: int):
             return
 
         context = form.context.data
-        if Comment(blog, auth, context).create_comment():
+        if Comment(None, blog, auth, context).create_comment():
             flash("评论成功")
         else:
             flash("评论失败")
@@ -112,16 +115,15 @@ def create_docx_page():
         file = set(str(form.file.data).replace(" ", "").split(";"))
         file_list = []
         for f in file:
-            try:
-                file_list.append(load_file_by_name(f))
-            except LoadFileError:
-                pass
+            f_ = load_file_by_name(f)
+            if f_ is not None:
+                file_list.append(f_)
 
         context = bleach.linkify(
             bleach.clean(
                 markdown(form.context.data, output_format='html'), tags=allow_tag, strip=True))
 
-        if BlogArticle(None, current_user, title, subtitle, context, file=file_list).write_blog():
+        if BlogArticle(None, current_user, title, subtitle, context, file=file_list).create():
             flash(f"博客 {title} 发表成功")
         else:
             flash(f"博客 {title} 发表失败")
