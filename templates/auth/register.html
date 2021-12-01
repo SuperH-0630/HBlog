@@ -29,8 +29,10 @@
                     {{ RegisterForm.passwd_again(class="form-control") }}
                 </div>
 
-                {{ RegisterForm.submit(class='btn btn-info mr-2') }}
-                <a class="btn btn-info mr-2" href="{{ url_for("auth.login_page") }}"> 前往登录 </a>
+                <div class="text-right">
+                    {{ RegisterForm.submit(class='btn btn-info mr-2') }}
+                    <a class="btn btn-info" href="{{ url_for("auth.login_page") }}"> 前往登录 </a>
+                </div>
             </form>
         </div>
     </div>

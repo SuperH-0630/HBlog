@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %} 修改密码 {% endblock %}
+
+{% block style %}
+    {{ super() }}
+    <link href="{{ url_for('static', filename='styles/auth/passwd.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block context %}
+    <section id="base" class="container mt-3">
+    <div class="row">
+        <div class="col-12 col-lg-6 offset-lg-3">
+            <form method="post" action="{{ url_for("auth.change_passwd_page") }}" class="passwd-form">
+                {{ ChangePasswdForm.hidden_tag() }}
+
+                <div class="form-group">
+                    {{ ChangePasswdForm.old_passwd.label }}
+                    {{ ChangePasswdForm.old_passwd(class="form-control") }}
+                </div>
+
+                <div class="form-group">
+                    {{ ChangePasswdForm.passwd.label }}
+                    {{ ChangePasswdForm.passwd(class="form-control") }}
+                </div>
+
+                <div class="form-group">
+                    {{ ChangePasswdForm.passwd_again.label }}
+                    {{ ChangePasswdForm.passwd_again(class="form-control") }}
+                </div>
+
+                <div class="text-right">
+                    {{ ChangePasswdForm.submit(class='btn btn-info') }}
+                </div>
+            </form>
+        </div>
+    </div>
+    </section>
+{% endblock %}

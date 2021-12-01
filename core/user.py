@@ -4,7 +4,7 @@ from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from typing import Optional
 
 from configure import conf
-from sql.user import read_user, check_role, get_user_email, create_user, get_role_name, delete_user
+from sql.user import read_user, check_role, get_user_email, create_user, get_role_name, delete_user, change_passwd_hash
 import core.blog
 import core.comment
 import core.msg
@@ -125,3 +125,6 @@ class User(UserMixin):
 
     def delete(self):
         return delete_user(self.user_id)
+
+    def change_passwd(self, passwd):
+        return change_passwd_hash(self.user_id, self.get_passwd_hash(passwd))

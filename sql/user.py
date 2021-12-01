@@ -39,6 +39,13 @@ def delete_user(user_id: int):
     return True
 
 
+def change_passwd_hash(user_id: int, passwd_hash: str):
+    cur = db.update(table='user', kw={'PasswdHash': f"'{passwd_hash}'"}, where=f'ID={user_id}')
+    if cur is None or cur.rowcount == 0:
+        return False
+    return True
+
+
 def get_user_email(user_id):
     """ 获取用户邮箱 """
     cur = db.search(columns=["Email"], table="user", where=f"ID='{user_id}'")

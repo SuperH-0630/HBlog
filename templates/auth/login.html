@@ -24,10 +24,11 @@
                     {{ form.passwd(class="form-control") }}
                 </div>
 
-                <a class="btn btn-info mr-2" href="{{ url_for("auth.register_page") }}"> 前往注册 </a>
-                {{ form.submit(class='btn btn-info mr-2') }}
-                {{ form.remember() }} {{ form.remember.label }}
-
+                <div class="text-right">
+                    <a class="btn btn-info mr-2" href="{{ url_for("auth.register_page") }}"> 前往注册 </a>
+                    {{ form.submit(class='btn btn-info mr-2') }}
+                    {{ form.remember() }} {{ form.remember.label }}
+                </div>
             </form>
         </div>
     </div>

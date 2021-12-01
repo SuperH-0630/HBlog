@@ -35,6 +35,15 @@ class RegisterForm(FlaskForm):
             raise ValidationError("Email already register")
 
 
+class ChangePasswdForm(FlaskForm):
+    old_passwd = PasswordField("旧密码", validators=[DataRequired()])
+    passwd = PasswordField("新密码", validators=[DataRequired(),
+                                              EqualTo("passwd_again", message="两次输入密码不相同"),
+                                              Length(8, 32)])
+    passwd_again = PasswordField("重复密码", validators=[DataRequired()])
+    submit = SubmitField("修改密码")
+
+
 @auth.route('/yours')
 @login_required
 def yours_page():
@@ -103,6 +112,22 @@ def logout_page():
     logout_user()
     flash("退出登录成功")
     return redirect(url_for("base.index_page"))
+
+
+@auth.route('/passwd', methods=['GET', 'POST'])
+@login_required
+def change_passwd_page():
+    form = ChangePasswdForm()
+    if form.validate_on_submit():
+        if not current_user.check_passwd(form.old_passwd.data):
+            flash("旧密码错误")
+            return redirect(url_for("auth.change_passwd_page"))
+        if current_user.change_passwd(form.passwd.data):
+            flash("密码修改成功")
+        else:
+            flash("密码修改失败")
+        return redirect(url_for("auth.yours_page"))
+    return render_template("auth/passwd.html", ChangePasswdForm=form)
 
 
 @auth.context_processor
