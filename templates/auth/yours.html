@@ -4,7 +4,7 @@
 
 {% block style %}
     {{ super() }}
-    <link href="{{ url_for('static', filename='styles/about_me/about_me.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='styles/auth/yours.css') }}" rel="stylesheet">
 {% endblock %}
 
 {% block context %}
@@ -20,7 +20,24 @@
                     <p class="card-text mb-2"> 留言条数：{{ msg_count }} </p>
                     <p class="card-text mb-2"> 博客：{{ blog_count }} </p>
 
-                    <a class="card-link" href="{{ url_for('auth.logout_page') }}"> 退出登录 </a>
+                    <div id="LogoutModal" class="modal fade" role="dialog" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h4 class="modal-title" id="LogoutModalLabel"> 退出登录？ </h4>
+                                </div>
+                                <div class="modal-body">
+                                    <p> 是否确认退出登录？ </p>
+                                </div>
+                                <div class="modal-footer">
+                                    <a class="btn btn-danger" href="{{ url_for('auth.logout_page') }}"> 确认 </a>
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a class="card-link" data-toggle="modal" data-target="#LogoutModal"> 退出登录 </a>
                 </div>
             </div>
         </div>
