@@ -32,7 +32,7 @@ class RegisterForm(FlaskForm):
 
     def validate_email(self, field):
         if load_user_by_email(field.data) is not None:
-            raise ValidationError("Email already register")
+            raise ValidationError("邮箱已被注册")
 
 
 class ChangePasswdForm(FlaskForm):
@@ -42,6 +42,15 @@ class ChangePasswdForm(FlaskForm):
                                               Length(8, 32)])
     passwd_again = PasswordField("重复密码", validators=[DataRequired()])
     submit = SubmitField("修改密码")
+
+
+class DeleteUserForm(FlaskForm):
+    email = StringField("邮箱", validators=[DataRequired(), Length(1, 32)])
+    submit = SubmitField("删除用户")
+
+    def validate_email(self, field):
+        if load_user_by_email(field.data) is None:
+            raise ValidationError("邮箱用户不存在")
 
 
 @auth.route('/yours')
@@ -128,6 +137,24 @@ def change_passwd_page():
             flash("密码修改失败")
         return redirect(url_for("auth.yours_page"))
     return render_template("auth/passwd.html", ChangePasswdForm=form)
+
+
+@auth.route('/delete', methods=['GET', 'POST'])
+@login_required
+def delete_user_page():
+    form = DeleteUserForm()
+    if form.validate_on_submit():
+        user = load_user_by_email(form.email.data)
+        if user is None:
+            abort(404)
+            return
+
+        if user.delete():
+            flash("用户删除成功")
+        else:
+            flash("用户删除失败")
+        return redirect(url_for("auth.delete_user_page"))
+    return render_template("auth/delete.html", DeleteUserForm=form)
 
 
 @auth.context_processor

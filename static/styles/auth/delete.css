@@ -1,0 +1,11 @@
+.delete-form {
+    background-color: white;
+    border-radius: 10px;
+    border: 2px solid #6b6882;
+    padding: 15px;
+}
+
+.modal div {
+    background-color: white;
+    border-radius: 10px;
+}

@@ -39,6 +39,10 @@
 
                     <a class="card-link" href="{{ url_for('auth.change_passwd_page') }}"> 修改密码 </a>
                     <a class="card-link" data-toggle="modal" data-target="#LogoutModal"> 退出登录 </a>
+                    {% if current_user.check_role('DeleteUser') %}
+                        <a class="card-link" href="{{ url_for('auth.delete_user_page') }}"> 删除用户 </a>
+                    {% endif %}
+
                 </div>
             </div>
         </div>
