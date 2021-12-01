@@ -83,7 +83,7 @@
                         <section class="col-12">
                             <div class="comment">
                                 <p class="comment-title h5">
-                                    {% if current_user.check_role("ReadUserInfo") %}  {# 判断是否可读取用户信息 #}
+                                    {% if show_email %}  {# 判断是否可读取用户信息 #}
                                         {{ comment.auth.email }}
                                     {% else %}
                                         {{ comment.auth.s_email }}

@@ -65,7 +65,7 @@
                             {% endif %}
 
                             <p class="msg-title h5">
-                                {% if current_user.check_role("ReadUserInfo") %}  {# 判断是否可读取用户信息 #}
+                                {% if show_email %}  {# 判断是否可读取用户信息 #}
                                     {{ msg.auth.email }}
                                 {% else %}
                                     {{ msg.auth.s_email }}

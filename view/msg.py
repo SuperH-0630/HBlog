@@ -38,7 +38,8 @@ def msg_page(page: int = 1):
                            page_list=page_list,
                            form=WriteForm(),
                            is_secret=DBBit.BIT_1,
-                           show_delete=current_user.check_role("DeleteMsg"))
+                           show_delete=current_user.check_role("DeleteMsg"),
+                           show_email=current_user.check_role("ReadUserInfo"))
 
 
 @msg.route('/write', methods=["POST"])

@@ -1,5 +1,6 @@
 from flask import Flask, Blueprint, render_template
 from typing import Optional
+from flask_login import current_user
 
 from configure import conf
 from view.base import App
@@ -19,7 +20,10 @@ def hello_page():
 def index_page():
     blog_list = BlogArticle.get_blog_list(limit=5, offset=0, not_top=True)
     msg_list = load_message_list(limit=6, offset=0, show_secret=False)
-    return render_template("index/index.html", blog_list=blog_list, msg_list=msg_list)
+    return render_template("index/index.html",
+                           blog_list=blog_list,
+                           msg_list=msg_list,
+                           show_email=current_user.check_role("ReadUserInfo"))
 
 
 @index.app_errorhandler(404)

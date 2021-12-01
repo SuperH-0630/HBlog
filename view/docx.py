@@ -78,7 +78,8 @@ def article_page(blog_id: int):
                            article=article,
                            archive_list=article.archive,
                            form=WriteCommentForm(),
-                           show_delete=current_user.check_role("DeleteComment"))
+                           show_delete=current_user.check_role("DeleteComment"),
+                           show_email=current_user.check_role("ReadUserInfo"))
 
 
 @docx.route('/comment/<int:blog>', methods=["POST"])
