@@ -13,19 +13,36 @@
             <div class="row">
                 <section class="col-12 col-lg-6 offset-lg-3 text-right">
                     <div class="create">
-                        <form class="writer clearfix" action="{{ url_for('archive.create_archive_page') }}" method="post">
-                        {{ form.hidden_tag() }}
-                        <div class="form-group text-left">
-                            {{ form.name.label }}
-                            {{ form.name(class="form-control") }}
-                        </div>
+                        <form action="{{ url_for('archive.create_archive_page') }}" method="post">
+                            {{ form.hidden_tag() }}
+                            <div class="form-group text-left">
+                                {{ form.name.label }}
+                                {{ form.name(class="form-control") }}
+                            </div>
 
-                        <div class="form-group text-left">
-                            {{ form.describe.label }}
-                            {{ form.describe(class="form-control") }}
-                        </div>
+                            <div class="form-group text-left">
+                                {{ form.describe.label }}
+                                {{ form.describe(class="form-control") }}
+                            </div>
 
-                        {{ form.submit(class="btn btn-info mb-2", value="创建归档") }}
+                            <div id="CreateModal" class="modal fade" role="dialog" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content text-left">
+                                        <div class="modal-header">
+                                            <h4 class="modal-title"> 创建归档？ </h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p> 是否确认创建归档？ </p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            {{ form.submit(class="btn btn-info", value="创建归档") }}
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="button" class="btn btn-info mb-2" data-toggle="modal" data-target="#CreateModal"> 创建归档 </button>
                     </form>
                     </div>
                 </section>
