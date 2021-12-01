@@ -16,7 +16,25 @@
                     {{ form.hidden_tag() }}
                     {{ form.context(class="form-control mb-2", rows="5") }}
                     {{ form.secret() }} {{ form.secret.label }}
-                    {{ form.submit(class="btn btn-info mb-2", value="留言") }}
+
+                    <div id="MsgModal" class="modal fade" role="dialog" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content text-left">
+                                <div class="modal-header">
+                                    <h4 class="modal-title" id="MsgModalLabel"> 确认留言？ </h4>
+                                </div>
+                                <div class="modal-body">
+                                    <p> 是否确认留言？请注意网络用语文明。 </p>
+                                </div>
+                                <div class="modal-footer">
+                                    {{ form.submit(class="btn btn-info", value="确认") }}
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn btn-info mb-2" data-toggle="modal" data-target="#MsgModal"> 留言 </button>
                 </form>
             </section>
         </div>
