@@ -13,7 +13,7 @@ import core.msg
 class AnonymousUser(AnonymousUserMixin):
     def __init__(self):
         super(AnonymousUser, self).__init__()
-        self.role = 3  # 默认角色
+        self.role = 4  # 默认角色
         self.email = ""  # 无邮箱
         self.passwd_hash = ""  # 无密码
 
