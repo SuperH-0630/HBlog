@@ -3,7 +3,7 @@ from sql import db
 
 def read_comment(blog_id: int):
     """ 读取文章的 comment """
-    cur = db.search(columns=["ID", "Auth", "Email", "Context", "UpdateTime"],
+    cur = db.search(columns=["CommentID", "Auth", "Email", "Context", "UpdateTime"],
                     table="comment_user",
                     where=f"BlogID={blog_id}")
     if cur is None or cur.rowcount == 0:
