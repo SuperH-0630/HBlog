@@ -45,4 +45,14 @@ conf["about-me-project"] = _conf["info"]["project"]
 conf["about-me-skill"] = _conf["info"]["skill"]
 conf["about-me-read"] = _conf["info"]["read"]
 
-conf["foot-info"] = _conf["info"]["foot-info"]
+conf["foot-info"] = f'{_conf["info"]["foot-info"]} Power by HBlog'
+
+aliyun = _conf.get("aliyun")
+if aliyun is None:
+    conf["aliyun"] = False
+else:
+    conf["aliyun"] = True
+    conf["aliyun-key"] = aliyun["Key"]
+    conf["aliyun-secret"] = aliyun["Secret"]
+    conf["aliyun-bucket-endpoint"] = aliyun["Bucket-Endpoint"]
+    conf["aliyun-bucket-name"] = aliyun["Bucket-Name"]

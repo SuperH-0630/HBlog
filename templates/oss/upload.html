@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %} 上传文件 {% endblock %}
+
+{% block style %}
+    {{ super() }}
+    <link href="{{ url_for('static', filename='styles/oss/upload.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block context %}
+    <section id="base" class="container mt-3">
+    <div class="row">
+        <div class="col-12 col-lg-6 offset-lg-3">
+            <form method="post" action="#" class="upload-form" enctype="multipart/form-data">
+                {{ UploadForm.hidden_tag() }}
+
+                <div class="form-group pb-2">
+                    {{ UploadForm.file(class="form-control") }}
+                </div>
+
+                <div class="text-right">
+                    {{ UploadForm.submit(class='btn btn-info mr-2') }}
+                </div>
+            </form>
+        </div>
+    </div>
+    </section>
+{% endblock %}

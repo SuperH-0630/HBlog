@@ -1,13 +1,13 @@
 from flask import Flask, Blueprint, render_template, redirect, flash, url_for, request, abort
 from flask_login import login_required, login_user, current_user, logout_user
 from flask_mail import Mail
+from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, ValidationError
 from wtforms.validators import DataRequired, Length, EqualTo
 from typing import Optional
 
 from view.base import App
 from core.user import User, load_user_by_email
-from flask_wtf import FlaskForm
 from send_email import send_msg
 
 auth = Blueprint("auth", __name__)
