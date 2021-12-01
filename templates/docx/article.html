@@ -18,6 +18,7 @@
                     {% for archive in article.archive %}
                         <span class="badge badge-info"> {{ archive.name }} </span>
                     {% endfor %}
+                    <a href="{{ url_for('docx.article_down_page', blog_id=article.blog_id) }}"> 下载 </a>
                     <hr>
 
                     {{ article.context | safe }}

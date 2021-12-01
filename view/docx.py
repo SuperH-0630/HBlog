@@ -1,4 +1,4 @@
-from flask import Flask, Blueprint, render_template, abort, redirect, url_for, flash
+from flask import Flask, Blueprint, render_template, abort, redirect, url_for, flash, make_response
 from flask_wtf import FlaskForm
 from flask_pagedown import PageDown
 from flask_pagedown.fields import PageDownField
@@ -80,6 +80,18 @@ def article_page(blog_id: int):
                            form=WriteCommentForm(),
                            show_delete=current_user.check_role("DeleteComment"),
                            show_email=current_user.check_role("ReadUserInfo"))
+
+
+@docx.route('/down/<int:blog_id>')
+def article_down_page(blog_id: int):
+    article = load_blog_by_id(blog_id)
+    if article is None:
+        abort(404)
+        return
+
+    response = make_response(article.context)
+    response.headers["Content-Disposition"] = f"attachment; filename={article.title}.html"
+    return response
 
 
 @docx.route('/comment/<int:blog>', methods=["POST"])
