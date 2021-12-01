@@ -10,3 +10,8 @@
     color: black;
     text-decoration: none;
 }
+
+#CommentModal div {
+    background-color: white;
+    border-radius: 10px;
+}
