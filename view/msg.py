@@ -33,13 +33,17 @@ def msg_page(page: int = 1):
                                  show_secret=current_user.check_role("ReadSecretMsg"))  # 判断是否可读取私密内容
     max_page = App.get_max_page(Message.get_msg_count(), 20)
     page_list = App.get_page("docx.docx_page", page, max_page)
-    return render_template("msg/msg.html", msg_list=msg_list, page_list=page_list, form=WriteForm(),
-                           is_secret=DBBit.BIT_1)
+    return render_template("msg/msg.html",
+                           msg_list=msg_list,
+                           page_list=page_list,
+                           form=WriteForm(),
+                           is_secret=DBBit.BIT_1,
+                           show_delete=current_user.check_role("DeleteMsg"))
 
 
 @msg.route('/write', methods=["POST"])
 @login_required
-def write_page():
+def write_msg_page():
     form = WriteForm()
     if form.validate_on_submit():
         auth: User = current_user
@@ -56,6 +60,19 @@ def write_page():
 
         return redirect(url_for("msg.msg_page", page=1))
     abort(404)
+
+
+@msg.route('/delete/<int:msg_id>')
+@login_required
+def delete_msg_page(msg_id: int):
+    if not current_user.check_role("DeleteMsg"):
+        abort(403)
+        return
+    if Message(msg_id, None, None).delete():
+        flash("留言删除成功")
+    else:
+        flash("留言删除失败")
+    return redirect(url_for("msg.msg_page", page=1))
 
 
 @msg.context_processor

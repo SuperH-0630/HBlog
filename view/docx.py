@@ -140,9 +140,9 @@ def delete_blog_page(blog_id: int):
         abort(403)
         return
     if BlogArticle(blog_id, None, None, None, None).delete():
-        flash("归档博文成功")
+        flash("博文删除成功")
     else:
-        flash("归档博文失败")
+        flash("博文删除失败")
     return redirect(url_for("docx.docx_page", page=1))
 
 

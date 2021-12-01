@@ -13,7 +13,7 @@ def load_message_list(limit: Optional[int] = None, offset: Optional[int] = None,
 
 
 class Message:
-    def __init__(self, msg_id, auth: "core.user.User", context, secret, update_time):
+    def __init__(self, msg_id, auth: "Optional[core.user.User]", context, secret=False, update_time=None):
         self.msg_id = msg_id
         self.auth = auth
         self.context = context

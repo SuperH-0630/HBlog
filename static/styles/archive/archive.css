@@ -13,3 +13,8 @@
     border: 2px solid #1685a9;
     padding: 15px;
 }
+
+.modal div {
+    background-color: white;
+    border-radius: 10px;
+}

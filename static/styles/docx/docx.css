@@ -37,7 +37,7 @@
     border-radius: 10px;
 }
 
-#CreateModal div {
+.modal div {
     background-color: white;
     border-radius: 10px;
 }
