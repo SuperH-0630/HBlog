@@ -6,7 +6,6 @@ from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired, Length
 
 from view.base import App
-from core.user import User
 from core.archive import Archive
 
 archive = Blueprint("archive", __name__)
@@ -25,13 +24,12 @@ def archive_page():
     return render_template("archive/archive.html", archive_list=archive_list, form=CreateArchiveForm())
 
 
-@archive.route("create-archive", methods=["POST"])
+@archive.route("create", methods=["POST"])
 @login_required
 def create_archive_page():
     form = CreateArchiveForm()
     if form.validate_on_submit():
-        auth: User = current_user
-        if not auth.check_role("WriteBlog"):  # 检查相应的权限
+        if not current_user.check_role("WriteBlog"):  # 检查相应的权限
             abort(403)
             return
 
@@ -41,6 +39,19 @@ def create_archive_page():
             flash(f"创建归档 {form.name.data} 失败")
         return redirect(url_for("archive.archive_page"))
     abort(404)
+
+
+@archive.route("delete/<int:archive_id>")
+@login_required
+def delete_archive(archive_id: int):
+    if not current_user.check_role("DeleteBlog"):
+        abort(403)
+        return
+    if Archive(None, None, archive_id).delete():
+        flash("归档删除成功")
+    else:
+        flash("归档删除失败")
+    return redirect(url_for("archive.archive_page"))
 
 
 @archive.context_processor

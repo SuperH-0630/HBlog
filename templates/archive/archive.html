@@ -35,7 +35,7 @@
                                             <p> 是否确认创建归档？ </p>
                                         </div>
                                         <div class="modal-footer">
-                                            {{ form.submit(class="btn btn-info", value="创建归档") }}
+                                            {{ form.submit(class="btn btn-info", value="确认") }}
                                             <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
                                         </div>
                                     </div>
@@ -59,6 +59,28 @@
                 <p> {{ archive[2] }} </p>
                 <p> 篇数: {{ archive[3] }} </p>
                 <a class="btn btn-info" href="{{ url_for("docx.archive_page", archive=archive[0], page=1) }}"> 进入 </a>
+                {% if current_user.check_role("DeleteBlog") %}
+                    <div id="DeleteModal{{archive[0]}}" class="modal fade" role="dialog" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content text-left">
+                                <div class="modal-header">
+                                    <h4 class="modal-title"> 确认删除归档？ </h4>
+                                </div>
+                                <div class="modal-body">
+                                    <p> 是否确认删除归档 {{ archive[1] }}？ </p>
+                                </div>
+                                <div class="modal-footer">
+                                    <a class="btn btn-danger"
+                                       href="{{ url_for("archive.delete_archive", archive_id=archive[0]) }}"> 删除 </a>
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal"> 取消 </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn btn-danger"
+                            data-toggle="modal" data-target="#DeleteModal{{archive[0]}}"> 删除归档 </button>
+                {% endif %}
             </div>
         {% endfor %}
     </section>
