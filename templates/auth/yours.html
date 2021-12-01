@@ -42,7 +42,9 @@
                     {% if current_user.check_role('DeleteUser') %}
                         <a class="card-link" href="{{ url_for('auth.delete_user_page') }}"> 删除用户 </a>
                     {% endif %}
-
+                    {% if current_user.check_role('ConfigureSystem') %}
+                        <a class="card-link" href="{{ url_for('auth.role_page') }}"> 角色设置 </a>
+                    {% endif %}
                 </div>
             </div>
         </div>

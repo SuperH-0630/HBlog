@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %} 角色管理 {% endblock %}
+
+{% block style %}
+    {{ super() }}
+    <link href="{{ url_for('static', filename='styles/auth/role.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block context %}
+    <section id="base" class="container mt-3">
+        <div class="row">
+            <div class="col-12 col-lg-6 offset-lg-3">
+                <ul id="RoleTab" class="nav nav-pills justify-content-center mb-2">
+                    <li class="active nav-item">
+                        <a href="#create" class="nav-link" data-toggle="tab"> 创建角色 </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#drop" class="nav-link" data-toggle="tab"> 删除角色 </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#set" class="nav-link" data-toggle="tab"> 设置角色 </a>
+                    </li>
+                </ul>
+
+                <div id="RoleTabDiv">
+                    <div id="RoleTabContent" class="tab-content">
+                        <div class="tab-pane fade active" id="create">
+                            <form method="post" action="{{ url_for('auth.role_create_page') }}" class="role-form">
+                                {{ CreateRoleForm.hidden_tag() }}
+
+                                <div class="form-group">
+                                    {{ CreateRoleForm.name.label }}
+                                    {{ CreateRoleForm.name(class="form-control") }}
+                                </div>
+
+                                <div class="form-group">
+                                    {{ CreateRoleForm.authority.label }}
+                                    {{ CreateRoleForm.authority(class="form-control") }}
+                                </div>
+
+                                <div id="CreateModal" class="modal fade" role="dialog" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h4 class="modal-title"> 创建角色？ </h4>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p> 是否确认创建角色？ </p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                {{ CreateRoleForm.submit(class='btn btn-info', value='确认') }}
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                                    取消
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="text-right">
+                                    <a class="btn btn-info" data-toggle="modal" data-target="#CreateModal"> 创建角色 </a>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="tab-pane fade" id="drop">
+                            <form method="post" action="{{ url_for('auth.role_delete_page') }}" class="role-form">
+                                {{ DeleteRoleForm.hidden_tag() }}
+
+                                <div class="form-group">
+                                    {{ DeleteRoleForm.name.label }}
+                                    {{ DeleteRoleForm.name(class="form-control") }}
+                                </div>
+
+                                <div id="DeleteModal" class="modal fade" role="dialog" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h4 class="modal-title"> 删除角色？ </h4>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p> 是否确认删除角色？ </p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                {{ DeleteRoleForm.submit(class='btn btn-danger', value='确认') }}
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                                    取消
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="text-right">
+                                    <a class="btn btn-danger" data-toggle="modal" data-target="#DeleteModal"> 删除角色 </a>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="tab-pane fade" id="set">
+                            <form method="post" action="{{ url_for('auth.role_set_page') }}" class="role-form">
+                                {{ SetRoleForm.hidden_tag() }}
+
+                                <div class="form-group">
+                                    {{ SetRoleForm.email.label }}
+                                    {{ SetRoleForm.email(class="form-control") }}
+                                </div>
+
+                                <div class="form-group">
+                                    {{ SetRoleForm.name.label }}
+                                    {{ SetRoleForm.name(class="form-control") }}
+                                </div>
+
+                                <div id="SetModal" class="modal fade" role="dialog" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h4 class="modal-title"> 设置角色？ </h4>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p> 是否确认设置角色？ </p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                {{ SetRoleForm.submit(class='btn btn-danger', value='确认') }}
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                                    取消
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="text-right">
+                                    <a class="btn btn-danger" data-toggle="modal" data-target="#SetModal"> 设置角色 </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block javascript %}
+    {{ super() }}
+    <script>
+        $('#RoleTab .active a').tab('show');  // 显示第一个 tab
+    </script>
+{% endblock %}

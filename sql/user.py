@@ -2,6 +2,14 @@ from sql import db
 from sql.base import DBBit
 import core.user
 
+from typing import List
+
+
+role_authority = ["WriteBlog", "WriteComment", "WriteMsg", "CreateUser",
+                  "ReadBlog", "ReadComment", "ReadMsg", "ReadSecretMsg", "ReadUserInfo",
+                  "DeleteBlog", "DeleteComment", "DeleteMsg", "DeleteUser",
+                  "ConfigureSystem", "ReadSystem"]
+
 
 def read_user(email: str):
     """ 读取用户 """
@@ -34,6 +42,41 @@ def delete_user(user_id: int):
     if cur is None:
         return False
     cur = db.delete(table="user", where=f"ID={user_id}")
+    if cur is None or cur.rowcount == 0:
+        return False
+    return True
+
+
+def create_role(name: str, authority: List[str]):
+    cur = db.insert(table="role", columns=["RoleName"], values=f"'{name}'", not_commit=True)
+    if cur is None or cur.rowcount == 0:
+        return False
+
+    kw = {}
+    for i in role_authority:
+        kw[i] = '0'
+    for i in authority:
+        if i in role_authority:
+            kw[i] = '1'
+
+    cur = db.update(table='role', kw=kw, where=f"RoleName='{name}'")
+    if cur is None or cur.rowcount == 0:
+        return False
+    return True
+
+
+def delete_role(name: str):
+    cur = db.delete(table="role", where=f"RoleName='{name}'")
+    if cur is None or cur.rowcount == 0:
+        return False
+    return True
+
+
+def set_user_role(name: str, user_id: str):
+    role_id = get_role_id_by_name(name)
+    if role_id is None:
+        return False
+    cur = db.update(table="user", kw={"Role": f"{role_id}"}, where=f"ID={user_id}")
     if cur is None or cur.rowcount == 0:
         return False
     return True
@@ -72,7 +115,15 @@ def check_role(role: int, operate: str):
 
 def check_role_by_name(role: str, operate: str):
     """ 检查角色权限（通过角色名） """
-    cur = db.search(columns=[operate], table="role", where=f"RoleName='{role}")
+    cur = db.search(columns=[operate], table="role", where=f"RoleName='{role}'")
     if cur is None or cur.rowcount == 0:
         return False
     return cur.fetchone()[0] == DBBit.BIT_1
+
+
+def get_role_id_by_name(role: str):
+    """ 检查角色权限（通过角色名） """
+    cur = db.search(columns=["RoleID"], table="role", where=f"RoleName='{role}'")
+    if cur is None or cur.rowcount == 0:
+        return None
+    return cur.fetchone()[0]

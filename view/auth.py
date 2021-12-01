@@ -53,6 +53,23 @@ class DeleteUserForm(FlaskForm):
             raise ValidationError("邮箱用户不存在")
 
 
+class CreateRoleForm(FlaskForm):
+    name = StringField("角色名称", validators=[DataRequired(), Length(1, 20)])
+    authority = StringField("权限", validators=[Length(0, 100)])
+    submit = SubmitField("创建角色")
+
+
+class DeleteRoleForm(FlaskForm):
+    name = StringField("角色名称", validators=[DataRequired(), Length(1, 20)])
+    submit = SubmitField("删除角色")
+
+
+class SetRoleForm(FlaskForm):
+    email = StringField("邮箱", validators=[DataRequired(), Length(1, 32)])
+    name = StringField("角色名称", validators=[DataRequired(), Length(1, 20)])
+    submit = SubmitField("设置角色")
+
+
 @auth.route('/yours')
 @login_required
 def yours_page():
@@ -142,6 +159,10 @@ def change_passwd_page():
 @auth.route('/delete', methods=['GET', 'POST'])
 @login_required
 def delete_user_page():
+    if not current_user.check_role("DeleteUser"):
+        abort(403)
+        return
+
     form = DeleteUserForm()
     if form.validate_on_submit():
         user = load_user_by_email(form.email.data)
@@ -155,6 +176,79 @@ def delete_user_page():
             flash("用户删除失败")
         return redirect(url_for("auth.delete_user_page"))
     return render_template("auth/delete.html", DeleteUserForm=form)
+
+
+@auth.route('/role', methods=['GET'])
+@login_required
+def role_page():
+    if not current_user.check_role("ConfigureSystem"):
+        abort(403)
+        return
+    return render_template("auth/role.html",
+                           CreateRoleForm=CreateRoleForm(),
+                           DeleteRoleForm=DeleteRoleForm(),
+                           SetRoleForm=SetRoleForm())
+
+
+@auth.route('/role-create', methods=['POST'])
+@login_required
+def role_create_page():
+    form = CreateRoleForm()
+    if form.validate_on_submit():
+        if not current_user.check_role("ConfigureSystem"):
+            abort(403)
+            return
+
+        if User.create_role(form.name.data, form.authority.data.replace(" ", "").split(";")):
+            flash("角色创建成功")
+        else:
+            flash("角色创建失败")
+        return redirect(url_for("auth.role_page"))
+
+    abort(404)
+    return
+
+
+@auth.route('/role-delete', methods=['POST'])
+@login_required
+def role_delete_page():
+    form = DeleteRoleForm()
+    if form.validate_on_submit():
+        if not current_user.check_role("ConfigureSystem"):
+            abort(403)
+            return
+
+        if User.delete_role(form.name.data):
+            flash("角色删除成功")
+        else:
+            flash("角色删除失败")
+        return redirect(url_for("auth.role_page"))
+
+    abort(404)
+    return
+
+
+@auth.route('/role-set', methods=['POST'])
+@login_required
+def role_set_page():
+    form = SetRoleForm()
+    if form.validate_on_submit():
+        if not current_user.check_role("ConfigureSystem"):
+            abort(403)
+            return
+
+        user = load_user_by_email(form.email.data)
+        if user is not None:
+            if user.set_user_role(form.name.data):
+                flash("角色设置成功")
+            else:
+                flash("角色设置失败")
+        else:
+            flash("邮箱未注册")
+        return redirect(url_for("auth.role_page"))
+
+    abort(404)
+    return
 
 
 @auth.context_processor
