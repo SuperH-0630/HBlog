@@ -1,6 +1,8 @@
 from sql.comment import read_comment, create_comment, get_user_comment_count, delete_comment
 import core.user
 
+from typing import Optional
+
 
 def load_comment_list(blog_id: int):
     comment_list = read_comment(blog_id)
@@ -11,7 +13,10 @@ def load_comment_list(blog_id: int):
 
 
 class Comment:
-    def __init__(self, comment_id, blog_id: int, auth: "core.user.User", context: str, update_time=None):
+    def __init__(self, comment_id,
+                 blog_id: Optional[int],
+                 auth: "Optional[core.user.User]",
+                 context: Optional[str], update_time=None):
         self.comment_id = comment_id
         self.blog_id = blog_id
         self.auth = auth

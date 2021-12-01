@@ -59,6 +59,27 @@
                     <hr>
 
                     {% for comment in article.comment %}
+
+                        {% if show_delete %}
+                            <div id="DeleteModal{{comment.comment_id}}" class="modal fade" role="dialog" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content text-left">
+                                        <div class="modal-header">
+                                            <h4 class="modal-title"> 确认删除评论？ </h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p> 是否确认删除评论？ </p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <a class="btn btn-danger"
+                                               href="{{ url_for("docx.delete_comment_page", comment_id=comment.comment_id) }}"> 删除 </a>
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal"> 取消 </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+
                         <section class="col-12">
                             <div class="comment">
                                 <p class="comment-title h5">
@@ -67,6 +88,12 @@
                                     {% else %}
                                         {{ comment.auth.s_email }}
                                     {% endif %}
+
+                                    {% if show_delete %}
+                                        <a class="mb-2"
+                                            data-toggle="modal" data-target="#DeleteModal{{comment.comment_id}}"> &times; </a>
+                                    {% endif %}
+
                                     <br>
                                     <small> {{ comment.update_time }} </small>
                                 </p>

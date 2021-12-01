@@ -77,7 +77,8 @@ def article_page(blog_id: int):
     return render_template("docx/article.html",
                            article=article,
                            archive_list=article.archive,
-                           form=WriteCommentForm())
+                           form=WriteCommentForm(),
+                           show_delete=current_user.check_role("DeleteComment"))
 
 
 @docx.route('/comment/<int:blog>', methods=["POST"])
@@ -143,6 +144,19 @@ def delete_blog_page(blog_id: int):
         flash("博文删除成功")
     else:
         flash("博文删除失败")
+    return redirect(url_for("docx.docx_page", page=1))
+
+
+@docx.route("delete_comment/<int:comment_id>")
+@login_required
+def delete_comment_page(comment_id: int):
+    if not current_user.check_role("DeleteComment"):
+        abort(403)
+        return
+    if Comment(comment_id, None, None, None).delete():
+        flash("博文评论成功")
+    else:
+        flash("博文评论失败")
     return redirect(url_for("docx.docx_page", page=1))
 
 
