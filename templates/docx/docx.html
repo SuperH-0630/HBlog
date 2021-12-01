@@ -34,9 +34,24 @@
 
                             {{ form.context(class="form-control mb-2", rows="15") }}
 
-                            <div class="text-right">
-                                {{ form.submit(class="btn btn-info mb-2", value="发表") }}
+                            <div id="CreateModal" class="modal fade" role="dialog" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content text-left">
+                                        <div class="modal-header">
+                                            <h4 class="modal-title"> 确认发表？ </h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p> 是否确认发表博文？请注意校对文本。 </p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            {{ form.submit(class="btn btn-info", value="确认") }}
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
+
+                            <button type="button" class="btn btn-info mb-2" data-toggle="modal" data-target="#CreateModal"> 发表 </button>
                         </form>
                     </div>
                 </div>

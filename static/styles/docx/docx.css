@@ -36,3 +36,8 @@
     border: 2px solid #0074D9;
     border-radius: 10px;
 }
+
+#CreateModal div {
+    background-color: white;
+    border-radius: 10px;
+}
