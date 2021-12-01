@@ -21,7 +21,10 @@ class CreateArchiveForm(FlaskForm):
 @archive.route('/')
 def archive_page():
     archive_list = Archive.get_archive_list()
-    return render_template("archive/archive.html", archive_list=archive_list, form=CreateArchiveForm())
+    return render_template("archive/archive.html",
+                           archive_list=archive_list,
+                           form=CreateArchiveForm(),
+                           show_delete=current_user.check_role("DeleteBlog"))
 
 
 @archive.route("create", methods=["POST"])
@@ -43,7 +46,7 @@ def create_archive_page():
 
 @archive.route("delete/<int:archive_id>")
 @login_required
-def delete_archive(archive_id: int):
+def delete_archive_page(archive_id: int):
     if not current_user.check_role("DeleteBlog"):
         abort(403)
         return

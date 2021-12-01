@@ -59,7 +59,7 @@
                 <p> {{ archive[2] }} </p>
                 <p> 篇数: {{ archive[3] }} </p>
                 <a class="btn btn-info" href="{{ url_for("docx.archive_page", archive=archive[0], page=1) }}"> 进入 </a>
-                {% if current_user.check_role("DeleteBlog") %}
+                {% if show_delete %}
                     <div id="DeleteModal{{archive[0]}}" class="modal fade" role="dialog" aria-hidden="true">
                         <div class="modal-dialog">
                             <div class="modal-content text-left">
@@ -71,7 +71,7 @@
                                 </div>
                                 <div class="modal-footer">
                                     <a class="btn btn-danger"
-                                       href="{{ url_for("archive.delete_archive", archive_id=archive[0]) }}"> 删除 </a>
+                                       href="{{ url_for("archive.delete_archive_page", archive_id=archive[0]) }}"> 删除 </a>
                                     <button type="button" class="btn btn-secondary" data-dismiss="modal"> 取消 </button>
                                 </div>
                             </div>

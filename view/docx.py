@@ -48,7 +48,8 @@ def docx_page(page: int = 1):
                            blog_list=blog_list,
                            is_top=DBBit.BIT_1,
                            page_list=page_list,
-                           form=WriteBlogForm())
+                           form=WriteBlogForm(),
+                           show_delete=current_user.check_role("DeleteBlog"))
 
 
 @docx.route('/<int:archive>/<int:page>')
@@ -130,6 +131,19 @@ def create_docx_page():
 
         return redirect(url_for("docx.docx_page", page=1))
     abort(404)
+
+
+@docx.route("delete/<int:blog_id>")
+@login_required
+def delete_blog_page(blog_id: int):
+    if not current_user.check_role("DeleteBlog"):
+        abort(403)
+        return
+    if BlogArticle(blog_id, None, None, None, None).delete():
+        flash("归档博文成功")
+    else:
+        flash("归档博文失败")
+    return redirect(url_for("docx.docx_page", page=1))
 
 
 @docx.context_processor
