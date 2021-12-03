@@ -1,3 +1,17 @@
+from configure import configure
+import os
+
+
+env_dict = os.environ
+hblog_conf = env_dict.get("hblog_conf")
+if hblog_conf is None:
+    print("执行配置文件: ./etc/conf.json")
+    configure("./etc/conf.json")
+else:
+    print(f"执行配置文件: {hblog_conf}")
+    configure(hblog_conf)
+
+
 from view import WebApp
 from waitress import serve
 
