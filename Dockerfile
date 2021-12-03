@@ -3,5 +3,6 @@ WORKDIR /app
 COPY . .
 RUN ["python", "-m", "pip", "install", "--upgrade", "pip"]
 RUN ["python", "-m", "pip", "install", "-r", "requirements.txt"]
-EXPOSE 8080
-ENTRYPOINT ["python", "main.py"]
+RUN ["python", "-m", "pip", "install", "gunicorn"]
+EXPOSE 80
+ENTRYPOINT ["python", "-m", "gunicorn", "-c", "./gunicorn.conf.py", "main:app"]
