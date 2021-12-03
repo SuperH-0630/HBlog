@@ -3,13 +3,6 @@
     border-radius: 10px;
     border: 2px solid #0074D9;
     background-color: white;
-
-    min-width: 30em;
-    height: 4em;
-    line-height: 4em;
-}
-
-.docx a{
     padding: 15px;
 }
 

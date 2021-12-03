@@ -1,3 +1,7 @@
+html {
+    word-break: break-word;
+}
+
 body {
     overflow-y: scroll;
     overflow-x: hidden;

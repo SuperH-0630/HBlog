@@ -3,10 +3,7 @@
     border-radius: 10px;
     border-width: 2px;
     border-style: solid;
-
-    min-width: 30em;
-    height: 4em;
-    line-height: 4em;
+    padding: 15px;
 }
 
 .docx {
@@ -20,7 +17,6 @@
 }
 
 .docx a, .docx-top a {
-    padding: 15px;
     color: black;
     text-decoration: none;
 }
