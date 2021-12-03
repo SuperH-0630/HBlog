@@ -1,4 +1,4 @@
-from configure import configure
+from configure import configure, conf
 import os
 
 
@@ -18,6 +18,9 @@ from waitress import serve
 
 web = WebApp(__name__)
 app = web.get_app()
+
+if conf["server-name"] is not None:
+    app.config['SERVER_NAME'] = conf["server-name"]
 
 
 if __name__ == '__main__':

@@ -27,6 +27,7 @@ def configure(conf_file: str, encoding="utf-8"):
     conf["email_sender"] = str(_email["sender"])
 
     conf["secret-key"] = str(_conf.get("secret-key", "HBlog-R-Salt"))
+    conf["server-name"] = _conf.get("server-name")
 
     introduce = _conf["info"]["introduce"]
     introduce_list = []
