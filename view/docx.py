@@ -18,7 +18,7 @@ from core.archive import load_archive_by_name
 
 docx = Blueprint("docx", __name__)
 app: Optional[Flask] = None
-allow_tag = ['a', 'abbr', 'acronym', 'b', 'blockquote', 'code', 'em', 'i', 'li', 'ol', 'pre', 'strong', 'small',
+allow_tag = ['a', 'abbr', 'acronym', 'b', 'br', 'blockquote', 'code', 'em', 'i', 'li', 'ol', 'pre', 'strong', 'small',
              'ul', 'h1', 'h2', 'h3', 'h4', 'h5' 'h6', 'p']
 
 
