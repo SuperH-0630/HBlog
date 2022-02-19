@@ -35,7 +35,7 @@ time_handle.setFormatter(log_formatter)
 gunicorn_access_logger = logging.getLogger("gunicorn.access")
 gunicorn_access_logger.setLevel(logging.INFO)
 
-accesslog = os.path.join(hblog_path, "/gunicorn_access.log")
+accesslog = os.path.join(hblog_path, "gunicorn_access.log")
 time_handle = logging.handlers.TimedRotatingFileHandler(accesslog, when="d", backupCount=10, encoding='utf-8')
 gunicorn_access_logger.addHandler(time_handle)
 time_handle.setFormatter(log_formatter)
