@@ -13,6 +13,7 @@ app: Optional[Flask] = None
 
 @index.route('/')
 def hello_page():
+    IndexApp.print_load_page_log(f"hello")
     return render_template("index/hello.html")
 
 
@@ -20,6 +21,7 @@ def hello_page():
 def index_page():
     blog_list = BlogArticle.get_blog_list(limit=5, offset=0, not_top=True)
     msg_list = load_message_list(limit=6, offset=0, show_secret=False)
+    IndexApp.print_load_page_log(f"index")
     return render_template("index/index.html",
                            blog_list=blog_list,
                            msg_list=msg_list,
@@ -28,21 +30,25 @@ def index_page():
 
 @index.app_errorhandler(404)
 def error_404(e):
+    IndexApp.print_load_page_log(f"404")
     return render_template("index/error.html", error_code="404", error_info=f"你似乎来到一片荒漠：{e}"), 404
 
 
 @index.app_errorhandler(405)
-def error_404(e):
+def error_405(e):
+    IndexApp.print_load_page_log(f"405")
     return render_template("index/error.html", error_code="404", error_info=f"请求错误：{e}"), 405
 
 
 @index.app_errorhandler(403)
 def error_403(e):
+    IndexApp.print_load_page_log(f"403")
     return render_template("index/error.html", error_code="404", error_info=f"权限不足：{e}"), 403
 
 
 @index.app_errorhandler(500)
 def error_500(e):
+    IndexApp.print_load_page_log(f"500")
     return render_template("index/error.html", error_code="404", error_info=f"服务器出问题啦：{e}"), 500
 
 

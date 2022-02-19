@@ -16,20 +16,15 @@ hblog_path = os.path.join(os.environ['HOME'], "hblog")
 os.makedirs(hblog_path, exist_ok=True, mode=0o775)
 
 # 设置访问日志和错误信息日志路径
-log_format = ("[%(levelname)s] %(name)s %(asctime)s "
-              "(%(pathname)s:%(lineno)d %(funcName)s) "
+log_format = ("[%(levelname)s]:%(name)s:%(asctime)s "
+              "(%(filename)s:%(lineno)d %(funcName)s) "
               "%(process)d %(thread)d "
               "%(message)s")
 log_formatter = logging.Formatter(log_format)
 
-console_handle = logging.StreamHandler(sys.stdout)
-console_handle.setFormatter(log_formatter)
-
 # 错误日志
 gunicorn_error_logger = logging.getLogger("gunicorn.error")
 gunicorn_error_logger.setLevel(logging.WARNING)
-
-gunicorn_error_logger.addHandler(console_handle)
 
 errorlog = os.path.join(hblog_path, "gunicorn_error.log")
 time_handle = logging.handlers.TimedRotatingFileHandler(errorlog, when="d", backupCount=30, encoding='utf-8')
@@ -39,8 +34,6 @@ time_handle.setFormatter(log_formatter)
 # 一般日志
 gunicorn_access_logger = logging.getLogger("gunicorn.access")
 gunicorn_access_logger.setLevel(logging.INFO)
-
-gunicorn_access_logger.addHandler(console_handle)
 
 accesslog = os.path.join(hblog_path, "/gunicorn_access.log")
 time_handle = logging.handlers.TimedRotatingFileHandler(accesslog, when="d", backupCount=10, encoding='utf-8')

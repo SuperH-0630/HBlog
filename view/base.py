@@ -1,8 +1,13 @@
-from flask import Flask, url_for
+import os.path
+
+from flask import Flask, url_for, request, current_app
 from flask_mail import Mail
-from flask_login import LoginManager
+from flask_login import LoginManager, current_user
 from typing import Optional
 
+import sys
+import logging.handlers
+import logging
 from configure import conf
 from core.user import AnonymousUser
 
@@ -24,6 +29,18 @@ class App:
         self._app.config["MAIL_PASSWORD"] = conf['email_passwd']
 
         self.mail = Mail(self._app)
+
+        self._app.logger.setLevel(conf["log-level"])
+        if conf["log-home"] is None:
+            if conf["log-home"]:
+                handle = logging.handlers.TimedRotatingFileHandler(
+                    os.path.join(conf["log-home"], f"flask-{os.getpid()}.log"))
+                handle.setFormatter(logging.Formatter(conf["log-format"]))
+                self._app.logger.addHandler(handle)
+        else:
+            handle = logging.StreamHandler(sys.stderr)
+            handle.setFormatter(logging.Formatter(conf["log-format"]))
+            self._app.logger.addHandler(handle)
 
     def get_app(self) -> Flask:
         return self._app
@@ -68,3 +85,58 @@ class App:
                           [f"{count - 1}", url_for(url, page=count - 1)],
                           [f"{count}", url_for(url, page=count)]]
         return page_list
+
+    @staticmethod
+    def __get_log_request_info():
+        return (f"user: '{current_user.email}' "
+                f"url: '{request.url}' blueprint: '{request.blueprint}' "
+                f"args: {request.args} form: {request.form} "
+                f"accept_encodings: '{request.accept_encodings}' "
+                f"accept_charsets: '{request.accept_charsets}' "
+                f"accept_mimetypes: '{request.accept_mimetypes}' "
+                f"accept_languages: '{request.accept_languages}'")
+
+    @staticmethod
+    def print_load_page_log(page: str):
+        current_app.logger.debug(
+            f"[{request.method}] Load - '{page}' " + App.__get_log_request_info())
+
+    @staticmethod
+    def print_form_error_log(opt: str):
+        current_app.logger.warning(
+            f"[{request.method}] '{opt}' - Bad form " + App.__get_log_request_info())
+
+    @staticmethod
+    def print_sys_opt_fail_log(opt: str):
+        current_app.logger.error(
+            f"[{request.method}] System {opt} - fail " + App.__get_log_request_info())
+
+    @staticmethod
+    def print_sys_opt_success_log(opt: str):
+        current_app.logger.warning(
+            f"[{request.method}] System {opt} - success " + App.__get_log_request_info())
+
+    @staticmethod
+    def print_user_opt_fail_log(opt: str):
+        current_app.logger.debug(
+            f"[{request.method}] User {opt} - fail " + App.__get_log_request_info())
+
+    @staticmethod
+    def print_user_opt_success_log(opt: str):
+        current_app.logger.debug(
+            f"[{request.method}] User {opt} - success " + App.__get_log_request_info())
+
+    @staticmethod
+    def print_user_opt_error_log(opt: str):
+        current_app.logger.warning(
+            f"[{request.method}] User {opt} - system fail " + App.__get_log_request_info())
+
+    @staticmethod
+    def print_import_user_opt_success_log(opt: str):
+        current_app.logger.info(
+            f"[{request.method}] User {opt} - success " + App.__get_log_request_info())
+
+    @staticmethod
+    def print_user_not_allow_opt_log(opt: str):
+        current_app.logger.info(
+            f"[{request.method}] User '{opt}' - reject " + App.__get_log_request_info())

@@ -1,7 +1,6 @@
-from flask import Flask, Blueprint, render_template
+from flask import Flask, Blueprint, render_template, current_app, request
 from typing import Optional
 
-from configure import conf
 from view.base import App
 
 
@@ -11,6 +10,7 @@ app: Optional[Flask] = None
 
 @about_me.route('/')
 def about_me_page():
+    AboutMeApp.print_load_page_log("about me")
     return render_template("about_me/about_me.html")
 
 

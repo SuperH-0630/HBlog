@@ -1,6 +1,8 @@
 import json
+import logging
+import os
 
-
+logging.basicConfig(encoding='utf-8')
 conf = dict()
 
 
@@ -60,3 +62,24 @@ def configure(conf_file: str, encoding="utf-8"):
         conf["aliyun-secret"] = aliyun["Secret"]
         conf["aliyun-bucket-endpoint"] = aliyun["Bucket-Endpoint"]
         conf["aliyun-bucket-name"] = aliyun["Bucket-Name"]
+
+    log = _conf.get("log")
+    if log is None:
+        conf["log-home"] = None
+        conf["log-format"] = ("[%(levelname)s]:%(name)s:%(asctime)s "
+                              "(%(filename)s:%(lineno)d %(funcName)s) "
+                              "%(process)d %(thread)d "
+                              "%(message)s")
+        conf["log-level"] = logging.INFO
+    else:
+        conf["log-home"] = log.get("home")
+        if conf["log-home"]:
+            os.makedirs(conf["log-home"], exist_ok=True)
+        conf["log-level"] = {"debug": logging.DEBUG,
+                             "info": logging.INFO,
+                             "warning": logging.WARNING,
+                             "error": logging.ERROR}.get(log.get("level", "info"))
+        conf["log-format"] = log.get("format", ("[%(levelname)s]:%(name)s:%(asctime)s "
+                                                "(%(filename)s:%(lineno)d %(funcName)s) "
+                                                "%(process)d %(thread)d "
+                                                "%(message)s"))
