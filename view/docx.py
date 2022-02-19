@@ -151,10 +151,10 @@ def create_docx_page():
                 markdown(form.context.data, output_format='html'), tags=allow_tag, strip=True))
 
         if BlogArticle(None, current_user, title, subtitle, context, archive=archive_list).create():
-            DocxApp.print_user_opt_success_log("write blog")
+            DocxApp.print_sys_opt_success_log("write blog")
             flash(f"博客 {title} 发表成功")
         else:
-            DocxApp.print_user_opt_fail_log("write blog")
+            DocxApp.print_sys_opt_fail_log("write blog")
             flash(f"博客 {title} 发表失败")
         return redirect(url_for("docx.docx_page", page=1))
     DocxApp.print_form_error_log("write blog")
@@ -170,10 +170,10 @@ def delete_blog_page(blog_id: int):
         return
 
     if BlogArticle(blog_id, None, None, None, None).delete():
-        DocxApp.print_user_opt_success_log("delete blog")
+        DocxApp.print_sys_opt_success_log("delete blog")
         flash("博文删除成功")
     else:
-        DocxApp.print_user_opt_fail_log("delete blog")
+        DocxApp.print_sys_opt_fail_log("delete blog")
         flash("博文删除失败")
     return redirect(url_for("docx.docx_page", page=1))
 
@@ -187,10 +187,10 @@ def delete_comment_page(comment_id: int):
         return
 
     if Comment(comment_id, None, None, None).delete():
-        DocxApp.print_user_opt_success_log("delete comment")
+        DocxApp.print_sys_opt_success_log("delete comment")
         flash("博文评论成功")
     else:
-        DocxApp.print_user_opt_fail_log("delete comment")
+        DocxApp.print_sys_opt_fail_log("delete comment")
         flash("博文评论失败")
     return redirect(url_for("docx.docx_page", page=1))
 
