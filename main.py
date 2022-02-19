@@ -1,7 +1,6 @@
 from configure import configure, conf
 import os
 
-
 env_dict = os.environ
 hblog_conf = env_dict.get("hblog_conf")
 if hblog_conf is None:
@@ -11,17 +10,14 @@ else:
     print(f"执行配置文件: {hblog_conf}")
     configure(hblog_conf)
 
-
 from view import WebApp
 from waitress import serve
-
 
 web = WebApp(__name__)
 app = web.get_app()
 
 if conf["server-name"] is not None:
     app.config['SERVER_NAME'] = conf["server-name"]
-
 
 if __name__ == '__main__':
     print("已启动服务: 127.0.0.1:8080")
