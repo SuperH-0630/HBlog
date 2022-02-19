@@ -31,12 +31,11 @@ class App:
         self.mail = Mail(self._app)
 
         self._app.logger.setLevel(conf["log-level"])
-        if conf["log-home"] is None:
-            if conf["log-home"]:
-                handle = logging.handlers.TimedRotatingFileHandler(
-                    os.path.join(conf["log-home"], f"flask-{os.getpid()}.log"))
-                handle.setFormatter(logging.Formatter(conf["log-format"]))
-                self._app.logger.addHandler(handle)
+        if conf["log-home"] is not None:
+            handle = logging.handlers.TimedRotatingFileHandler(
+                os.path.join(conf["log-home"], f"flask-{os.getpid()}.log"))
+            handle.setFormatter(logging.Formatter(conf["log-format"]))
+            self._app.logger.addHandler(handle)
         else:
             handle = logging.StreamHandler(sys.stderr)
             handle.setFormatter(logging.Formatter(conf["log-format"]))
