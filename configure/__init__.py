@@ -2,7 +2,6 @@ import json
 import logging
 import os
 
-logging.basicConfig(encoding='utf-8')
 conf = dict()
 
 
