@@ -97,7 +97,7 @@ def article_down_page(blog_id: int):
         return
 
     response = make_response(article.context)
-    response.headers["Content-Disposition"] = f"attachment; filename={article.title}.html"
+    response.headers["Content-Disposition"] = f"attachment;filename={article.title.encode().decode('latin-1')}.html"
     DocxApp.print_load_page_log(f"download article (id: {blog_id})")
     return response
 
