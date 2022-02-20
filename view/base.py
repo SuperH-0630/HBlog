@@ -1,11 +1,12 @@
 import os.path
+import sys
 
 from flask import Flask, url_for, request, current_app
 from flask_mail import Mail
 from flask_login import LoginManager, current_user
+from flask.logging import default_handler
 from typing import Optional
 
-import sys
 import logging.handlers
 import logging
 from configure import conf
@@ -30,10 +31,16 @@ class App:
 
         self.mail = Mail(self._app)
 
+        self._app.logger.removeHandler(default_handler)
         self._app.logger.setLevel(conf["log-level"])
+        self._app.logger.propagate = False
         if conf["log-home"] is not None:
             handle = logging.handlers.TimedRotatingFileHandler(
                 os.path.join(conf["log-home"], f"flask-{os.getpid()}.log"))
+            handle.setFormatter(logging.Formatter(conf["log-format"]))
+            self._app.logger.addHandler(handle)
+        if conf["log-stderr"]:
+            handle = logging.StreamHandler(sys.stderr)
             handle.setFormatter(logging.Formatter(conf["log-format"]))
             self._app.logger.addHandler(handle)
 

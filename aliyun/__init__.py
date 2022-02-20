@@ -11,7 +11,7 @@ class Aliyun:
         self.secret = secret
         self.auth = oss2.Auth(key, secret)
         self.bucket = oss2.Bucket(self.auth, endpoint, name)
-        self.logger = logging.getLogger("aliyun")
+        self.logger = logging.getLogger("main.aliyun")
         self.logger.setLevel(conf["log-level"])
         if conf["log-home"] is not None:
             handle = logging.handlers.TimedRotatingFileHandler(

@@ -70,6 +70,7 @@ def configure(conf_file: str, encoding="utf-8"):
                               "%(process)d %(thread)d "
                               "%(message)s")
         conf["log-level"] = logging.INFO
+        conf["log-stderr"] = False
     else:
         conf["log-home"] = log.get("home")
         if conf["log-home"]:
@@ -82,3 +83,4 @@ def configure(conf_file: str, encoding="utf-8"):
                                                 "(%(filename)s:%(lineno)d %(funcName)s) "
                                                 "%(process)d %(thread)d "
                                                 "%(message)s"))
+        conf["log-stderr"] = log.get("stderr", False)

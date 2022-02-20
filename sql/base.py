@@ -33,7 +33,7 @@ class Database(metaclass=abc.ABCMeta):
             self._port = 3306
         else:
             self._port = int(port)
-        self.logger = logging.getLogger("mysql")
+        self.logger = logging.getLogger("main.database")
         self.logger.setLevel(conf["log-level"])
         if conf["log-home"] is not None:
             handle = logging.handlers.TimedRotatingFileHandler(
