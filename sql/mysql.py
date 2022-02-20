@@ -24,6 +24,7 @@ class MysqlDB(Database):
             raise
         self._cursor = self._db.cursor()
         self._lock = threading.RLock()
+        self.logger.info(f"MySQL({self._name}@{self._host}) connect")
 
     def close(self):
         if self._cursor is not None:
@@ -33,6 +34,7 @@ class MysqlDB(Database):
         self._db = None
         self._cursor = None
         self._lock = None
+        self.logger.warning(f"MySQL({self._name}@{self._host}) connect close")
 
     def is_connect(self) -> bool:
         if self._cursor is None or self._db is None:
@@ -125,8 +127,7 @@ class MysqlDB(Database):
             self._lock.acquire()  # 上锁
             self._cursor.execute(sql)
         except pymysql.MySQLError:
-            print(f"sql='{sql}'")
-            traceback.print_exc()
+            self.logger.error(f"MySQL({self._name}@{self._host}) SQL {sql} error", exc_info=True, extra=True)
             return None
         finally:
             self._lock.release()  # 释放锁
@@ -141,8 +142,7 @@ class MysqlDB(Database):
             self._cursor.execute(sql)
         except pymysql.MySQLError:
             self._db.rollback()
-            print(f"sql={sql}")
-            traceback.print_exc()
+            self.logger.error(f"MySQL({self._name}@{self._host}) SQL {sql} error", exc_info=True, extra=True)
             return None
         finally:
             if not not_commit:
@@ -154,5 +154,7 @@ class MysqlDB(Database):
         try:
             self._lock.acquire()
             self._db.commit()
+        except pymysql.MySQLError:
+            self.logger.error(f"MySQL({self._name}@{self._host}) commit error")
         finally:
             self._lock.release()

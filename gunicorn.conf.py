@@ -1,6 +1,5 @@
 # gunicorn.conf.py
 import os
-import sys
 import multiprocessing
 import logging.handlers
 import logging

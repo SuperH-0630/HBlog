@@ -36,10 +36,6 @@ class App:
                 os.path.join(conf["log-home"], f"flask-{os.getpid()}.log"))
             handle.setFormatter(logging.Formatter(conf["log-format"]))
             self._app.logger.addHandler(handle)
-        else:
-            handle = logging.StreamHandler(sys.stderr)
-            handle.setFormatter(logging.Formatter(conf["log-format"]))
-            self._app.logger.addHandler(handle)
 
     def get_app(self) -> Flask:
         return self._app
