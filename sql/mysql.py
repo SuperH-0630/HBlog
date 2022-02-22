@@ -127,7 +127,7 @@ class MysqlDB(Database):
             self._lock.acquire()  # 上锁
             self._cursor.execute(sql)
         except pymysql.MySQLError:
-            self.logger.error(f"MySQL({self._name}@{self._host}) SQL {sql} error", exc_info=True, extra=True)
+            self.logger.error(f"MySQL({self._name}@{self._host}) SQL {sql} error", exc_info=True)
             return None
         finally:
             self._lock.release()  # 释放锁
@@ -142,7 +142,7 @@ class MysqlDB(Database):
             self._cursor.execute(sql)
         except pymysql.MySQLError:
             self._db.rollback()
-            self.logger.error(f"MySQL({self._name}@{self._host}) SQL {sql} error", exc_info=True, extra=True)
+            self.logger.error(f"MySQL({self._name}@{self._host}) SQL {sql} error", exc_info=True)
             return None
         finally:
             if not not_commit:
@@ -155,6 +155,6 @@ class MysqlDB(Database):
             self._lock.acquire()
             self._db.commit()
         except pymysql.MySQLError:
-            self.logger.error(f"MySQL({self._name}@{self._host}) commit error")
+            self.logger.error(f"MySQL({self._name}@{self._host}) commit error", exec_info=True)
         finally:
             self._lock.release()
