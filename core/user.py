@@ -1,6 +1,7 @@
 from flask_login import UserMixin, AnonymousUserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from itsdangerous import URLSafeTimedSerializer as Serializer
+from itsdangerous.exc import BadData
 from typing import Optional
 
 from configure import conf
@@ -107,16 +108,16 @@ class User(UserMixin):
 
     @staticmethod
     def creat_token(email: str, passwd_hash: str):
-        s = Serializer(conf["secret-key"], expires_in=3600)
+        s = Serializer(conf["secret-key"])
         return s.dumps({"email": email, "passwd_hash": passwd_hash})
 
     @staticmethod
     def load_token(token: str):
-        s = Serializer(conf["secret-key"], expires_in=3600)
+        s = Serializer(conf["secret-key"])
         try:
-            token = s.loads(token)
+            token = s.loads(token, max_age=3600)
             return token['email'], token['passwd_hash']
-        except Exception:
+        except BadData:
             return None
 
     @staticmethod
