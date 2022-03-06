@@ -15,9 +15,9 @@ from sql.user import (read_user,
                       create_role,
                       delete_role,
                       set_user_role)
-import core.blog
-import core.comment
-import core.msg
+import object.blog
+import object.comment
+import object.msg
 
 
 class AnonymousUser(AnonymousUserMixin):
@@ -64,9 +64,9 @@ class User(UserMixin):
         self.user_id = user_id
 
     def count_info(self):
-        msg = core.msg.Message.get_msg_count(self)
-        comment = core.comment.Comment.get_user_comment_count(self)
-        blog = core.blog.BlogArticle.get_blog_count(None, self)
+        msg = object.msg.Message.get_msg_count(self)
+        comment = object.comment.Comment.get_user_comment_count(self)
+        blog = object.blog.BlogArticle.get_blog_count(None, self)
         return msg, comment, blog
 
     @property

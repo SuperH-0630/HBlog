@@ -11,11 +11,10 @@ else:
     logging.info(f"Configure file {hblog_conf}")
     configure(hblog_conf)
 
-from view import WebApp
+from app import HBlogFlask
 from waitress import serve
 
-web = WebApp(__name__)
-app = web.get_app()
+app = HBlogFlask(__name__)
 
 if conf["server-name"] is not None:
     app.config['SERVER_NAME'] = conf["server-name"]

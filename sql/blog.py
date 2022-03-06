@@ -1,9 +1,9 @@
 from sql import db
 from typing import Optional, List
-import core.archive
+import object.archive
 
 
-def create_blog(auth_id: int, title: str, subtitle:str, context: str, archive_list: List[core.archive.Archive]) -> bool:
+def create_blog(auth_id: int, title: str, subtitle:str, context: str, archive_list: List[object.archive.Archive]) -> bool:
     """写入新的blog"""
     cur = db.insert(table="blog", columns=["Auth", "Title", "SubTitle", "Context"],
                     values=f"{auth_id}, '{title}', '{subtitle}', '{context}'")

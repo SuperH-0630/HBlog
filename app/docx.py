@@ -1,23 +1,20 @@
 from flask import Flask, Blueprint, render_template, abort, redirect, url_for, flash, make_response
 from flask_wtf import FlaskForm
-from flask_pagedown import PageDown
 from flask_pagedown.fields import PageDownField
 from flask_login import login_required, current_user
 from wtforms import TextAreaField, StringField, SubmitField
 from wtforms.validators import DataRequired, Length
-from typing import Optional
 import bleach
 from markdown import markdown
 
-from view.base import App
+import app
 from sql.base import DBBit
-from core.blog import BlogArticle, load_blog_by_id
-from core.user import User
-from core.comment import Comment
-from core.archive import load_archive_by_name
+from object.blog import BlogArticle, load_blog_by_id
+from object.user import User
+from object.comment import Comment
+from object.archive import load_archive_by_name
 
 docx = Blueprint("docx", __name__)
-app: Optional[Flask] = None
 allow_tag = ['a', 'abbr', 'acronym', 'b', 'br', 'blockquote', 'code', 'em', 'i', 'li', 'ol', 'pre', 'strong', 'small',
              'ul', 'h1', 'h2', 'h3', 'h4', 'h5' 'h6', 'p']
 
@@ -38,14 +35,14 @@ class WriteCommentForm(FlaskForm):
 @docx.route('/<int:page>')
 def docx_page(page: int = 1):
     if page < 1:
-        DocxApp.print_user_opt_fail_log(f"Load docx list with error page({page})")
+        app.HBlogFlask.print_user_opt_fail_log(f"Load docx list with error page({page})")
         abort(404)
         return
 
     blog_list = BlogArticle.get_blog_list(limit=20, offset=(page - 1) * 20)
-    max_page = App.get_max_page(BlogArticle.get_blog_count(), 20)
-    page_list = App.get_page("docx.docx_page", page, max_page)
-    DocxApp.print_load_page_log(f"docx list (page: {page})")
+    max_page = app.HBlogFlask.get_max_page(BlogArticle.get_blog_count(), 20)
+    page_list = app.HBlogFlask.get_page("docx.docx_page", page, max_page)
+    app.HBlogFlask.print_load_page_log(f"docx list (page: {page})")
     return render_template("docx/docx.html",
                            blog_list=blog_list,
                            is_top=DBBit.BIT_1,
@@ -57,14 +54,14 @@ def docx_page(page: int = 1):
 @docx.route('/<int:archive>/<int:page>')
 def archive_page(archive: int, page: int = 1):
     if page < 1:
-        DocxApp.print_user_opt_fail_log(f"Load archive-docx list with error page({page}) archive: {archive}")
+        app.HBlogFlask.print_user_opt_fail_log(f"Load archive-docx list with error page({page}) archive: {archive}")
         abort(404)
         return
 
     blog_list = BlogArticle.get_blog_list(archive_id=archive, limit=20, offset=(page - 1) * 20)
-    max_page = App.get_max_page(BlogArticle.get_blog_count(archive_id=archive), 20)
-    page_list = App.get_page("docx.archive_page", page, max_page)
-    DocxApp.print_load_page_log(f"archive-docx list (archive-id: {archive} page: {page})")
+    max_page = app.HBlogFlask.get_max_page(BlogArticle.get_blog_count(archive_id=archive), 20)
+    page_list = app.HBlogFlask.get_page("docx.archive_page", page, max_page)
+    app.HBlogFlask.print_load_page_log(f"archive-docx list (archive-id: {archive} page: {page})")
     return render_template("docx/docx.html",
                            blog_list=blog_list,
                            is_top=DBBit.BIT_1,
@@ -76,10 +73,10 @@ def archive_page(archive: int, page: int = 1):
 def article_page(blog_id: int):
     article = load_blog_by_id(blog_id)
     if article is None:
-        DocxApp.print_user_opt_fail_log(f"Load article with error id({blog_id})")
+        app.HBlogFlask.print_user_opt_fail_log(f"Load article with error id({blog_id})")
         abort(404)
         return
-    DocxApp.print_load_page_log(f"article (id: {blog_id})")
+    app.HBlogFlask.print_load_page_log(f"article (id: {blog_id})")
     return render_template("docx/article.html",
                            article=article,
                            archive_list=article.archive,
@@ -92,13 +89,13 @@ def article_page(blog_id: int):
 def article_down_page(blog_id: int):
     article = load_blog_by_id(blog_id)
     if article is None:
-        DocxApp.print_user_opt_fail_log(f"Download article with error id({blog_id})")
+        app.HBlogFlask.print_user_opt_fail_log(f"Download article with error id({blog_id})")
         abort(404)
         return
 
     response = make_response(article.context)
     response.headers["Content-Disposition"] = f"attachment;filename={article.title.encode().decode('latin-1')}.html"
-    DocxApp.print_load_page_log(f"download article (id: {blog_id})")
+    app.HBlogFlask.print_load_page_log(f"download article (id: {blog_id})")
     return response
 
 
@@ -109,19 +106,19 @@ def comment_page(blog: int):
     if form.validate_on_submit():
         auth: User = current_user
         if not auth.check_role("WriteComment"):  # 检查是否具有权限
-            DocxApp.print_user_not_allow_opt_log("comment")
+            app.HBlogFlask.print_user_not_allow_opt_log("comment")
             abort(403)
             return
 
         context = form.context.data
         if Comment(None, blog, auth, context).create():
-            DocxApp.print_user_opt_success_log("comment")
+            app.HBlogFlask.print_user_opt_success_log("comment")
             flash("评论成功")
         else:
-            DocxApp.print_user_opt_error_log("comment")
+            app.HBlogFlask.print_user_opt_error_log("comment")
             flash("评论失败")
         return redirect(url_for("docx.article_page", blog_id=blog))
-    DocxApp.print_form_error_log("comment")
+    app.HBlogFlask.print_form_error_log("comment")
     abort(404)
 
 
@@ -132,7 +129,7 @@ def create_docx_page():
     if form.validate_on_submit():
         auth: User = current_user
         if not auth.check_role("WriteBlog"):  # 检查是否具有写入权限
-            DocxApp.print_user_not_allow_opt_log("write blog")
+            app.HBlogFlask.print_user_not_allow_opt_log("write blog")
             abort(403)
             return
 
@@ -151,13 +148,13 @@ def create_docx_page():
                 markdown(form.context.data, output_format='html'), tags=allow_tag, strip=True))
 
         if BlogArticle(None, current_user, title, subtitle, context, archive=archive_list).create():
-            DocxApp.print_sys_opt_success_log("write blog")
+            app.HBlogFlask.print_sys_opt_success_log("write blog")
             flash(f"博客 {title} 发表成功")
         else:
-            DocxApp.print_sys_opt_fail_log("write blog")
+            app.HBlogFlask.print_sys_opt_fail_log("write blog")
             flash(f"博客 {title} 发表失败")
         return redirect(url_for("docx.docx_page", page=1))
-    DocxApp.print_form_error_log("write blog")
+    app.HBlogFlask.print_form_error_log("write blog")
     abort(404)
 
 
@@ -165,15 +162,15 @@ def create_docx_page():
 @login_required
 def delete_blog_page(blog_id: int):
     if not current_user.check_role("DeleteBlog"):
-        DocxApp.print_user_not_allow_opt_log("delete blog")
+        app.HBlogFlask.print_user_not_allow_opt_log("delete blog")
         abort(403)
         return
 
     if BlogArticle(blog_id, None, None, None, None).delete():
-        DocxApp.print_sys_opt_success_log("delete blog")
+        app.HBlogFlask.print_sys_opt_success_log("delete blog")
         flash("博文删除成功")
     else:
-        DocxApp.print_sys_opt_fail_log("delete blog")
+        app.HBlogFlask.print_sys_opt_fail_log("delete blog")
         flash("博文删除失败")
     return redirect(url_for("docx.docx_page", page=1))
 
@@ -182,15 +179,15 @@ def delete_blog_page(blog_id: int):
 @login_required
 def delete_comment_page(comment_id: int):
     if not current_user.check_role("DeleteComment"):
-        DocxApp.print_user_not_allow_opt_log("delete comment")
+        app.HBlogFlask.print_user_not_allow_opt_log("delete comment")
         abort(403)
         return
 
     if Comment(comment_id, None, None, None).delete():
-        DocxApp.print_sys_opt_success_log("delete comment")
+        app.HBlogFlask.print_sys_opt_success_log("delete comment")
         flash("博文评论成功")
     else:
-        DocxApp.print_sys_opt_fail_log("delete comment")
+        app.HBlogFlask.print_sys_opt_fail_log("delete comment")
         flash("博文评论失败")
     return redirect(url_for("docx.docx_page", page=1))
 
@@ -198,14 +195,3 @@ def delete_comment_page(comment_id: int):
 @docx.context_processor
 def inject_base():
     return {"top_nav": ["", "", "active", "", "", ""]}
-
-
-class DocxApp(App):
-    def __init__(self, import_name):
-        super(DocxApp, self).__init__(import_name)
-
-        global app
-        app = self._app
-        self.pagedown = PageDown()
-        self.pagedown.init_app(app)
-        app.register_blueprint(docx, url_prefix="/docx")

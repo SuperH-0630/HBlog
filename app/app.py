@@ -1,54 +1,79 @@
 import os.path
 import sys
 
-from flask import Flask, url_for, request, current_app
+from flask import Flask, url_for, request, current_app, g, render_template
 from flask_mail import Mail
 from flask_login import LoginManager, current_user
 from flask.logging import default_handler
-from typing import Optional
+from flask_pagedown import PageDown
+from typing import Optional, Union
 
 import logging.handlers
 import logging
 from configure import conf
-from core.user import AnonymousUser
+from object.user import AnonymousUser, load_user_by_email
+
+from .index import index
+from .archive import archive
+from .docx import docx
+from .msg import msg
+from .oss import oss
+from .auth import auth
+from .about_me import about_me
 
 
-class App:
-    def __init__(self, import_name: str):
-        self._app = Flask(import_name)
-        self._app.config["SECRET_KEY"] = conf['secret-key']
+class HBlogFlask(Flask):
+    def __init__(self, import_name: str, *args, **kwargs):
+        super(HBlogFlask, self).__init__(import_name, *args, **kwargs)
+
+        self.register_blueprint(index, url_prefix="/")
+        self.register_blueprint(archive, url_prefix="/archive")
+        self.register_blueprint(docx, url_prefix="/docx")
+        self.register_blueprint(msg, url_prefix="/msg")
+        self.register_blueprint(auth, url_prefix="/auth")
+        self.register_blueprint(about_me, url_prefix="/about-me")
+        self.register_blueprint(oss, url_prefix="/oss")
 
         self.login_manager = LoginManager()
-        self.login_manager.init_app(self._app)
+        self.login_manager.init_app(self)
         self.login_manager.anonymous_user = AnonymousUser  # 设置未登录的匿名对象
+        self.login_manager.login_view = "auth.login_page"
 
-        self._app.config["MAIL_SERVER"] = conf['email_server']
-        self._app.config["MAIL_PORT"] = conf['email_port']
-        self._app.config["MAIL_USE_TLS"] = conf['email_tls']
-        self._app.config["MAIL_USE_SSL"] = conf['email_ssl']
-        self._app.config["MAIL_USERNAME"] = conf['email_name']
-        self._app.config["MAIL_PASSWORD"] = conf['email_passwd']
+        self.config["SECRET_KEY"] = conf['secret-key']
+        self.config["MAIL_SERVER"] = conf['email_server']
+        self.config["MAIL_PORT"] = conf['email_port']
+        self.config["MAIL_USE_TLS"] = conf['email_tls']
+        self.config["MAIL_USE_SSL"] = conf['email_ssl']
+        self.config["MAIL_USERNAME"] = conf['email_name']
+        self.config["MAIL_PASSWORD"] = conf['email_passwd']
 
-        self.mail = Mail(self._app)
+        self.mail = Mail(self)
+        self.pagedown = PageDown()
+        self.pagedown.init_app(self)
 
-        self._app.logger.removeHandler(default_handler)
-        self._app.logger.setLevel(conf["log-level"])
-        self._app.logger.propagate = False
+        self.logger.removeHandler(default_handler)
+        self.logger.setLevel(conf["log-level"])
+        self.logger.propagate = False
         if conf["log-home"] is not None:
             handle = logging.handlers.TimedRotatingFileHandler(
                 os.path.join(conf["log-home"], f"flask-{os.getpid()}.log"))
             handle.setFormatter(logging.Formatter(conf["log-format"]))
-            self._app.logger.addHandler(handle)
+            self.logger.addHandler(handle)
         if conf["log-stderr"]:
             handle = logging.StreamHandler(sys.stderr)
             handle.setFormatter(logging.Formatter(conf["log-format"]))
-            self._app.logger.addHandler(handle)
+            self.logger.addHandler(handle)
 
-    def get_app(self) -> Flask:
-        return self._app
+        @self.login_manager.user_loader
+        def user_loader(email: str):
+            return load_user_by_email(email)
 
-    def run(self):
-        self.run()
+        func = {"render_template": render_template, "self": self}
+        for i in [400, 401, 403, 404, 405, 408, 410, 413, 414, 423, 500, 501, 502]:
+            exec(f"def error_{i}(e):\n"
+                 f"\tself.print_load_page_log('{i}')\n"
+                 f"\treturn render_template('error.html', error_code='{i}', error_info=e)", func)
+            self.errorhandler(i)(func[f"error_{i}"])
 
     @staticmethod
     def get_max_page(count: int, count_page: int):
@@ -101,44 +126,48 @@ class App:
     @staticmethod
     def print_load_page_log(page: str):
         current_app.logger.debug(
-            f"[{request.method}] Load - '{page}' " + App.__get_log_request_info())
+            f"[{request.method}] Load - '{page}' " + HBlogFlask.__get_log_request_info())
 
     @staticmethod
     def print_form_error_log(opt: str):
         current_app.logger.warning(
-            f"[{request.method}] '{opt}' - Bad form " + App.__get_log_request_info())
+            f"[{request.method}] '{opt}' - Bad form " + HBlogFlask.__get_log_request_info())
 
     @staticmethod
     def print_sys_opt_fail_log(opt: str):
         current_app.logger.error(
-            f"[{request.method}] System {opt} - fail " + App.__get_log_request_info())
+            f"[{request.method}] System {opt} - fail " + HBlogFlask.__get_log_request_info())
 
     @staticmethod
     def print_sys_opt_success_log(opt: str):
         current_app.logger.warning(
-            f"[{request.method}] System {opt} - success " + App.__get_log_request_info())
+            f"[{request.method}] System {opt} - success " + HBlogFlask.__get_log_request_info())
 
     @staticmethod
     def print_user_opt_fail_log(opt: str):
         current_app.logger.debug(
-            f"[{request.method}] User {opt} - fail " + App.__get_log_request_info())
+            f"[{request.method}] User {opt} - fail " + HBlogFlask.__get_log_request_info())
 
     @staticmethod
     def print_user_opt_success_log(opt: str):
         current_app.logger.debug(
-            f"[{request.method}] User {opt} - success " + App.__get_log_request_info())
+            f"[{request.method}] User {opt} - success " + HBlogFlask.__get_log_request_info())
 
     @staticmethod
     def print_user_opt_error_log(opt: str):
         current_app.logger.warning(
-            f"[{request.method}] User {opt} - system fail " + App.__get_log_request_info())
+            f"[{request.method}] User {opt} - system fail " + HBlogFlask.__get_log_request_info())
 
     @staticmethod
     def print_import_user_opt_success_log(opt: str):
         current_app.logger.info(
-            f"[{request.method}] User {opt} - success " + App.__get_log_request_info())
+            f"[{request.method}] User {opt} - success " + HBlogFlask.__get_log_request_info())
 
     @staticmethod
     def print_user_not_allow_opt_log(opt: str):
         current_app.logger.info(
-            f"[{request.method}] User '{opt}' - reject " + App.__get_log_request_info())
+            f"[{request.method}] User '{opt}' - reject " + HBlogFlask.__get_log_request_info())
+
+
+Hblog = Union[HBlogFlask, Flask]
+

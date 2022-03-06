@@ -9,9 +9,9 @@ from sql.blog import (get_blog_list,
                       create_blog,
                       delete_blog,
                       get_user_user_count)
-import core.user
-import core.archive
-import core.comment
+import object.user
+import object.archive
+import object.comment
 
 
 class LoadBlogError(Exception):
@@ -24,7 +24,7 @@ def load_blog_by_id(blog_id) -> "Optional[BlogArticle]":
     if len(blog) == 0:
         return None
 
-    auth = core.user.load_user_by_id(blog[0])
+    auth = object.user.load_user_by_id(blog[0])
     if auth is None:
         return None
 
@@ -33,8 +33,8 @@ def load_blog_by_id(blog_id) -> "Optional[BlogArticle]":
     context = blog[3]
     update_time = blog[6]
     top = blog[7]
-    comment = core.comment.load_comment_list(blog_id)
-    archive = core.archive.Archive.get_blog_archive(blog_id)
+    comment = object.comment.load_comment_list(blog_id)
+    archive = object.archive.Archive.get_blog_archive(blog_id)
     return BlogArticle(blog_id, auth, title, subtitle, context, update_time, top, comment, archive)
 
 
