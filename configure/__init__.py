@@ -7,8 +7,7 @@ conf = {
     "BLOG_NAME": "HBlog",
     "BLOG_DESCRIBE": "Huan Blog.",
     "FOOT": "Power by HBlog",
-    "ABOUT_ME_NAME": "",
-    "ABOUT_ME_DESCRIBE": "",
+    "ABOUT_ME_PAGE": "",
     "INTRODUCTION": "",
     "INTRODUCTION_LINK": "",
     "MYSQL_URL": "localhost",
@@ -42,17 +41,18 @@ def configure(conf_file: str, encoding="utf-8"):
     with open(conf_file, mode="r", encoding=encoding) as f:
         json_str = f.read()
         conf.update(json.loads(json_str))
+    if type(conf["LOG_LEVEL"]) is str:
+        conf["LOG_LEVEL"] = {"debug": logging.DEBUG,
+                             "info": logging.INFO,
+                             "warning": logging.WARNING,
+                             "error": logging.ERROR}.get(conf["LOG_LEVEL"])
 
-        if type(conf["LOG_LEVEL"]) is str:
-            conf["LOG_LEVEL"] = {"debug": logging.DEBUG,
-                                 "info": logging.INFO,
-                                 "warning": logging.WARNING,
-                                 "error": logging.ERROR}.get(conf["LOG_LEVEL"])
-
-        introduce = conf["INTRODUCE"]
-        introduce_list = []
-        for i in introduce:
-            describe: str = introduce[i]
-            describe = " ".join([f"<p>{i}</p>" for i in describe.split('\n')])
-            introduce_list.append((i, describe))
-        conf["INTRODUCE"] = introduce_list
+    introduce = conf["INTRODUCE"]
+    introduce_list = []
+    for i in introduce:
+        describe: str = introduce[i]
+        describe = " ".join([f"<p>{i}</p>" for i in describe.split('\n')])
+        introduce_list.append((i, describe))
+    conf["INTRODUCE"] = introduce_list
+    if len(conf["LOG_HOME"]) > 0:
+        os.makedirs(conf["LOG_HOME"], exist_ok=True)

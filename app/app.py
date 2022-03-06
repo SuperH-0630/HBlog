@@ -1,4 +1,4 @@
-import os.path
+import os
 import sys
 
 from flask import Flask, url_for, request, current_app, g, render_template
@@ -10,6 +10,8 @@ from typing import Optional, Union
 
 import logging.handlers
 import logging
+from bs4 import BeautifulSoup
+
 from configure import conf
 from object.user import AnonymousUser, load_user_by_email
 
@@ -25,6 +27,7 @@ from .about_me import about_me
 class HBlogFlask(Flask):
     def __init__(self, import_name: str, *args, **kwargs):
         super(HBlogFlask, self).__init__(import_name, *args, **kwargs)
+        self.about_me = ""
         self.update_configure()
 
         self.register_blueprint(index, url_prefix="/")
@@ -70,6 +73,11 @@ class HBlogFlask(Flask):
 
     def update_configure(self):
         self.config.update(conf)
+        about_me_page = conf["ABOUT_ME_PAGE"]
+        if len(about_me_page) > 0 and os.path.exists(about_me_page):
+            with open(about_me_page, "r", encoding='utf-8') as f:
+                bs = BeautifulSoup(f.read(), "html.parser")
+            self.about_me = str(bs.find("body").find("div", class_="about-me"))
 
     @staticmethod
     def get_max_page(count: int, count_page: int):
