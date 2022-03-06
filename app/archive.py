@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, abort, redirect, url_for, flash, c
 from flask_login import login_required, current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
-from wtforms.validators import DataRequired, Length
+from wtforms.validators import DataRequired
 
 import app
 from object.archive import Archive
@@ -11,8 +11,8 @@ archive = Blueprint("archive", __name__)
 
 
 class CreateArchiveForm(FlaskForm):
-    name = StringField("名字", validators=[DataRequired(), Length(1, 10)])
-    describe = StringField("描述", validators=[DataRequired(), Length(1, 30)])
+    name = StringField("名字", validators=[DataRequired()])
+    describe = StringField("描述", validators=[DataRequired()])
     submit = SubmitField("创建归档")
 
 
@@ -36,12 +36,19 @@ def create_archive_page():
             abort(403)
             return
 
-        if Archive(form.name.data, form.describe.data, None).create():
-            app.HBlogFlask.print_sys_opt_success_log(f"Create archive {form.name.data}")
-            flash(f"创建归档 {form.name.data} 成功")
+        name = form.name.data
+        describe = form.describe.data
+        if len(name) > 10:
+            flash("归档名太长了")
+        elif len(describe) > 30:
+            flash("归档描述太长了")
         else:
-            app.HBlogFlask.print_sys_opt_fail_log(f"Create archive {form.name.data}")
-            flash(f"创建归档 {form.name.data} 失败")
+            if Archive(name, describe, None).create():
+                app.HBlogFlask.print_sys_opt_success_log(f"Create archive {name}")
+                flash(f"创建归档 {name} 成功")
+            else:
+                app.HBlogFlask.print_sys_opt_fail_log(f"Create archive {name}")
+                flash(f"创建归档 {name} 失败")
         return redirect(url_for("archive.archive_page"))
     current_app.logger.warning("Create archive with error form.")
     abort(404)

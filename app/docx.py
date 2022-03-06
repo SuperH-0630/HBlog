@@ -1,9 +1,9 @@
-from flask import Flask, Blueprint, render_template, abort, redirect, url_for, flash, make_response
+from flask import Blueprint, render_template, abort, redirect, url_for, flash, make_response
 from flask_wtf import FlaskForm
 from flask_pagedown.fields import PageDownField
 from flask_login import login_required, current_user
 from wtforms import TextAreaField, StringField, SubmitField
-from wtforms.validators import DataRequired, Length
+from wtforms.validators import DataRequired
 import bleach
 from markdown import markdown
 
@@ -20,9 +20,9 @@ allow_tag = ['a', 'abbr', 'acronym', 'b', 'br', 'blockquote', 'code', 'em', 'i',
 
 
 class WriteBlogForm(FlaskForm):
-    title = StringField("标题", validators=[DataRequired(), Length(1, 10)])
-    subtitle = StringField("副标题", validators=[DataRequired(), Length(1, 10)])
-    archive = StringField("归档", validators=[DataRequired(), Length(1, 10)])
+    title = StringField("标题", validators=[DataRequired()])
+    subtitle = StringField("副标题", validators=[DataRequired()])
+    archive = StringField("归档")
     context = PageDownField("博客内容", validators=[DataRequired()])
     submit = SubmitField("提交博客")
 
@@ -134,7 +134,14 @@ def create_docx_page():
             return
 
         title = form.title.data
+        if len(title) > 10:
+            flash("标题太长了")
+            abort(400)
+
         subtitle = form.subtitle.data
+        if len(subtitle) > 10:
+            flash("副标题太长了")
+            abort(400)
 
         archive = set(str(form.archive.data).replace(" ", "").split(";"))
         archive_list = []

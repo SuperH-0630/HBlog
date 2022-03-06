@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, redirect, flash, url_for, request,
 from flask_login import login_required, login_user, current_user, logout_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, ValidationError
-from wtforms.validators import DataRequired, Length, EqualTo
+from wtforms.validators import DataRequired
 
 import app
 from object.user import User, load_user_by_email
@@ -12,17 +12,15 @@ auth = Blueprint("auth", __name__)
 
 
 class LoginForm(FlaskForm):
-    email = StringField("邮箱", validators=[DataRequired(), Length(1, 32)])
-    passwd = PasswordField("密码", validators=[DataRequired(), Length(8, 32)])
+    email = StringField("邮箱", validators=[DataRequired()])
+    passwd = PasswordField("密码", validators=[DataRequired()])
     remember = BooleanField("记住我")
     submit = SubmitField("登录")
 
 
 class RegisterForm(FlaskForm):
-    email = StringField("邮箱", validators=[DataRequired(), Length(1, 32)])
-    passwd = PasswordField("密码", validators=[DataRequired(),
-                                             EqualTo("passwd_again", message="两次输入密码不相同"),
-                                             Length(8, 32)])
+    email = StringField("邮箱", validators=[DataRequired()])
+    passwd = PasswordField("密码", validators=[DataRequired()])
     passwd_again = PasswordField("重复密码", validators=[DataRequired()])
     submit = SubmitField("注册")
 
@@ -33,15 +31,13 @@ class RegisterForm(FlaskForm):
 
 class ChangePasswdForm(FlaskForm):
     old_passwd = PasswordField("旧密码", validators=[DataRequired()])
-    passwd = PasswordField("新密码", validators=[DataRequired(),
-                                              EqualTo("passwd_again", message="两次输入密码不相同"),
-                                              Length(8, 32)])
+    passwd = PasswordField("新密码", validators=[DataRequired()])
     passwd_again = PasswordField("重复密码", validators=[DataRequired()])
     submit = SubmitField("修改密码")
 
 
 class DeleteUserForm(FlaskForm):
-    email = StringField("邮箱", validators=[DataRequired(), Length(1, 32)])
+    email = StringField("邮箱", validators=[DataRequired()])
     submit = SubmitField("删除用户")
 
     def validate_email(self, field):
@@ -50,19 +46,19 @@ class DeleteUserForm(FlaskForm):
 
 
 class CreateRoleForm(FlaskForm):
-    name = StringField("角色名称", validators=[DataRequired(), Length(1, 20)])
-    authority = StringField("权限", validators=[Length(0, 100)])
+    name = StringField("角色名称", validators=[DataRequired()])
+    authority = StringField("权限")
     submit = SubmitField("创建角色")
 
 
 class DeleteRoleForm(FlaskForm):
-    name = StringField("角色名称", validators=[DataRequired(), Length(1, 20)])
+    name = StringField("角色名称", validators=[DataRequired()])
     submit = SubmitField("删除角色")
 
 
 class SetRoleForm(FlaskForm):
-    email = StringField("邮箱", validators=[DataRequired(), Length(1, 32)])
-    name = StringField("角色名称", validators=[DataRequired(), Length(1, 20)])
+    email = StringField("邮箱", validators=[DataRequired()])
+    name = StringField("角色名称", validators=[DataRequired()])
     submit = SubmitField("设置角色")
 
 
@@ -106,6 +102,17 @@ def register_page():
 
     form = RegisterForm()
     if form.validate_on_submit():
+        email = form.email.data
+        passwd = form.passwd.data
+        if len(email) > 20:
+            flash("邮箱太长了")
+            return redirect(url_for("auth.register_page"))
+        elif not 8 < len(passwd) < 32:
+            flash("请输入8-12位密码")
+            return redirect(url_for("auth.register_page"))
+        elif passwd != form.passwd_again.data:
+            flash("两次输入的密码不一致")
+            return redirect(url_for("auth.register_page"))
         token = User.creat_token(form.email.data, form.passwd.data)
         register_url = url_for("auth.confirm_page", token=token, _external=True)
         hblog: app.Hblog = current_app
@@ -157,11 +164,19 @@ def logout_page():
 def change_passwd_page():
     form = ChangePasswdForm()
     if form.validate_on_submit():
-        if not current_user.check_passwd(form.old_passwd.data):
+        passwd = form.passwd.data
+        if not 8 < passwd < 32:
+            flash("请输入8-32位密码")
+            return redirect(url_for("auth.change_passwd_page"))
+        elif passwd != form.passwd_again.data:
+            flash("两次输入的密码不一致")
+            return redirect(url_for("auth.change_passwd_page"))
+        elif not current_user.check_passwd(form.old_passwd.data):
             app.HBlogFlask.print_user_opt_fail_log("change passwd (old passwd error)")
             flash("旧密码错误")
             return redirect(url_for("auth.change_passwd_page"))
-        if current_user.change_passwd(form.passwd.data):
+
+        if current_user.change_passwd(passwd):
             app.HBlogFlask.print_user_opt_success_log(f"change passwd")
             flash("密码修改成功")
         else:
@@ -224,12 +239,16 @@ def role_create_page():
             abort(403)
             return
 
-        if User.create_role(form.name.data, form.authority.data.replace(" ", "").split(";")):
-            app.HBlogFlask.print_sys_opt_success_log(f"Create role success: {form.name.data}")
-            flash("角色创建成功")
+        name = form.name.data
+        if len(name) > 10:
+            flash("角色名字太长")
         else:
-            app.HBlogFlask.print_sys_opt_success_log(f"Create role fail: {form.name.data}")
-            flash("角色创建失败")
+            if User.create_role(name, form.authority.data.replace(" ", "").split(";")):
+                app.HBlogFlask.print_sys_opt_success_log(f"Create role success: {name}")
+                flash("角色创建成功")
+            else:
+                app.HBlogFlask.print_sys_opt_success_log(f"Create role fail: {name}")
+                flash("角色创建失败")
         return redirect(url_for("auth.role_page"))
 
     abort(404)
