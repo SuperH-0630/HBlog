@@ -2,85 +2,57 @@ import json
 import logging
 import os
 
-conf = dict()
+conf = {
+    "SECRET_KEY": "HBlog-R-Salt",
+    "BLOG_NAME": "HBlog",
+    "BLOG_DESCRIBE": "Huan Blog.",
+    "FOOT": "Power by HBlog",
+    "ABOUT_ME_NAME": "",
+    "ABOUT_ME_DESCRIBE": "",
+    "INTRODUCTION": "",
+    "INTRODUCTION_LINK": "",
+    "MYSQL_URL": "localhost",
+    "MYSQL_NAME": "local",
+    "MYSQL_PASSWD": "123456",
+    "MYSQL_PORT": 3306,
+    "MAIL_SERVER": "",
+    "MAIL_PORT": "",
+    "MAIL_TLS": False,
+    "MAIL_SSL": False,
+    "MAIL_PASSWD": "",
+    "MAIL_PREFIX": "",
+    "MAIL_SENDER": "",
+    "USE_ALIYUN": False,
+    "ALIYUN_KET": "",
+    "ALIYUN_SECRET": "",
+    "ALIYUN_BUCKET_ENDPOINT": "",
+    "ALIYUN_BUCKET_NAME": "",
+    "LOG_HOME": "",
+    "LOG_FORMAT": "[%(levelname)s]:%(name)s:%(asctime)s "
+                  "(%(filename)s:%(lineno)d %(funcName)s) "
+                  "%(process)d %(thread)d "
+                  "%(message)s",
+    "LOG_LEVEL": logging.INFO,
+    "LOG_STDERR": True,
+}
 
 
 def configure(conf_file: str, encoding="utf-8"):
     """ 运行配置程序, 该函数需要在其他模块被执行前调用 """
     with open(conf_file, mode="r", encoding=encoding) as f:
         json_str = f.read()
-        _conf: dict = json.loads(json_str)
+        conf.update(json.loads(json_str))
 
-    _mysql = _conf["mysql"]
-    conf["mysql_url"] = str(_mysql["url"])
-    conf["mysql_name"] = str(_mysql["name"])
-    conf["mysql_passwd"] = str(_mysql["passwd"])
-    conf["mysql_port"] = int(_mysql.get("port", 3306))
+        if type(conf["LOG_LEVEL"]) is str:
+            conf["LOG_LEVEL"] = {"debug": logging.DEBUG,
+                                 "info": logging.INFO,
+                                 "warning": logging.WARNING,
+                                 "error": logging.ERROR}.get(conf["LOG_LEVEL"])
 
-    _email = _conf["email"]
-    conf["email_server"] = str(_email["server"])
-    conf["email_port"] = int(_email["port"])
-    conf["email_tls"] = bool(_email.get("tls", False))
-    conf["email_ssl"] = bool(_email.get("ssl", False))
-    conf["email_name"] = str(_email["name"])
-    conf["email_passwd"] = str(_email["passwd"])
-    conf["email_prefix"] = str(_email.get("prefix", "[HBlog]"))
-    conf["email_sender"] = str(_email["sender"])
-
-    conf["secret-key"] = str(_conf.get("secret-key", "HBlog-R-Salt"))
-    conf["server-name"] = _conf.get("server-name")
-
-    introduce = _conf["info"]["introduce"]
-    introduce_list = []
-    for i in introduce:
-        describe: str = introduce[i]
-        describe = " ".join([f"<p>{i}</p>" for i in describe.split('\n')])
-        introduce_list.append((i, describe))
-
-    conf["describe-link"] = _conf["info"]["link"]
-    conf["describe-info"] = introduce_list
-
-    conf["blog-name"] = _conf["info"]["blog-name"]
-    conf["blog-describe"] = _conf["info"]["blog-describe"]
-
-    conf["about-me-name"] = _conf["info"]["about-me"]["name"]
-    conf["about-me-describe"] = _conf["info"]["about-me"]["describe"]
-
-    conf["about-me-project"] = _conf["info"]["project"]
-    conf["about-me-skill"] = _conf["info"]["skill"]
-    conf["about-me-read"] = _conf["info"]["read"]
-
-    conf["foot-info"] = f'{_conf["info"]["foot-info"]} Power by HBlog'
-
-    aliyun = _conf.get("aliyun")
-    if aliyun is None:
-        conf["aliyun"] = False
-    else:
-        conf["aliyun"] = True
-        conf["aliyun-key"] = aliyun["Key"]
-        conf["aliyun-secret"] = aliyun["Secret"]
-        conf["aliyun-bucket-endpoint"] = aliyun["Bucket-Endpoint"]
-        conf["aliyun-bucket-name"] = aliyun["Bucket-Name"]
-
-    log = _conf.get("log")
-    if log is None:
-        conf["log-home"] = None
-        conf["log-format"] = ("[%(levelname)s]:%(name)s:%(asctime)s "
-                              "(%(filename)s:%(lineno)d %(funcName)s) "
-                              "%(process)d %(thread)d "
-                              "%(message)s")
-        conf["log-level"] = logging.INFO
-        conf["log-stderr"] = False
-    else:
-        conf["log-home"] = log.get("home")
-        if conf["log-home"]:
-            os.makedirs(conf["log-home"], exist_ok=True)
-        conf["log-level"] = {"debug": logging.DEBUG,
-                             "info": logging.INFO,
-                             "warning": logging.WARNING,
-                             "error": logging.ERROR}.get(log.get("level", "info"))
-        conf["log-format"] = log.get("format", ("[%(levelname)s]:%(name)s:%(asctime)s "
-                                                "(%(filename)s:%(lineno)d %(funcName)s) "
-                                                "%(process)d %(thread)d "
-                                                "%(message)s"))
-        conf["log-stderr"] = log.get("stderr", False)
+        introduce = conf["INTRODUCE"]
+        introduce_list = []
+        for i in introduce:
+            describe: str = introduce[i]
+            describe = " ".join([f"<p>{i}</p>" for i in describe.split('\n')])
+            introduce_list.append((i, describe))
+        conf["INTRODUCE"] = introduce_list

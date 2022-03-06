@@ -14,13 +14,13 @@
             <div class="card mr-lg-2 mb-3">
                 <div class="card-header"> 关于我 </div>
                 <div class="card-body">
-                    <h4 class="card-title"> {{ conf['about-me-name'] }} </h4>
+                    <h4 class="card-title"> {{ conf['ABOUT_ME_NAME'] }} </h4>
                     <h5 class="card-subtitle"> 博主 </h5>
-                    <p class="card-text"> {{ conf['about-me-describe'] }} </p>
+                    <p class="card-text"> {{ conf['ABOUT_ME_DESCRIBE'] }} </p>
 
 
-                    {% for link in conf['describe-link'] %}
-                        <a class="card-link" href="{{ conf['describe-link'][link] }}"> {{ link }} </a>
+                    {% for link in conf['DESCRIBE_LINK'] %}
+                        <a class="card-link" href="{{ conf['DESCRIBE_LINK'][link] }}"> {{ link }} </a>
                     {% endfor %}
                 </div>
             </div>

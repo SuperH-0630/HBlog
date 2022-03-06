@@ -33,7 +33,7 @@ def inject_base():
 
 @index.app_context_processor
 def inject_base():
-    return {"blog_name": conf['blog-name'],
+    return {"blog_name": conf['BLOG_NAME'],
             "top_nav": ["", "", "", "", "", ""],
-            "blog_describe": conf['blog-describe'],
+            "blog_describe": conf['BLOG_DESCRIBE'],
             "conf": conf}

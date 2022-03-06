@@ -25,6 +25,7 @@ from .about_me import about_me
 class HBlogFlask(Flask):
     def __init__(self, import_name: str, *args, **kwargs):
         super(HBlogFlask, self).__init__(import_name, *args, **kwargs)
+        self.update_configure()
 
         self.register_blueprint(index, url_prefix="/")
         self.register_blueprint(archive, url_prefix="/archive")
@@ -39,29 +40,21 @@ class HBlogFlask(Flask):
         self.login_manager.anonymous_user = AnonymousUser  # 设置未登录的匿名对象
         self.login_manager.login_view = "auth.login_page"
 
-        self.config["SECRET_KEY"] = conf['secret-key']
-        self.config["MAIL_SERVER"] = conf['email_server']
-        self.config["MAIL_PORT"] = conf['email_port']
-        self.config["MAIL_USE_TLS"] = conf['email_tls']
-        self.config["MAIL_USE_SSL"] = conf['email_ssl']
-        self.config["MAIL_USERNAME"] = conf['email_name']
-        self.config["MAIL_PASSWORD"] = conf['email_passwd']
-
         self.mail = Mail(self)
         self.pagedown = PageDown()
         self.pagedown.init_app(self)
 
         self.logger.removeHandler(default_handler)
-        self.logger.setLevel(conf["log-level"])
+        self.logger.setLevel(conf["LOG_LEVEL"])
         self.logger.propagate = False
-        if conf["log-home"] is not None:
+        if len(conf["LOG_HOME"]) > 0:
             handle = logging.handlers.TimedRotatingFileHandler(
-                os.path.join(conf["log-home"], f"flask-{os.getpid()}.log"))
-            handle.setFormatter(logging.Formatter(conf["log-format"]))
+                os.path.join(conf["LOG_HOME"], f"flask-{os.getpid()}.log"))
+            handle.setFormatter(logging.Formatter(conf["LOG_FORMAT"]))
             self.logger.addHandler(handle)
-        if conf["log-stderr"]:
+        if conf["LOG_STDERR"]:
             handle = logging.StreamHandler(sys.stderr)
-            handle.setFormatter(logging.Formatter(conf["log-format"]))
+            handle.setFormatter(logging.Formatter(conf["LOG_FORMAT"]))
             self.logger.addHandler(handle)
 
         @self.login_manager.user_loader
@@ -74,6 +67,9 @@ class HBlogFlask(Flask):
                  f"\tself.print_load_page_log('{i}')\n"
                  f"\treturn render_template('error.html', error_code='{i}', error_info=e)", func)
             self.errorhandler(i)(func[f"error_{i}"])
+
+    def update_configure(self):
+        self.config.update(conf)
 
     @staticmethod
     def get_max_page(count: int, count_page: int):

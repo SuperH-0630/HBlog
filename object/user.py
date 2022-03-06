@@ -108,12 +108,12 @@ class User(UserMixin):
 
     @staticmethod
     def creat_token(email: str, passwd_hash: str):
-        s = Serializer(conf["secret-key"])
+        s = Serializer(conf["SECRET_KEY"])
         return s.dumps({"email": email, "passwd_hash": passwd_hash})
 
     @staticmethod
     def load_token(token: str):
-        s = Serializer(conf["secret-key"])
+        s = Serializer(conf["SECRET_KEY"])
         try:
             token = s.loads(token, max_age=3600)
             return token['email'], token['passwd_hash']

@@ -3,4 +3,4 @@ from configure import conf
 
 
 DB = MysqlDB
-db = DB(host=conf["mysql_url"], name=conf["mysql_name"], passwd=conf["mysql_passwd"], port=conf["mysql_port"])
+db = DB(host=conf["MYSQL_URL"], name=conf["MYSQL_NAME"], passwd=conf["MYSQL_PASSWD"], port=conf["MYSQL_PORT"])

@@ -12,13 +12,13 @@
         <div class="row">
             <article class="col-12">
                 <div class="introduce mr-lg-2 ml-lg-2">
-                    {% for info in conf['describe-info'] %}
+                    {% for info in conf['INTRODUCE'] %}
                         <h2> {{ info[0] }} </h2>
                         {{ info[1] | safe }}
                     {% endfor %}
 
-                    {% for link in conf['describe-link'] %}
-                        <a class="btn btn-info mb-2" href="{{ conf['describe-link'][link] }}"> {{ link }} </a>
+                    {% for link in conf['INTRODUCE_LINK'] %}
+                        <a class="btn btn-info mb-2" href="{{ conf['INTRODUCE_LINK'][link] }}"> {{ link }} </a>
                     {% endfor %}
                 </div>
             </article>

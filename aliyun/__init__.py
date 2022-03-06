@@ -12,10 +12,10 @@ class Aliyun:
         self.auth = oss2.Auth(key, secret)
         self.bucket = oss2.Bucket(self.auth, endpoint, name)
         self.logger = logging.getLogger("main.aliyun")
-        self.logger.setLevel(conf["log-level"])
-        if conf["log-home"] is not None:
+        self.logger.setLevel(conf["LOG_LEVEL"])
+        if len(conf["LOG_HOME"]) > 0:
             handle = logging.handlers.TimedRotatingFileHandler(
-                os.path.join(conf["log-home"], f"aliyun-{os.getpid()}-{key}.log"))
+                os.path.join(conf["LOG_HOME"], f"aliyun-{os.getpid()}-{key}.log"))
             handle.setFormatter(logging.Formatter(conf["log-format"]))
             self.logger.addHandler(handle)
 
@@ -32,10 +32,10 @@ class Aliyun:
         return url
 
 
-if conf["aliyun"]:
-    aliyun = Aliyun(conf["aliyun-key"],
-                    conf["aliyun-secret"],
-                    conf["aliyun-bucket-endpoint"],
-                    conf["aliyun-bucket-name"])
+if conf["USE_ALIYUN"]:
+    aliyun = Aliyun(conf["ALIYUN_KET"],
+                    conf["ALIYUN_SECRET"],
+                    conf["ALIYUN_BUCKET_ENDPOINT"],
+                    conf["ALIYUN_BUCKET_NAME"])
 else:
     aliyun = None

@@ -16,9 +16,6 @@ from waitress import serve
 
 app = HBlogFlask(__name__)
 
-if conf["server-name"] is not None:
-    app.config['SERVER_NAME'] = conf["server-name"]
-
 if __name__ == '__main__':
     logging.info("Server start on 127.0.0.1:8080")
     serve(app, host='0.0.0.0', port="8080")

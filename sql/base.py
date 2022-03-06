@@ -34,11 +34,11 @@ class Database(metaclass=abc.ABCMeta):
         else:
             self._port = int(port)
         self.logger = logging.getLogger("main.database")
-        self.logger.setLevel(conf["log-level"])
-        if conf["log-home"] is not None:
+        self.logger.setLevel(conf["LOG_LEVEL"])
+        if len(conf["LOG_HOME"]) > 0:
             handle = logging.handlers.TimedRotatingFileHandler(
-                os.path.join(conf["log-home"], f"mysql-{os.getpid()}-{name}@{host}.log"))
-            handle.setFormatter(logging.Formatter(conf["log-format"]))
+                os.path.join(conf["LOG_HOME"], f"mysql-{os.getpid()}-{name}@{host}.log"))
+            handle.setFormatter(logging.Formatter(conf["LOG_FORMAT"]))
             self.logger.addHandler(handle)
 
     @abc.abstractmethod
