@@ -16,7 +16,7 @@ class Aliyun:
         if len(conf["LOG_HOME"]) > 0:
             handle = logging.handlers.TimedRotatingFileHandler(
                 os.path.join(conf["LOG_HOME"], f"aliyun-{os.getpid()}-{key}.log"))
-            handle.setFormatter(logging.Formatter(conf["log-format"]))
+            handle.setFormatter(logging.Formatter(conf["LOG_FORMAT"]))
             self.logger.addHandler(handle)
 
     def upload_file(self, name, f):
