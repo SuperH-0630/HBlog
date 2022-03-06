@@ -33,7 +33,7 @@ class Aliyun:
 
 
 if conf["USE_ALIYUN"]:
-    aliyun = Aliyun(conf["ALIYUN_KET"],
+    aliyun = Aliyun(conf["ALIYUN_KEY"],
                     conf["ALIYUN_SECRET"],
                     conf["ALIYUN_BUCKET_ENDPOINT"],
                     conf["ALIYUN_BUCKET_NAME"])

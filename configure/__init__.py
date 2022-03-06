@@ -22,7 +22,7 @@ conf = {
     "MAIL_PREFIX": "",
     "MAIL_SENDER": "",
     "USE_ALIYUN": False,
-    "ALIYUN_KET": "",
+    "ALIYUN_KEY": "",
     "ALIYUN_SECRET": "",
     "ALIYUN_BUCKET_ENDPOINT": "",
     "ALIYUN_BUCKET_NAME": "",
