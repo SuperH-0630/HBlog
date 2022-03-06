@@ -27,6 +27,8 @@ class Aliyun:
                          f"version id: {res.versionid} key: {self.key}")
 
     def shared_obj(self, name, time=15):
+        if not self.bucket.object_exists(name):
+            return None
         url = self.bucket.sign_url('GET', name, time, slash_safe=True)
         self.logger.debug(f"Get url {url} name: {name} time: {time}s key: {self.key}")
         return url
