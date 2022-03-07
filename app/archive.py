@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, abort, redirect, url_for, flash, current_app, request
+from flask import Blueprint, render_template, redirect, url_for, flash
 from flask_login import login_required, current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
@@ -28,40 +28,29 @@ def archive_page():
 
 @archive.route("create", methods=["POST"])
 @login_required
-def create_archive_page():
-    form = CreateArchiveForm()
-    if form.validate_on_submit():
-        if not current_user.check_role("WriteBlog"):  # 检查相应的权限
-            app.HBlogFlask.print_user_not_allow_opt_log("Create archive")
-            abort(403)
-            return
-
-        name = form.name.data
-        describe = form.describe.data
-        if len(name) > 10:
-            flash("归档名太长了")
-        elif len(describe) > 30:
-            flash("归档描述太长了")
+@app.form_required(CreateArchiveForm, "create archive")
+@app.role_required("WriteBlog", "create archive")
+def create_archive_page(form: CreateArchiveForm):
+    name = form.name.data
+    describe = form.describe.data
+    if len(name) > 10:
+        flash("归档名太长了")
+    elif len(describe) > 30:
+        flash("归档描述太长了")
+    else:
+        if Archive(name, describe, None).create():
+            app.HBlogFlask.print_sys_opt_success_log(f"Create archive {name}")
+            flash(f"创建归档 {name} 成功")
         else:
-            if Archive(name, describe, None).create():
-                app.HBlogFlask.print_sys_opt_success_log(f"Create archive {name}")
-                flash(f"创建归档 {name} 成功")
-            else:
-                app.HBlogFlask.print_sys_opt_fail_log(f"Create archive {name}")
-                flash(f"创建归档 {name} 失败")
-        return redirect(url_for("archive.archive_page"))
-    current_app.logger.warning("Create archive with error form.")
-    abort(404)
+            app.HBlogFlask.print_sys_opt_fail_log(f"Create archive {name}")
+            flash(f"创建归档 {name} 失败")
+    return redirect(url_for("archive.archive_page"))
 
 
 @archive.route("delete/<int:archive_id>")
 @login_required
+@app.role_required("DeleteBlog", "delete archive")
 def delete_archive_page(archive_id: int):
-    if not current_user.check_role("DeleteBlog"):
-        app.HBlogFlask.print_user_not_allow_opt_log("Delete archive")
-        abort(403)
-        return
-
     if Archive(None, None, archive_id).delete():
         app.HBlogFlask.print_sys_opt_success_log(f"Delete archive {archive_id}")
         flash("归档删除成功")

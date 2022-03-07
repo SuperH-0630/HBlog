@@ -10,7 +10,6 @@ from markdown import markdown
 import app
 from sql.base import DBBit
 from object.blog import BlogArticle, load_blog_by_id
-from object.user import User
 from object.comment import Comment
 from object.archive import load_archive_by_name
 
@@ -101,78 +100,58 @@ def article_down_page(blog_id: int):
 
 @docx.route('/comment/<int:blog>', methods=["POST"])
 @login_required
-def comment_page(blog: int):
-    form = WriteCommentForm()
-    if form.validate_on_submit():
-        auth: User = current_user
-        if not auth.check_role("WriteComment"):  # 检查是否具有权限
-            app.HBlogFlask.print_user_not_allow_opt_log("comment")
-            abort(403)
-            return
-
-        context = form.context.data
-        if Comment(None, blog, auth, context).create():
-            app.HBlogFlask.print_user_opt_success_log("comment")
-            flash("评论成功")
-        else:
-            app.HBlogFlask.print_user_opt_error_log("comment")
-            flash("评论失败")
-        return redirect(url_for("docx.article_page", blog_id=blog))
-    app.HBlogFlask.print_form_error_log("comment")
-    abort(404)
+@app.form_required(WriteCommentForm, "write comment")
+@app.role_required("WriteComment", "write comment")
+def comment_page(blog: int, form: WriteCommentForm):
+    context = form.context.data
+    if Comment(None, blog, current_user, context).create():
+        app.HBlogFlask.print_user_opt_success_log("comment")
+        flash("评论成功")
+    else:
+        app.HBlogFlask.print_user_opt_error_log("comment")
+        flash("评论失败")
+    return redirect(url_for("docx.article_page", blog_id=blog))
 
 
 @docx.route('/create-docx', methods=["POST"])
 @login_required
-def create_docx_page():
-    form = WriteBlogForm()
-    if form.validate_on_submit():
-        auth: User = current_user
-        if not auth.check_role("WriteBlog"):  # 检查是否具有写入权限
-            app.HBlogFlask.print_user_not_allow_opt_log("write blog")
-            abort(403)
-            return
+@app.form_required(WriteBlogForm, "write blog")
+@app.role_required("WriteBlog", "write blog")
+def create_docx_page(form: WriteBlogForm):
+    title = form.title.data
+    if len(title) > 10:
+        flash("标题太长了")
+        abort(400)
 
-        title = form.title.data
-        if len(title) > 10:
-            flash("标题太长了")
-            abort(400)
+    subtitle = form.subtitle.data
+    if len(subtitle) > 10:
+        flash("副标题太长了")
+        abort(400)
 
-        subtitle = form.subtitle.data
-        if len(subtitle) > 10:
-            flash("副标题太长了")
-            abort(400)
+    archive = set(str(form.archive.data).replace(" ", "").split(";"))
+    archive_list = []
+    for f in archive:
+        f_ = load_archive_by_name(f)
+        if f_ is not None:
+            archive_list.append(f_)
 
-        archive = set(str(form.archive.data).replace(" ", "").split(";"))
-        archive_list = []
-        for f in archive:
-            f_ = load_archive_by_name(f)
-            if f_ is not None:
-                archive_list.append(f_)
+    context = bleach.linkify(
+        bleach.clean(
+            markdown(form.context.data, output_format='html'), tags=allow_tag, strip=True))
 
-        context = bleach.linkify(
-            bleach.clean(
-                markdown(form.context.data, output_format='html'), tags=allow_tag, strip=True))
-
-        if BlogArticle(None, current_user, title, subtitle, context, archive=archive_list).create():
-            app.HBlogFlask.print_sys_opt_success_log("write blog")
-            flash(f"博客 {title} 发表成功")
-        else:
-            app.HBlogFlask.print_sys_opt_fail_log("write blog")
-            flash(f"博客 {title} 发表失败")
-        return redirect(url_for("docx.docx_page", page=1))
-    app.HBlogFlask.print_form_error_log("write blog")
-    abort(404)
+    if BlogArticle(None, current_user, title, subtitle, context, archive=archive_list).create():
+        app.HBlogFlask.print_sys_opt_success_log("write blog")
+        flash(f"博客 {title} 发表成功")
+    else:
+        app.HBlogFlask.print_sys_opt_fail_log("write blog")
+        flash(f"博客 {title} 发表失败")
+    return redirect(url_for("docx.docx_page", page=1))
 
 
 @docx.route("delete/<int:blog_id>")
 @login_required
+@app.role_required("DeleteBlog", "delete blog")
 def delete_blog_page(blog_id: int):
-    if not current_user.check_role("DeleteBlog"):
-        app.HBlogFlask.print_user_not_allow_opt_log("delete blog")
-        abort(403)
-        return
-
     if BlogArticle(blog_id, None, None, None, None).delete():
         app.HBlogFlask.print_sys_opt_success_log("delete blog")
         flash("博文删除成功")
@@ -184,12 +163,8 @@ def delete_blog_page(blog_id: int):
 
 @docx.route("delete_comment/<int:comment_id>")
 @login_required
+@app.role_required("DeleteComment", "delete comment")
 def delete_comment_page(comment_id: int):
-    if not current_user.check_role("DeleteComment"):
-        app.HBlogFlask.print_user_not_allow_opt_log("delete comment")
-        abort(403)
-        return
-
     if Comment(comment_id, None, None, None).delete():
         app.HBlogFlask.print_sys_opt_success_log("delete comment")
         flash("博文评论成功")

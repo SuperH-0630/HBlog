@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, flash, url_for, request, abort, current_app, g
+from flask import Blueprint, render_template, redirect, flash, url_for, request, abort, current_app
 from flask_login import login_required, login_user, current_user, logout_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, ValidationError
@@ -189,12 +189,8 @@ def change_passwd_page():
 
 @auth.route('/delete', methods=['GET', 'POST'])
 @login_required
+@app.role_required("DeleteUser", "delete user")
 def delete_user_page():
-    if not current_user.check_role("DeleteUser"):
-        app.HBlogFlask.print_user_not_allow_opt_log("delete user")
-        abort(403)
-        return
-
     form = DeleteUserForm()
     if form.validate_on_submit():
         user = load_user_by_email(form.email.data)
@@ -216,12 +212,8 @@ def delete_user_page():
 
 @auth.route('/role', methods=['GET'])
 @login_required
+@app.role_required("ConfigureSystem", "load role setting")
 def role_page():
-    if not current_user.check_role("ConfigureSystem"):
-        app.HBlogFlask.print_user_not_allow_opt_log("load role setting")
-        abort(403)
-        return
-
     app.HBlogFlask.print_load_page_log("role setting")
     return render_template("auth/role.html",
                            CreateRoleForm=CreateRoleForm(),
@@ -231,77 +223,53 @@ def role_page():
 
 @auth.route('/role-create', methods=['POST'])
 @login_required
-def role_create_page():
-    form = CreateRoleForm()
-    if form.validate_on_submit():
-        if not current_user.check_role("ConfigureSystem"):
-            app.HBlogFlask.print_user_not_allow_opt_log("create role")
-            abort(403)
-            return
-
-        name = form.name.data
-        if len(name) > 10:
-            flash("角色名字太长")
+@app.form_required(CreateRoleForm, "create role")
+@app.role_required("ConfigureSystem", "create role")
+def role_create_page(form: CreateRoleForm):
+    name = form.name.data
+    if len(name) > 10:
+        flash("角色名字太长")
+    else:
+        if User.create_role(name, form.authority.data.replace(" ", "").split(";")):
+            app.HBlogFlask.print_sys_opt_success_log(f"Create role success: {name}")
+            flash("角色创建成功")
         else:
-            if User.create_role(name, form.authority.data.replace(" ", "").split(";")):
-                app.HBlogFlask.print_sys_opt_success_log(f"Create role success: {name}")
-                flash("角色创建成功")
-            else:
-                app.HBlogFlask.print_sys_opt_success_log(f"Create role fail: {name}")
-                flash("角色创建失败")
-        return redirect(url_for("auth.role_page"))
-
-    abort(404)
-    return
+            app.HBlogFlask.print_sys_opt_success_log(f"Create role fail: {name}")
+            flash("角色创建失败")
+    return redirect(url_for("auth.role_page"))
 
 
 @auth.route('/role-delete', methods=['POST'])
 @login_required
-def role_delete_page():
-    form = DeleteRoleForm()
-    if form.validate_on_submit():
-        if not current_user.check_role("ConfigureSystem"):
-            app.HBlogFlask.print_user_not_allow_opt_log("delete role")
-            abort(403)
-            return
-
-        if User.delete_role(form.name.data):
-            app.HBlogFlask.print_sys_opt_success_log(f"Delete role success: {form.name.data}")
-            flash("角色删除成功")
-        else:
-            app.HBlogFlask.print_sys_opt_fail_log(f"Delete role fail: {form.name.data}")
-            flash("角色删除失败")
-        return redirect(url_for("auth.role_page"))
-
-    abort(404)
-    return
+@app.form_required(DeleteRoleForm, "delete role")
+@app.role_required("ConfigureSystem", "delete role")
+def role_delete_page(form: DeleteRoleForm):
+    if User.delete_role(form.name.data):
+        app.HBlogFlask.print_sys_opt_success_log(f"Delete role success: {form.name.data}")
+        flash("角色删除成功")
+    else:
+        app.HBlogFlask.print_sys_opt_fail_log(f"Delete role fail: {form.name.data}")
+        flash("角色删除失败")
+    return redirect(url_for("auth.role_page"))
 
 
 @auth.route('/role-set', methods=['POST'])
 @login_required
-def role_set_page():
-    form = SetRoleForm()
-    if form.validate_on_submit():
-        if not current_user.check_role("ConfigureSystem"):
-            app.HBlogFlask.print_user_not_allow_opt_log("assign user a role")
-            abort(403)
-            return
-
-        user = load_user_by_email(form.email.data)
-        if user is not None:
-            if user.set_user_role(form.name.data):
-                app.HBlogFlask.print_sys_opt_success_log(f"Role assign {form.email.data} -> {form.name.data}")
-                flash("角色设置成功")
-            else:
-                app.HBlogFlask.print_sys_opt_fail_log(f"Role assign {form.email.data} -> {form.name.data}")
-                flash("角色设置失败")
+@app.form_required(SetRoleForm, "assign user a role")
+@app.role_required("ConfigureSystem", "assign user a role")
+def role_set_page(form: SetRoleForm):
+    user = load_user_by_email(form.email.data)
+    if user is not None:
+        if user.set_user_role(form.name.data):
+            app.HBlogFlask.print_sys_opt_success_log(f"Role assign {form.email.data} -> {form.name.data}")
+            flash("角色设置成功")
         else:
-            app.HBlogFlask.print_sys_opt_fail_log(f"Role assign (bad email) {form.email.data} -> {form.name.data}")
-            flash("邮箱未注册")
-        return redirect(url_for("auth.role_page"))
-
-    abort(404)
-    return
+            app.HBlogFlask.print_sys_opt_fail_log(f"Role assign {form.email.data} -> {form.name.data}")
+            flash("角色设置失败")
+    else:
+        app.HBlogFlask.print_sys_opt_fail_log(f"Role assign (bad email) {form.email.data} -> {form.name.data}")
+        flash("邮箱未注册")
+    return redirect(url_for("auth.role_page"))
 
 
 @auth.context_processor

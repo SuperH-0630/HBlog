@@ -1,5 +1,5 @@
 from flask import Blueprint, redirect, render_template, abort, flash, url_for, request
-from flask_login import login_required, current_user
+from flask_login import login_required
 from flask_wtf import FlaskForm
 from wtforms import FileField, StringField, SubmitField
 from wtforms.validators import DataRequired
@@ -35,12 +35,8 @@ def get_page(name: str):
 
 @oss.route('upload', methods=["GET", "POST"])
 @login_required
+@app.role_required("ConfigureSystem", "upload file")
 def upload_page():
-    if not current_user.check_role("ConfigureSystem"):
-        app.HBlogFlask.print_user_not_allow_opt_log("upload file")
-        abort(403)
-        return
-
     form = UploadForm()
     if form.validate_on_submit():
         file = request.files["file"]
