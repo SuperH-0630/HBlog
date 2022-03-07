@@ -6,6 +6,7 @@
 {% block style %}
     {{ super() }}
     <link href="{{ url_for('static', filename='styles/docx/docx.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='editor.md/css/editormd.min.css') }}" />
 {% endblock %}
 
 {% block context %}
@@ -32,7 +33,9 @@
                                 {{ form.archive(class="form-control") }}
                             </div>
 
-                            {{ form.context(class="form-control mb-2", rows="15") }}
+                            <div id="editor">
+                                {{ form.context(class="form-control mb-2", style="display:none;") }}
+                            </div>
 
                             <div id="CreateModal" class="modal fade" role="dialog" aria-hidden="true">
                                 <div class="modal-dialog">
@@ -122,5 +125,20 @@
 
 {% block javascript %}
     {{ super() }}
-    {{ pagedown.include_pagedown() }}
+    <script src="{{ url_for('static', filename='editor.md/editormd.min.js') }}"></script>
+    <script type="text/javascript">
+        $(function() {
+            let editor = editormd("editor", {
+                height: 400,
+                path: "{{ url_for('static',filename='editor.md/lib/') }}",
+                placeholder: "请写下你的日志...",
+                saveHTMLToTextarea: true,
+                emoji: true,
+                taskList: true,
+                tex: true,
+                flowChart: true,
+                sequenceDiagram: true,
+            });
+        });
+    </script>
 {% endblock %}

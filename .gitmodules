@@ -1,0 +1,3 @@
+[submodule "static/editor.md"]
+	path = static/editor.md
+	url = git@github.com:pandao/editor.md.git

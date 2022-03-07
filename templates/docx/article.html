@@ -6,6 +6,7 @@
 {% block style %}
     {{ super() }}
     <link href="{{ url_for('static', filename='styles/docx/article.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='editor.md/css/editormd.min.css') }}" />
 {% endblock %}
 
 {% block context %}
@@ -21,7 +22,10 @@
                     <a href="{{ url_for('docx.article_down_page', blog_id=article.blog_id) }}"> 下载 </a>
                     <hr>
 
-                    {{ article.context | safe }}
+                    <div id="markdown-view">
+                        {# 不要插入label #}
+                        <textarea style="display:none;"> {{ article.context }} </textarea>
+                    </div>
                 </article>
             </div>
         {% endif %}
@@ -106,4 +110,24 @@
             </div>
         {% endif %}
     </section>
+{% endblock %}
+
+{% block javascript %}
+    {{ super() }}
+    <script src="{{ url_for('static', filename='editor.md/editormd.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='editor.md/lib/marked.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='editor.md/lib/prettify.min.js') }}"></script>
+    <script type="text/javascript">
+        $(function() {
+            let editor = editormd.markdownToHTML("markdown-view", {
+                path: "{{ url_for('static',filename='editor.md/lib/') }}",
+                saveHTMLToTextarea: true,
+                emoji: true,
+                taskList: true,
+                tex: true,
+                flowChart: true,
+                sequenceDiagram: true,
+            });
+        });
+    </script>
 {% endblock %}

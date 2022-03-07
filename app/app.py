@@ -5,7 +5,6 @@ from flask import Flask, url_for, request, current_app, g, render_template
 from flask_mail import Mail
 from flask_login import LoginManager, current_user
 from flask.logging import default_handler
-from flask_pagedown import PageDown
 from typing import Optional, Union
 
 import logging.handlers
@@ -44,8 +43,6 @@ class HBlogFlask(Flask):
         self.login_manager.login_view = "auth.login_page"
 
         self.mail = Mail(self)
-        self.pagedown = PageDown()
-        self.pagedown.init_app(self)
 
         self.logger.removeHandler(default_handler)
         self.logger.setLevel(conf["LOG_LEVEL"])

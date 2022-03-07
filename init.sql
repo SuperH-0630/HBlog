@@ -68,8 +68,6 @@ CREATE TABLE IF NOT EXISTS blog -- 创建博客表
     Title      char(20) NOT NULL,                           -- 标题
     SubTitle   char(20) NOT NULL,                           -- 副标题
     Context    TEXT     NOT NULL,                           -- 内容
-    Quote      char(100),                                   -- 引用网站
-    Spider     char(10),                                    -- 爬虫类型
     CreateTime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, -- 创建的时间
     UpdateTime DATETIME NOT NULL DEFAULT (CreateTime),      -- 创建的时间
     Top        BIT      NOT NULL DEFAULT 0,                 -- 置顶
@@ -112,8 +110,6 @@ SELECT blog.ID          AS BlogID,
        Title,
        SubTitle,
        Context,
-       Quote,
-       Spider,
        CreateTime,
        UpdateTime,
        Top

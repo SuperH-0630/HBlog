@@ -31,8 +31,8 @@ def load_blog_by_id(blog_id) -> "Optional[BlogArticle]":
     title = blog[1]
     subtitle = blog[2]
     context = blog[3]
-    update_time = blog[6]
-    top = blog[7]
+    update_time = blog[4]
+    top = blog[5]
     comment = object.comment.load_comment_list(blog_id)
     archive = object.archive.Archive.get_blog_archive(blog_id)
     return BlogArticle(blog_id, auth, title, subtitle, context, update_time, top, comment, archive)

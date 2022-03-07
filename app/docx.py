@@ -1,11 +1,8 @@
 from flask import Blueprint, render_template, abort, redirect, url_for, flash, make_response
 from flask_wtf import FlaskForm
-from flask_pagedown.fields import PageDownField
 from flask_login import login_required, current_user
 from wtforms import TextAreaField, StringField, SubmitField
 from wtforms.validators import DataRequired
-import bleach
-from markdown import markdown
 
 import app
 from sql.base import DBBit
@@ -14,16 +11,18 @@ from object.comment import Comment
 from object.archive import load_archive_by_name
 
 docx = Blueprint("docx", __name__)
-allow_tag = ['a', 'abbr', 'acronym', 'b', 'br', 'blockquote', 'code', 'em', 'i', 'li', 'ol', 'pre', 'strong', 'small',
-             'ul', 'h1', 'h2', 'h3', 'h4', 'h5' 'h6', 'p']
 
 
 class WriteBlogForm(FlaskForm):
     title = StringField("标题", validators=[DataRequired()])
     subtitle = StringField("副标题", validators=[DataRequired()])
     archive = StringField("归档")
-    context = PageDownField("博客内容", validators=[DataRequired()])
+    context = TextAreaField("博客内容", validators=[DataRequired()])
     submit = SubmitField("提交博客")
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.context.data = "# Blog Title\n## Blog subtitle\nHello, World"
 
 
 class WriteCommentForm(FlaskForm):
@@ -93,7 +92,7 @@ def article_down_page(blog_id: int):
         return
 
     response = make_response(article.context)
-    response.headers["Content-Disposition"] = f"attachment;filename={article.title.encode().decode('latin-1')}.html"
+    response.headers["Content-Disposition"] = f"attachment;filename={article.title.encode().decode('latin-1')}.md"
     app.HBlogFlask.print_load_page_log(f"download article (id: {blog_id})")
     return response
 
@@ -135,11 +134,7 @@ def create_docx_page(form: WriteBlogForm):
         if f_ is not None:
             archive_list.append(f_)
 
-    context = bleach.linkify(
-        bleach.clean(
-            markdown(form.context.data, output_format='html'), tags=allow_tag, strip=True))
-
-    if BlogArticle(None, current_user, title, subtitle, context, archive=archive_list).create():
+    if BlogArticle(None, current_user, title, subtitle, form.context.data, archive=archive_list).create():
         app.HBlogFlask.print_sys_opt_success_log("write blog")
         flash(f"博客 {title} 发表成功")
     else:
