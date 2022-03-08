@@ -65,17 +65,14 @@ def create_role(name: str, authority: List[str]):
     return True
 
 
-def delete_role(name: str):
-    cur = db.delete(table="role", where=f"RoleName='{name}'")
+def delete_role(role_id: int):
+    cur = db.delete(table="role", where=f"RoleID={role_id}")
     if cur is None or cur.rowcount == 0:
         return False
     return True
 
 
-def set_user_role(name: str, user_id: str):
-    role_id = get_role_id_by_name(name)
-    if role_id is None:
-        return False
+def set_user_role(role_id: int, user_id: str):
     cur = db.update(table="user", kw={"Role": f"{role_id}"}, where=f"ID={user_id}")
     if cur is None or cur.rowcount == 0:
         return False
@@ -127,3 +124,11 @@ def get_role_id_by_name(role: str):
     if cur is None or cur.rowcount == 0:
         return None
     return cur.fetchone()[0]
+
+
+def get_role_list():
+    """ 获取归档列表 """
+    cur = db.search(columns=["RoleID", "RoleName"], table="role")
+    if cur is None or cur.rowcount == 0:
+        return []
+    return cur.fetchall()

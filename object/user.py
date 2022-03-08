@@ -4,6 +4,7 @@ from itsdangerous import URLSafeTimedSerializer as Serializer
 from itsdangerous.exc import BadData
 from typing import Optional
 
+import sql.user
 from configure import conf
 from sql.user import (read_user,
                       check_role,
@@ -14,7 +15,8 @@ from sql.user import (read_user,
                       change_passwd_hash,
                       create_role,
                       delete_role,
-                      set_user_role)
+                      set_user_role,
+                      get_role_list)
 import object.blog
 import object.comment
 import object.msg
@@ -53,6 +55,8 @@ def load_user_by_id(user_id):
 
 
 class User(UserMixin):
+    RoleAuthorize = sql.user.role_authority
+
     def __init__(self, email, passwd_hash, role, user_id):
         self.email = email
         self.passwd_hash = passwd_hash
@@ -144,8 +148,12 @@ class User(UserMixin):
         return create_role(name, authority)
 
     @staticmethod
-    def delete_role(name: str):
-        return delete_role(name)
+    def delete_role(role_id: int):
+        return delete_role(role_id)
 
-    def set_user_role(self, name: str):
-        return set_user_role(name, self.user_id)
+    def set_user_role(self, role_id: int):
+        return set_user_role(role_id, self.user_id)
+
+    @staticmethod
+    def get_role_list():
+        return get_role_list()

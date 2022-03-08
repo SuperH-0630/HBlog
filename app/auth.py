@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, flash, url_for, request, abort, current_app
 from flask_login import login_required, login_user, current_user, logout_user
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, ValidationError
+from wtforms import StringField, PasswordField, BooleanField, SelectMultipleField, SelectField, SubmitField, ValidationError
 from wtforms.validators import DataRequired
 
 import app
@@ -47,19 +47,27 @@ class DeleteUserForm(FlaskForm):
 
 class CreateRoleForm(FlaskForm):
     name = StringField("角色名称", validators=[DataRequired()])
-    authority = StringField("权限")
+    authority = SelectMultipleField("权限", coerce=str, choices=User.RoleAuthorize)
     submit = SubmitField("创建角色")
 
 
 class DeleteRoleForm(FlaskForm):
-    name = StringField("角色名称", validators=[DataRequired()])
+    name = SelectField("角色名称", validators=[DataRequired()], coerce=int)
     submit = SubmitField("删除角色")
+
+    def __init__(self):
+        super(DeleteRoleForm, self).__init__()
+        self.name.choices = [(i[0], i[1]) for i in User.get_role_list()]
 
 
 class SetRoleForm(FlaskForm):
     email = StringField("邮箱", validators=[DataRequired()])
-    name = StringField("角色名称", validators=[DataRequired()])
+    name = SelectField("角色名称", validators=[DataRequired()], coerce=int)
     submit = SubmitField("设置角色")
+
+    def __init__(self):
+        super(SetRoleForm, self).__init__()
+        self.name.choices = [(i[0], i[1]) for i in User.get_role_list()]
 
 
 @auth.route('/yours')
@@ -230,7 +238,7 @@ def role_create_page(form: CreateRoleForm):
     if len(name) > 10:
         flash("角色名字太长")
     else:
-        if User.create_role(name, form.authority.data.replace(" ", "").split(";")):
+        if User.create_role(name, form.authority.data):
             app.HBlogFlask.print_sys_opt_success_log(f"Create role success: {name}")
             flash("角色创建成功")
         else:
