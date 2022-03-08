@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, abort, redirect, url_for, flash, make_response
+from flask import Blueprint, render_template, abort, redirect, url_for, flash, make_response, g
 from flask_wtf import FlaskForm
 from flask_login import login_required, current_user
 from wtforms import TextAreaField, StringField, SelectMultipleField, SubmitField
@@ -103,7 +103,8 @@ def article_down_page(blog_id: int):
 @login_required
 @app.form_required(WriteCommentForm, "write comment")
 @app.role_required("WriteComment", "write comment")
-def comment_page(blog: int, form: WriteCommentForm):
+def comment_page(blog: int):
+    form: WriteCommentForm = g.form
     context = form.context.data
     if Comment(None, blog, current_user, context).create():
         app.HBlogFlask.print_user_opt_success_log("comment")
@@ -118,7 +119,8 @@ def comment_page(blog: int, form: WriteCommentForm):
 @login_required
 @app.form_required(WriteBlogForm, "write blog")
 @app.role_required("WriteBlog", "write blog")
-def create_docx_page(form: WriteBlogForm):
+def create_docx_page():
+    form: WriteBlogForm = g.form
     title = form.title.data
     if len(title) > 10:
         flash("标题太长了")

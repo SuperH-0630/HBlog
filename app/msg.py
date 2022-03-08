@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, abort, redirect, url_for, flash
+from flask import Blueprint, render_template, abort, redirect, url_for, flash, g
 from flask_wtf import FlaskForm
 from flask_login import login_required, current_user
 from wtforms import TextAreaField, BooleanField, SubmitField
@@ -45,7 +45,8 @@ def msg_page(page: int = 1):
 @login_required
 @app.form_required(WriteForm, "write msg")
 @app.role_required("WriteMsg", "write msg")
-def write_msg_page(form: WriteForm):
+def write_msg_page():
+    form: WriteForm = g.form
     context = form.context.data
     secret = form.secret.data
     if Message(None, current_user, context, secret, None).create():

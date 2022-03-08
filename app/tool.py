@@ -1,5 +1,5 @@
 from functools import wraps
-from flask import abort
+from flask import abort, g
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from typing import ClassVar
@@ -26,6 +26,7 @@ def form_required(form: ClassVar[FlaskForm], opt: str):
             if not f.validate_on_submit():
                 app.HBlogFlask.print_form_error_log(opt)
                 return abort(404)
-            return func(*args, **kwargs, form=f)
+            g.form = f
+            return func(*args, **kwargs)
         return new_func
     return required

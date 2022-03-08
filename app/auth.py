@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, flash, url_for, request, abort, current_app
+from flask import Blueprint, render_template, redirect, flash, url_for, request, abort, current_app, g
 from flask_login import login_required, login_user, current_user, logout_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SelectMultipleField, SelectField, SubmitField, ValidationError
@@ -233,7 +233,8 @@ def role_page():
 @login_required
 @app.form_required(CreateRoleForm, "create role")
 @app.role_required("ConfigureSystem", "create role")
-def role_create_page(form: CreateRoleForm):
+def role_create_page():
+    form: CreateRoleForm = g.form
     name = form.name.data
     if len(name) > 10:
         flash("角色名字太长")
@@ -251,7 +252,8 @@ def role_create_page(form: CreateRoleForm):
 @login_required
 @app.form_required(DeleteRoleForm, "delete role")
 @app.role_required("ConfigureSystem", "delete role")
-def role_delete_page(form: DeleteRoleForm):
+def role_delete_page():
+    form: DeleteRoleForm = g.form
     if User.delete_role(form.name.data):
         app.HBlogFlask.print_sys_opt_success_log(f"Delete role success: {form.name.data}")
         flash("角色删除成功")
@@ -265,7 +267,8 @@ def role_delete_page(form: DeleteRoleForm):
 @login_required
 @app.form_required(SetRoleForm, "assign user a role")
 @app.role_required("ConfigureSystem", "assign user a role")
-def role_set_page(form: SetRoleForm):
+def role_set_page():
+    form: SetRoleForm = g.form
     user = load_user_by_email(form.email.data)
     if user is not None:
         if user.set_user_role(form.name.data):

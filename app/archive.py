@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash
+from flask import Blueprint, render_template, redirect, url_for, flash, g
 from flask_login import login_required, current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
@@ -30,7 +30,8 @@ def archive_page():
 @login_required
 @app.form_required(CreateArchiveForm, "create archive")
 @app.role_required("WriteBlog", "create archive")
-def create_archive_page(form: CreateArchiveForm):
+def create_archive_page():
+    form: CreateArchiveForm = g.form
     name = form.name.data
     describe = form.describe.data
     if len(name) > 10:
