@@ -42,7 +42,7 @@
                                 </div>
                             </div>
 
-                            <button type="button" class="btn btn-info mb-2" data-toggle="modal" data-target="#CreateModal"> 创建归档 </button>
+                            <button type="button" class="btn btn-primary mb-2" data-toggle="modal" data-target="#CreateModal"> 创建归档 </button>
                     </form>
                     </div>
                 </section>
@@ -58,7 +58,7 @@
                 <hr>
                 <p> {{ archive[2] }} </p>
                 <p> 篇数: {{ archive[3] }} </p>
-                <a class="btn btn-info" href="{{ url_for("docx.archive_page", archive=archive[0], page=1) }}"> 进入 </a>
+                <a class="btn btn-primary" href="{{ url_for("docx.archive_page", archive=archive[0], page=1) }}"> 进入 </a>
                 {% if show_delete %}
                     <div id="DeleteModal{{archive[0]}}" class="modal fade" role="dialog" aria-hidden="true">
                         <div class="modal-dialog">
@@ -72,7 +72,7 @@
                                 <div class="modal-footer">
                                     <a class="btn btn-danger"
                                        href="{{ url_for("archive.delete_archive_page", archive_id=archive[0]) }}"> 删除 </a>
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal"> 取消 </button>
+                                    <button type="button" class="btn btn-outline-dark" data-dismiss="modal"> 取消 </button>
                                 </div>
                             </div>
                         </div>

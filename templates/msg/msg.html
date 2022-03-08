@@ -27,14 +27,14 @@
                                     <p> 是否确认留言？请注意网络用语文明。 </p>
                                 </div>
                                 <div class="modal-footer">
-                                    {{ form.submit(class="btn btn-info", value="确认") }}
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                                    {{ form.submit(class="btn btn-danger", value="确认") }}
+                                    <button type="button" class="btn btn-outline-dark" data-dismiss="modal">取消</button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <button type="button" class="btn btn-info mb-2" data-toggle="modal" data-target="#MsgModal"> 留言 </button>
+                    <button type="button" class="btn btn-primary mb-2" data-toggle="modal" data-target="#MsgModal"> 留言 </button>
                 </form>
             </section>
         </div>
@@ -57,7 +57,7 @@
                                             <div class="modal-footer">
                                                 <a class="btn btn-danger"
                                                    href="{{ url_for("msg.delete_msg_page", msg_id=msg.msg_id) }}"> 删除 </a>
-                                                <button type="button" class="btn btn-secondary" data-dismiss="modal"> 取消 </button>
+                                                <button type="button" class="btn btn-outline-dark" data-dismiss="modal"> 取消 </button>
                                             </div>
                                         </div>
                                     </div>
