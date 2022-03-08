@@ -66,7 +66,7 @@
 
         {% if current_user.check_role("ReadBlog") %}
             {# 检查是否具有读取权限 #}
-            <div class="row">
+            <div id="ReadBlogList" class="row">
                 <article class="col-12">
                 {% for blog in blog_list %}
                     {% if show_delete %}
@@ -115,7 +115,7 @@
                 </article>
             </div>
 
-            <ul class="pagination col-12 justify-content-center">
+            <ul id="ReadBlogPageList" class="pagination col-12 justify-content-center">
                 {{ macro.get_page_list(page_list) }}
             </ul>
 
@@ -129,7 +129,7 @@
     <script type="text/javascript">
         $(function() {
             let editor = editormd("editor", {
-                height: 400,
+                height: document.documentElement.clientHeight * 0.5,
                 path: "{{ url_for('static',filename='editor.md/lib/') }}",
                 placeholder: "请写下你的日志...",
                 saveHTMLToTextarea: true,
@@ -138,6 +138,12 @@
                 tex: true,
                 flowChart: true,
                 sequenceDiagram: true,
+                onfullscreen() {
+                    document.getElementById("ReadBlogList").style.visibility = 'hidden';
+                    document.getElementById("ReadBlogPageList").style.visibility = 'hidden';},
+                onfullscreenExit() {
+                    document.getElementById("ReadBlogList").style.visibility = 'visible';
+                    document.getElementById("ReadBlogPageList").style.visibility = 'visible';},
             });
         });
     </script>
