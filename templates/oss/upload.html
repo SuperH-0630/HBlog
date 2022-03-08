@@ -13,14 +13,13 @@
         <div class="col-12 col-lg-6 offset-lg-3">
             <form method="post" action="#" class="upload-form" enctype="multipart/form-data">
                 {{ UploadForm.hidden_tag() }}
-
-                <div class="form-group pb-2">
-                    {{ UploadForm.path.label }}
-                    {{ UploadForm.path(class="form-control", value="hblog/") }}
-                </div>
+                {{ macro.render_field(UploadForm.path) }}
 
                 <div class="form-group pb-2">
                     {{ UploadForm.file(class="form-control") }}
+                    {% for error in UploadForm.file.errors %}
+                        <small class="text-danger form-text"> {{ error }} </small>
+                    {% endfor %}
                 </div>
 
                 <div class="text-right">

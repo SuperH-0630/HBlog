@@ -13,21 +13,9 @@
         <div class="col-12 col-lg-6 offset-lg-3">
             <form method="post" action="{{ url_for("auth.change_passwd_page") }}" class="passwd-form">
                 {{ ChangePasswdForm.hidden_tag() }}
-
-                <div class="form-group">
-                    {{ ChangePasswdForm.old_passwd.label }}
-                    {{ ChangePasswdForm.old_passwd(class="form-control") }}
-                </div>
-
-                <div class="form-group">
-                    {{ ChangePasswdForm.passwd.label }}
-                    {{ ChangePasswdForm.passwd(class="form-control") }}
-                </div>
-
-                <div class="form-group">
-                    {{ ChangePasswdForm.passwd_again.label }}
-                    {{ ChangePasswdForm.passwd_again(class="form-control") }}
-                </div>
+                {{ macro.render_field(ChangePasswdForm.old_passwd) }}
+                {{ macro.render_field(ChangePasswdForm.passwd) }}
+                {{ macro.render_field(ChangePasswdForm.passwd_again) }}
 
                 <div class="text-right">
                     {{ ChangePasswdForm.submit(class='btn btn-outline-danger') }}

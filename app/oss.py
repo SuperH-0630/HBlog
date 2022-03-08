@@ -2,7 +2,7 @@ from flask import Blueprint, redirect, render_template, abort, flash, url_for, r
 from flask_login import login_required
 from flask_wtf import FlaskForm
 from wtforms import FileField, StringField, SubmitField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, Length
 
 from aliyun import aliyun
 import app
@@ -11,9 +11,15 @@ oss = Blueprint("oss", __name__)
 
 
 class UploadForm(FlaskForm):
-    file = FileField("选择文件", validators=[DataRequired()])
-    path = StringField("存储路径")
+    file = FileField("选择文件", description="待上传文件",
+                     validators=[DataRequired(message="必须选择文件")])
+    path = StringField("存储文件夹", description="文件路径(不含文件名)",
+                       validators=[Length(-1, 30, message="文件路径长度为30个字符以内")])
     submit = SubmitField("上传")
+
+    def __init__(self):
+        super(UploadForm, self).__init__()
+        self.path.data = "hblog/"
 
 
 @oss.before_request

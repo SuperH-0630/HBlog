@@ -13,11 +13,7 @@
             <div class="col-12 col-lg-6 offset-lg-3">
                 <form method="post" action="{{ url_for("auth.delete_user_page") }}" class="delete-form">
                     {{ DeleteUserForm.hidden_tag() }}
-
-                    <div class="form-group">
-                        {{ DeleteUserForm.email.label }}
-                        {{ DeleteUserForm.email(class="form-control") }}
-                    </div>
+                    {{ macro.render_field(DeleteUserForm.email) }}
 
                     <div id="DeleteModal" class="modal fade" role="dialog" aria-hidden="true">
                         <div class="modal-dialog">

@@ -28,16 +28,8 @@
                         <div class="tab-pane fade active" id="create">
                             <form method="post" action="{{ url_for('auth.role_create_page') }}" class="role-form">
                                 {{ CreateRoleForm.hidden_tag() }}
-
-                                <div class="form-group">
-                                    {{ CreateRoleForm.name.label }}
-                                    {{ CreateRoleForm.name(class="form-control") }}
-                                </div>
-
-                                <div class="form-group">
-                                    {{ CreateRoleForm.authority.label }}
-                                    {{ CreateRoleForm.authority(class="form-control") }}
-                                </div>
+                                {{ macro.render_field(CreateRoleForm.name) }}
+                                {{ macro.render_field(CreateRoleForm.authority) }}
 
                                 <div id="CreateModal" class="modal fade" role="dialog" aria-hidden="true">
                                     <div class="modal-dialog">
@@ -67,11 +59,7 @@
                         <div class="tab-pane fade" id="drop">
                             <form method="post" action="{{ url_for('auth.role_delete_page') }}" class="role-form">
                                 {{ DeleteRoleForm.hidden_tag() }}
-
-                                <div class="form-group">
-                                    {{ DeleteRoleForm.name.label }}
-                                    {{ DeleteRoleForm.name(class="form-control") }}
-                                </div>
+                                {{ macro.render_field(DeleteRoleForm.name) }}
 
                                 <div id="DeleteModal" class="modal fade" role="dialog" aria-hidden="true">
                                     <div class="modal-dialog">
@@ -101,16 +89,8 @@
                         <div class="tab-pane fade" id="set">
                             <form method="post" action="{{ url_for('auth.role_set_page') }}" class="role-form">
                                 {{ SetRoleForm.hidden_tag() }}
-
-                                <div class="form-group">
-                                    {{ SetRoleForm.email.label }}
-                                    {{ SetRoleForm.email(class="form-control") }}
-                                </div>
-
-                                <div class="form-group">
-                                    {{ SetRoleForm.name.label }}
-                                    {{ SetRoleForm.name(class="form-control") }}
-                                </div>
+                                {{ macro.render_field(SetRoleForm.email) }}
+                                {{ macro.render_field(SetRoleForm.name) }}
 
                                 <div id="SetModal" class="modal fade" role="dialog" aria-hidden="true">
                                     <div class="modal-dialog">

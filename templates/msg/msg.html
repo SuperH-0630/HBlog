@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% import "macro.html" as macro %}
 
 {% block title %} 留言 {% endblock %}
 
@@ -12,9 +11,12 @@
     <section id="base" class="container mt-3">
         <div class="row">
             <section class="col-12 text-right">
-                <form class="writer clearfix" action="{{ url_for('msg.write_msg_page') }}" method="post">
+                <form class="writer clearfix" action="{{ url_for('msg.write_msg_page', page=page) }}" method="post">
                     {{ form.hidden_tag() }}
                     {{ form.context(class="form-control mb-2", rows="5") }}
+                    {% for error in form.context.errors %}
+                        <small class="text-danger form-text text-left"> {{ error }} </small>
+                    {% endfor %}
                     {{ form.secret() }} {{ form.secret.label }}
 
                     <div id="MsgModal" class="modal fade" role="dialog" aria-hidden="true">

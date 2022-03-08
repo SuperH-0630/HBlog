@@ -1,8 +1,8 @@
-from flask import Blueprint, render_template, abort, redirect, url_for, flash, make_response, g
+from flask import Blueprint, render_template, abort, redirect, url_for, flash, make_response, g, request
 from flask_wtf import FlaskForm
 from flask_login import login_required, current_user
-from wtforms import TextAreaField, StringField, SelectMultipleField, SubmitField
-from wtforms.validators import DataRequired
+from wtforms import TextAreaField, StringField, SelectMultipleField, SubmitField, ValidationError
+from wtforms.validators import DataRequired, Length
 
 import app
 from sql.base import DBBit
@@ -14,8 +14,12 @@ docx = Blueprint("docx", __name__)
 
 
 class WriteBlogForm(FlaskForm):
-    title = StringField("标题", validators=[DataRequired()])
-    subtitle = StringField("副标题", validators=[DataRequired()])
+    title = StringField("标题", description="博文主标题",
+                        validators=[
+                            DataRequired(message="必须填写标题"),
+                            Length(1, 20, message="标题长度1-20个字符")])
+    subtitle = StringField("副标题", description="博文副标题",
+                           validators=[Length(-1, 20, message="副标题长度20个字符以内")])
     archive = SelectMultipleField("归档", coerce=int)
     context = TextAreaField("博客内容", validators=[DataRequired()])
     submit = SubmitField("提交博客")
@@ -24,16 +28,31 @@ class WriteBlogForm(FlaskForm):
         super().__init__(**kwargs)
         self.context.data = "# Blog Title\n## Blog subtitle\nHello, World"
         archive = Archive.get_archive_list()
-        self.archive.choices = [(-1, "None")] + [(i[0], f"{i[1]} ({i[3]})") for i in archive]
+        self.archive_res = []
+        self.archive_choices = [(-1, "None")]
+        for i in archive:
+            self.archive_res.append(i[0])
+            self.archive_choices.append((i[0], f"{i[1]} ({i[3]})"))
+        self.archive.choices = self.archive_choices
+
+    def validate_archive(self, field):
+        if -1 in field.data:
+            if len(field.data) != 1:
+                raise ValidationError("归档指定错误(none归档不能和其他归档同时被指定)")
+        else:
+            for i in field.data:
+                if i not in self.archive_res:
+                    raise ValidationError("错误的归档被指定")
 
 
 class WriteCommentForm(FlaskForm):
-    context = TextAreaField(validators=[DataRequired()])
+    context = TextAreaField("", description="评论正文",
+                            validators=[DataRequired(message="请输入评论的内容"),
+                                        Length(1, 100, message="请输入1-100个字的评论")])
     submit = SubmitField("评论")
 
 
-@docx.route('/<int:page>')
-def docx_page(page: int = 1):
+def __load_docx_page(page: int, form: WriteBlogForm):
     if page < 1:
         app.HBlogFlask.print_user_opt_fail_log(f"Load docx list with error page({page})")
         abort(404)
@@ -44,11 +63,17 @@ def docx_page(page: int = 1):
     page_list = app.HBlogFlask.get_page("docx.docx_page", page, max_page)
     app.HBlogFlask.print_load_page_log(f"docx list (page: {page})")
     return render_template("docx/docx.html",
+                           page=page,
                            blog_list=blog_list,
                            is_top=DBBit.BIT_1,
                            page_list=page_list,
-                           form=WriteBlogForm(),
+                           form=form,
                            show_delete=current_user.check_role("DeleteBlog"))
+
+
+@docx.route('/<int:page>')
+def docx_page(page: int = 1):
+    return __load_docx_page(page, WriteBlogForm())
 
 
 @docx.route('/<int:archive>/<int:page>')
@@ -69,8 +94,7 @@ def archive_page(archive: int, page: int = 1):
                            form=None)
 
 
-@docx.route('/article/<int:blog_id>')
-def article_page(blog_id: int):
+def __load_article_page(blog_id: int, form: WriteCommentForm):
     article = load_blog_by_id(blog_id)
     if article is None:
         app.HBlogFlask.print_user_opt_fail_log(f"Load article with error id({blog_id})")
@@ -80,9 +104,14 @@ def article_page(blog_id: int):
     return render_template("docx/article.html",
                            article=article,
                            archive_list=article.archive,
-                           form=WriteCommentForm(),
+                           form=form,
                            show_delete=current_user.check_role("DeleteComment"),
                            show_email=current_user.check_role("ReadUserInfo"))
+
+
+@docx.route('/article/<int:blog_id>')
+def article_page(blog_id: int):
+    return __load_article_page(blog_id, WriteCommentForm())
 
 
 @docx.route('/down/<int:blog_id>')
@@ -99,38 +128,30 @@ def article_down_page(blog_id: int):
     return response
 
 
-@docx.route('/comment/<int:blog>', methods=["POST"])
+@docx.route('/comment/<int:blog_id>', methods=["POST"])
 @login_required
-@app.form_required(WriteCommentForm, "write comment")
+@app.form_required(WriteCommentForm, "write comment", __load_article_page)
 @app.role_required("WriteComment", "write comment")
-def comment_page(blog: int):
+def comment_page(blog_id: int):
     form: WriteCommentForm = g.form
     context = form.context.data
-    if Comment(None, blog, current_user, context).create():
+    if Comment(None, blog_id, current_user, context).create():
         app.HBlogFlask.print_user_opt_success_log("comment")
         flash("评论成功")
     else:
         app.HBlogFlask.print_user_opt_error_log("comment")
         flash("评论失败")
-    return redirect(url_for("docx.article_page", blog_id=blog))
+    return redirect(url_for("docx.article_page", blog_id=blog_id))
 
 
 @docx.route('/create-docx', methods=["POST"])
 @login_required
-@app.form_required(WriteBlogForm, "write blog")
+@app.form_required(WriteBlogForm, "write blog", lambda form: __load_docx_page(int(request.args.get("page", 1)), form))
 @app.role_required("WriteBlog", "write blog")
 def create_docx_page():
     form: WriteBlogForm = g.form
     title = form.title.data
-    if len(title) > 10:
-        flash("标题太长了")
-        abort(400)
-
     subtitle = form.subtitle.data
-    if len(subtitle) > 10:
-        flash("副标题太长了")
-        abort(400)
-
     archive = []
     if -1 not in form.archive.data:
         for i in form.archive.data:

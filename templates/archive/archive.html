@@ -15,14 +15,9 @@
                     <div class="create">
                         <form action="{{ url_for('archive.create_archive_page') }}" method="post">
                             {{ form.hidden_tag() }}
-                            <div class="form-group text-left">
-                                {{ form.name.label }}
-                                {{ form.name(class="form-control") }}
-                            </div>
-
-                            <div class="form-group text-left">
-                                {{ form.describe.label }}
-                                {{ form.describe(class="form-control") }}
+                            <div class="text-left">
+                                {{ macro.render_field(form.name) }}
+                                {{ macro.render_field(form.describe) }}
                             </div>
 
                             <div id="CreateModal" class="modal fade" role="dialog" aria-hidden="true">

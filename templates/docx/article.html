@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% import "macro.html" as macro %}
 
 {% block title %} 文档 {% endblock %}
 
@@ -36,10 +35,12 @@
                     <h1 class="mt-3"> 评论 </h1>
 
                     <section class="col-12 text-right">
-                        <form action="{{ url_for('docx.comment_page', blog=article.blog_id) }}" method="post">
+                        <form action="{{ url_for('docx.comment_page', blog_id=article.blog_id) }}" method="post">
                             {{ form.hidden_tag() }}
                             {{ form.context(class="form-control mb-2", rows="3") }}
-
+                            {% for error in form.context.errors %}
+                                <small class="text-danger form-text text-left"> {{ error }} </small>
+                            {% endfor %}
 
                             <div id="CommentModal" class="modal fade" role="dialog" aria-hidden="true">
                                 <div class="modal-dialog">

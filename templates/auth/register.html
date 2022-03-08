@@ -13,22 +13,9 @@
         <div class="col-12 col-lg-6 offset-lg-3">
             <form method="post" action="{{ url_for("auth.register_page") }}" class="register-form">
                 {{ RegisterForm.hidden_tag() }}
-
-                <div class="form-group">
-                    {{ RegisterForm.email.label }}
-                    {{ RegisterForm.email(class="form-control") }}
-                </div>
-
-                <div class="form-group">
-                    {{ RegisterForm.passwd.label }}
-                    {{ RegisterForm.passwd(class="form-control") }}
-                </div>
-
-                <div class="form-group">
-                    {{ RegisterForm.passwd_again.label }}
-                    {{ RegisterForm.passwd_again(class="form-control") }}
-                </div>
-
+                {{ macro.render_field(RegisterForm.email) }}
+                {{ macro.render_field(RegisterForm.passwd) }}
+                {{ macro.render_field(RegisterForm.passwd_again) }}
                 <div class="text-right">
                     {{ RegisterForm.submit(class='btn btn-success mr-2') }}
                     <a class="btn btn-outline-secondary" href="{{ url_for("auth.login_page") }}"> 前往登录 </a>

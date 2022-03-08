@@ -7,3 +7,13 @@
         {% endif %}
     {% endfor %}
 {% endmacro %}
+
+{% macro render_field(field) %}
+    <div class="form-group">
+        {{ field.label }}
+        {{ field(class="form-control", **kwargs) | safe }}
+        {% for error in field.errors %}
+            <small class="text-danger form-text"> {{ error }} </small>
+        {% endfor %}
+    </div>
+{% endmacro %}
