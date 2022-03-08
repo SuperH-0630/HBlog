@@ -1,14 +1,14 @@
 from flask import Blueprint, render_template, abort, redirect, url_for, flash, make_response
 from flask_wtf import FlaskForm
 from flask_login import login_required, current_user
-from wtforms import TextAreaField, StringField, SubmitField
+from wtforms import TextAreaField, StringField, SelectMultipleField, SubmitField
 from wtforms.validators import DataRequired
 
 import app
 from sql.base import DBBit
 from object.blog import BlogArticle, load_blog_by_id
 from object.comment import Comment
-from object.archive import load_archive_by_name
+from object.archive import load_archive_by_id, Archive
 
 docx = Blueprint("docx", __name__)
 
@@ -16,13 +16,15 @@ docx = Blueprint("docx", __name__)
 class WriteBlogForm(FlaskForm):
     title = StringField("标题", validators=[DataRequired()])
     subtitle = StringField("副标题", validators=[DataRequired()])
-    archive = StringField("归档")
+    archive = SelectMultipleField("归档", coerce=int)
     context = TextAreaField("博客内容", validators=[DataRequired()])
     submit = SubmitField("提交博客")
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.context.data = "# Blog Title\n## Blog subtitle\nHello, World"
+        archive = Archive.get_archive_list()
+        self.archive.choices = [(-1, "None")] + [(i[0], f"{i[1]} ({i[3]})") for i in archive]
 
 
 class WriteCommentForm(FlaskForm):
@@ -127,14 +129,14 @@ def create_docx_page(form: WriteBlogForm):
         flash("副标题太长了")
         abort(400)
 
-    archive = set(str(form.archive.data).replace(" ", "").split(";"))
-    archive_list = []
-    for f in archive:
-        f_ = load_archive_by_name(f)
-        if f_ is not None:
-            archive_list.append(f_)
+    archive = []
+    if -1 not in form.archive.data:
+        for i in form.archive.data:
+            i = load_archive_by_id(i)
+            if i is not None:
+                archive.append(i)
 
-    if BlogArticle(None, current_user, title, subtitle, form.context.data, archive=archive_list).create():
+    if BlogArticle(None, current_user, title, subtitle, form.context.data, archive=archive).create():
         app.HBlogFlask.print_sys_opt_success_log("write blog")
         flash(f"博客 {title} 发表成功")
     else:

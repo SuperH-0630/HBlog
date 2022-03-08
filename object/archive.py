@@ -1,13 +1,13 @@
 from typing import Optional
 
-from sql.archive import get_archive_id_by_name, create_archive, get_archive_list, read_archive, delete_archive
+from sql.archive import get_archive_name_by_id, create_archive, get_archive_list, read_archive, delete_archive
 
 
-def load_archive_by_name(name: str) -> "Optional[Archive]":
-    archive_id, describe = get_archive_id_by_name(name)
+def load_archive_by_id(archive_id: int) -> "Optional[Archive]":
+    archive_name, describe = get_archive_name_by_id(archive_id)
     if archive_id is None:
         return None
-    return Archive(name, describe, archive_id)
+    return Archive(archive_name, describe, archive_id)
 
 
 class Archive:

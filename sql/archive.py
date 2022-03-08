@@ -41,10 +41,10 @@ def get_archive_list(limit: Optional[int] = None, offset: Optional[int] = None):
     return cur.fetchall()
 
 
-def get_archive_id_by_name(name: str):
+def get_archive_name_by_id(archive_id: int):
     """ 获取归档 ID """
-    cur = db.search(columns=["ID", "DescribeText"], table="archive",
-                    where=f"Name='{name}'")
+    cur = db.search(columns=["Name", "DescribeText"], table="archive",
+                    where=f"ID={archive_id}")
     if cur is None or cur.rowcount == 0:
         return None, None
     return cur.fetchone()
