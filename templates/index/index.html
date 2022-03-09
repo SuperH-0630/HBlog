@@ -32,7 +32,7 @@
                                                       href="{{ url_for("docx.article_page", blog=blog[0]) }}">
                             {{ blog[1] }}
                                 <small> {{ blog[2] }}
-                                    <small> {{ blog[3] }} </small> </small> </a></div>
+                                    <small> {{ blog[3] }} / {{ blog[4] }} </small> </small> </a></div>
                     {% endfor %}
                     </article>
                 {% else %}
@@ -42,7 +42,7 @@
                                               href="{{ url_for("docx.article_page", blog=blog[0]) }}">
                             {{ blog[1] }}
                                 <small> {{ blog[2] }}
-                                    <small> {{ blog[3] }} </small> </small> </a></div>
+                                    <small> {{ blog[3] }} / {{ blog[4] }} </small> </small> </a></div>
                     {% endfor %}
                     </article>
                 {% endif %}

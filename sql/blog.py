@@ -35,7 +35,7 @@ def update_blog(blog_id: int, context: str) -> bool:
 
 def read_blog(blog_id: int) -> list:
     """ 读取blog内容 """
-    cur = db.search(columns=["Auth", "Title", "SubTitle", "Context", "UpdateTime", "Top"],
+    cur = db.search(columns=["Auth", "Title", "SubTitle", "Context", "UpdateTime", "CreateTime", "Top"],
                     table="blog",
                     where=f"ID={blog_id}")
     if cur is None or cur.rowcount == 0:
@@ -58,7 +58,8 @@ def delete_blog(blog_id: int):
 
 def get_blog_list(limit: Optional[int] = None, offset: Optional[int] = None) -> list:
     """ 获得 blog 列表 """
-    cur = db.search(columns=["ID", "Title", "SubTitle", "UpdateTime", "Top"], table="blog_with_top",
+    cur = db.search(columns=["ID", "Title", "SubTitle", "UpdateTime", "CreateTime", "Top"], table="blog_with_top",
+                    order_by=[("CreateTime", "DESC"), ("Title", "ASC"), ("SubTitle", "ASC")],
                     limit=limit,
                     offset=offset)
     if cur is None or cur.rowcount == 0:
@@ -68,8 +69,8 @@ def get_blog_list(limit: Optional[int] = None, offset: Optional[int] = None) -> 
 
 def get_blog_list_not_top(limit: Optional[int] = None, offset: Optional[int] = None) -> list:
     """ 获得blog列表 忽略置顶 """
-    cur = db.search(columns=["ID", "Title", "SubTitle", "UpdateTime"], table="blog",
-                    order_by=[("UpdateTime", "DESC")],
+    cur = db.search(columns=["ID", "Title", "SubTitle", "UpdateTime", "CreateTime"], table="blog",
+                    order_by=[("CreateTime", "DESC"), ("Title", "ASC"), ("SubTitle", "ASC")],
                     limit=limit,
                     offset=offset)
     if cur is None or cur.rowcount == 0:
@@ -87,7 +88,8 @@ def get_blog_count() -> int:
 
 def get_archive_blog_list(archive_id, limit: Optional[int] = None, offset: Optional[int] = None) -> list:
     """ 获得指定归档的 blog 列表 """
-    cur = db.search(columns=["BlogID", "Title", "SubTitle", "UpdateTime", "Top"], table="blog_with_archive",
+    cur = db.search(columns=["BlogID", "Title", "SubTitle", "UpdateTime", "CreateTime", "Top"], table="blog_with_archive",
+                    order_by=[("CreateTime", "DESC"), ("Title", "ASC"), ("SubTitle", "ASC")],
                     where=f"ArchiveID={archive_id}",
                     limit=limit,
                     offset=offset)

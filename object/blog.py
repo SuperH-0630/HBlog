@@ -33,20 +33,22 @@ def load_blog_by_id(blog_id) -> "Optional[BlogArticle]":
     subtitle = blog[2]
     context = blog[3]
     update_time = blog[4]
-    top = blog[5]
+    create_time = blog[4]
+    top = blog[6]
     comment = object.comment.load_comment_list(blog_id)
     archive = object.archive.Archive.get_blog_archive(blog_id)
-    return BlogArticle(blog_id, auth, title, subtitle, context, update_time, top, comment, archive)
+    return BlogArticle(blog_id, auth, title, subtitle, context, update_time, create_time, top, comment, archive)
 
 
 class BlogArticle:
-    def __init__(self, blog_id, auth, title, subtitle, context, update_time=None, top=False, comment=None, archive=None):
+    def __init__(self, blog_id, auth, title, subtitle, context, update_time=None, create_time=None, top=False, comment=None, archive=None):
         self.blog_id = blog_id
         self.user = auth
         self.title = title
         self.subtitle = subtitle
         self.context = context
         self.update_time = update_time
+        self.create_time = create_time
         self.top = top
         self.comment = [] if comment is None else comment
         self.archive = [] if archive is None else archive

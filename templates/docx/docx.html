@@ -80,7 +80,7 @@
                         </div>
                     {% endif %}
 
-                    {% if blog[4] == is_top %}
+                    {% if blog[5] == is_top %}
                         <div class="docx-top">
                             {% if show_delete %}
                                 <button type="button" class="btn btn-danger ml-2"
@@ -89,7 +89,7 @@
                             <a class="h4" href="{{ url_for("docx.article_page", blog=blog[0]) }}">
                             {{ blog[1] }}
                                 <small> {{ blog[2] }}
-                                    <small> {{ blog[3] }} </small> </small> </a></div>
+                                    <small> {{ blog[3] }} / {{ blog[4] }} </small> </small> </a></div>
                     {% else %}
                         <div class="docx">
                             {% if show_delete %}
@@ -99,7 +99,7 @@
                             <a class="h4" href="{{ url_for("docx.article_page", blog=blog[0]) }}">
                             {{ blog[1] }}
                                 <small> {{ blog[2] }}
-                                    <small> {{ blog[3] }} </small> </small> </a></div>
+                                    <small> {{ blog[3] }} / {{ blog[4] }} </small> </small> </a></div>
                     {% endif %}
                 {% endfor %}
                 </article>
