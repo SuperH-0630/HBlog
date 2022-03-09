@@ -15,7 +15,7 @@ def hello_page():
     return render_template("index/hello.html")
 
 
-@index.route('/index')
+@index.route('/home')
 def index_page():
     blog_list = BlogArticle.get_blog_list(limit=5, offset=0, not_top=True)
     msg_list = load_message_list(limit=6, offset=0, show_secret=False)

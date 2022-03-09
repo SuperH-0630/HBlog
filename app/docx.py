@@ -71,13 +71,16 @@ def __load_docx_page(page: int, form: WriteBlogForm):
                            show_delete=current_user.check_role("DeleteBlog"))
 
 
-@docx.route('/<int:page>')
-def docx_page(page: int = 1):
+@docx.route('/')
+def docx_page():
+    page = int(request.args.get("page", 1))
     return __load_docx_page(page, WriteBlogForm())
 
 
-@docx.route('/<int:archive>/<int:page>')
-def archive_page(archive: int, page: int = 1):
+@docx.route('/archive')
+def archive_page():
+    page = int(request.args.get("page", 1))
+    archive = int(request.args.get("archive", 1))
     if page < 1:
         app.HBlogFlask.print_user_opt_fail_log(f"Load archive-docx list with error page({page}) archive: {archive}")
         abort(404)
@@ -109,13 +112,15 @@ def __load_article_page(blog_id: int, form: WriteCommentForm):
                            show_email=current_user.check_role("ReadUserInfo"))
 
 
-@docx.route('/article/<int:blog_id>')
-def article_page(blog_id: int):
+@docx.route('/article')
+def article_page():
+    blog_id = int(request.args.get("blog", 1))
     return __load_article_page(blog_id, WriteCommentForm())
 
 
-@docx.route('/down/<int:blog_id>')
-def article_down_page(blog_id: int):
+@docx.route('/article/download')
+def article_down_page():
+    blog_id = int(request.args.get("blog", 1))
     article = load_blog_by_id(blog_id)
     if article is None:
         app.HBlogFlask.print_user_opt_fail_log(f"Download article with error id({blog_id})")
@@ -128,23 +133,7 @@ def article_down_page(blog_id: int):
     return response
 
 
-@docx.route('/comment/<int:blog_id>', methods=["POST"])
-@login_required
-@app.form_required(WriteCommentForm, "write comment", __load_article_page)
-@app.role_required("WriteComment", "write comment")
-def comment_page(blog_id: int):
-    form: WriteCommentForm = g.form
-    context = form.context.data
-    if Comment(None, blog_id, current_user, context).create():
-        app.HBlogFlask.print_user_opt_success_log("comment")
-        flash("评论成功")
-    else:
-        app.HBlogFlask.print_user_opt_error_log("comment")
-        flash("评论失败")
-    return redirect(url_for("docx.article_page", blog_id=blog_id))
-
-
-@docx.route('/create-docx', methods=["POST"])
+@docx.route('/article/create', methods=["POST"])
 @login_required
 @app.form_required(WriteBlogForm, "write blog", lambda form: __load_docx_page(int(request.args.get("page", 1)), form))
 @app.role_required("WriteBlog", "write blog")
@@ -168,10 +157,11 @@ def create_docx_page():
     return redirect(url_for("docx.docx_page", page=1))
 
 
-@docx.route("delete/<int:blog_id>")
+@docx.route("/article/delete")
 @login_required
 @app.role_required("DeleteBlog", "delete blog")
-def delete_blog_page(blog_id: int):
+def delete_blog_page():
+    blog_id = int(request.args.get("blog", 1))
     if BlogArticle(blog_id, None, None, None, None).delete():
         app.HBlogFlask.print_sys_opt_success_log("delete blog")
         flash("博文删除成功")
@@ -181,10 +171,28 @@ def delete_blog_page(blog_id: int):
     return redirect(url_for("docx.docx_page", page=1))
 
 
-@docx.route("delete_comment/<int:comment_id>")
+@docx.route('/comment/create', methods=["POST"])
+@login_required
+@app.form_required(WriteCommentForm, "write comment", __load_article_page)
+@app.role_required("WriteComment", "write comment")
+def comment_page():
+    blog_id = int(request.args.get("blog", 1))
+    form: WriteCommentForm = g.form
+    context = form.context.data
+    if Comment(None, blog_id, current_user, context).create():
+        app.HBlogFlask.print_user_opt_success_log("comment")
+        flash("评论成功")
+    else:
+        app.HBlogFlask.print_user_opt_error_log("comment")
+        flash("评论失败")
+    return redirect(url_for("docx.article_page", blog=blog_id))
+
+
+@docx.route("/comment/delete")
 @login_required
 @app.role_required("DeleteComment", "delete comment")
-def delete_comment_page(comment_id: int):
+def delete_comment_page():
+    comment_id = int(request.args.get("comment", 1))
     if Comment(comment_id, None, None, None).delete():
         app.HBlogFlask.print_sys_opt_success_log("delete comment")
         flash("博文评论成功")

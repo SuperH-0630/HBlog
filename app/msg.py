@@ -44,12 +44,13 @@ def __load_msg_page(page: int, form: WriteForm):
                            show_email=current_user.check_role("ReadUserInfo"))
 
 
-@msg.route('/<int:page>')
-def msg_page(page: int = 1):
+@msg.route('/')
+def msg_page():
+    page = int(request.args.get("page", 1))
     return __load_msg_page(page, WriteForm())
 
 
-@msg.route('/write', methods=["POST"])
+@msg.route('/create', methods=["POST"])
 @login_required
 @app.form_required(WriteForm, "write msg", lambda form: __load_msg_page(int(request.args.get("page", 1)), form))
 @app.role_required("WriteMsg", "write msg")
@@ -66,10 +67,11 @@ def write_msg_page():
     return redirect(url_for("msg.msg_page", page=1))
 
 
-@msg.route('/delete/<int:msg_id>')
+@msg.route('/delete')
 @login_required
 @app.role_required("DeleteMsg", "delete msg")
-def delete_msg_page(msg_id: int):
+def delete_msg_page():
+    msg_id = int(request.args.get("msg", 1))
     if Message(msg_id, None, None).delete():
         app.HBlogFlask.print_user_opt_success_log("delete msg")
         flash("留言删除成功")

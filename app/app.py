@@ -34,7 +34,7 @@ class HBlogFlask(Flask):
         self.register_blueprint(docx, url_prefix="/docx")
         self.register_blueprint(msg, url_prefix="/msg")
         self.register_blueprint(auth, url_prefix="/auth")
-        self.register_blueprint(about_me, url_prefix="/about-me")
+        self.register_blueprint(about_me, url_prefix="/about")
         self.register_blueprint(oss, url_prefix="/oss")
 
         self.login_manager = LoginManager()

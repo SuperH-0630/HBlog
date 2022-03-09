@@ -72,7 +72,7 @@
                                     </div>
                                     <div class="modal-footer">
                                         <a class="btn btn-danger"
-                                           href="{{ url_for("docx.delete_blog_page", blog_id=blog[0]) }}"> 删除 </a>
+                                           href="{{ url_for("docx.delete_blog_page", blog=blog[0]) }}"> 删除 </a>
                                         <button type="button" class="btn btn-outline-dark" data-dismiss="modal"> 取消 </button>
                                     </div>
                                 </div>
@@ -86,7 +86,7 @@
                                 <button type="button" class="btn btn-danger ml-2"
                                     data-toggle="modal" data-target="#DeleteModal{{blog[0]}}"> &times; </button>
                             {% endif %}
-                            <a class="h4" href="{{ url_for("docx.article_page", blog_id=blog[0]) }}">
+                            <a class="h4" href="{{ url_for("docx.article_page", blog=blog[0]) }}">
                             {{ blog[1] }}
                                 <small> {{ blog[2] }}
                                     <small> {{ blog[3] }} </small> </small> </a></div>
@@ -96,7 +96,7 @@
                                 <button type="button" class="btn btn-danger ml-2"
                                     data-toggle="modal" data-target="#DeleteModal{{blog[0]}}"> &times; </button>
                             {% endif %}
-                            <a class="h4" href="{{ url_for("docx.article_page", blog_id=blog[0]) }}">
+                            <a class="h4" href="{{ url_for("docx.article_page", blog=blog[0]) }}">
                             {{ blog[1] }}
                                 <small> {{ blog[2] }}
                                     <small> {{ blog[3] }} </small> </small> </a></div>

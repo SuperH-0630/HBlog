@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, g
+from flask import Blueprint, render_template, redirect, url_for, flash, g, request
 from flask_login import login_required, current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, SubmitField
@@ -40,7 +40,7 @@ def archive_page():
     return __load_archive_page(CreateArchiveForm())
 
 
-@archive.route("create", methods=["POST"])
+@archive.route("/create", methods=["POST"])
 @login_required
 @app.form_required(CreateArchiveForm, "create archive", __load_archive_page)
 @app.role_required("WriteBlog", "create archive")
@@ -57,10 +57,11 @@ def create_archive_page():
     return redirect(url_for("archive.archive_page"))
 
 
-@archive.route("delete/<int:archive_id>")
+@archive.route("/delete")
 @login_required
 @app.role_required("DeleteBlog", "delete archive")
-def delete_archive_page(archive_id: int):
+def delete_archive_page():
+    archive_id = int(request.args.get("archive", 1))
     if Archive(None, None, archive_id).delete():
         app.HBlogFlask.print_sys_opt_success_log(f"Delete archive {archive_id}")
         flash("归档删除成功")

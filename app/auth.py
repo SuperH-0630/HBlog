@@ -128,7 +128,7 @@ class SetRoleForm(RoleForm):
             raise ValidationError("邮箱用户不存在")
 
 
-@auth.route('/yours')
+@auth.route('/user/yours')
 @login_required
 def yours_page():
     msg_count, comment_count, blog_count = current_user.count_info()
@@ -136,7 +136,7 @@ def yours_page():
     return render_template("auth/yours.html", msg_count=msg_count, comment_count=comment_count, blog_count=blog_count)
 
 
-@auth.route('/login', methods=["GET", "POST"])
+@auth.route('/user/login', methods=["GET", "POST"])
 def login_page():
     if current_user.is_authenticated:
         app.HBlogFlask.print_user_not_allow_opt_log("login")
@@ -160,7 +160,7 @@ def login_page():
     return render_template("auth/login.html", form=form)
 
 
-@auth.route('/register', methods=["GET", "POST"])
+@auth.route('/user/register', methods=["GET", "POST"])
 def register_page():
     if current_user.is_authenticated:
         app.HBlogFlask.print_user_not_allow_opt_log("register")
@@ -179,7 +179,7 @@ def register_page():
     return render_template("auth/register.html", RegisterForm=form)
 
 
-@auth.route('/confirm')
+@auth.route('/user/confirm')
 def confirm_page():
     token = request.args.get("token", None)
     if token is None:
@@ -205,7 +205,7 @@ def confirm_page():
     return redirect(url_for("base.index_page"))
 
 
-@auth.route('/logout')
+@auth.route('/user/logout')
 @login_required
 def logout_page():
     app.HBlogFlask.print_import_user_opt_success_log(f"logout")
@@ -214,7 +214,7 @@ def logout_page():
     return redirect(url_for("base.index_page"))
 
 
-@auth.route('/passwd', methods=['GET', 'POST'])
+@auth.route('/user/set/passwd', methods=['GET', 'POST'])
 @login_required
 def change_passwd_page():
     form = ChangePasswdForm()
@@ -230,7 +230,7 @@ def change_passwd_page():
     return render_template("auth/passwd.html", ChangePasswdForm=form)
 
 
-@auth.route('/delete', methods=['GET', 'POST'])
+@auth.route('/user/delete', methods=['GET', 'POST'])
 @login_required
 @app.role_required("DeleteUser", "delete user")
 def delete_user_page():
@@ -259,7 +259,7 @@ def role_page():
                            SetRoleForm=SetRoleForm())
 
 
-@auth.route('/role-create', methods=['POST'])
+@auth.route('/role/create', methods=['POST'])
 @login_required
 @app.form_required(CreateRoleForm, "create role")
 @app.role_required("ConfigureSystem", "create role")
@@ -275,7 +275,7 @@ def role_create_page():
     return redirect(url_for("auth.role_page"))
 
 
-@auth.route('/role-delete', methods=['POST'])
+@auth.route('/role/delete', methods=['POST'])
 @login_required
 @app.form_required(DeleteRoleForm, "delete role")
 @app.role_required("ConfigureSystem", "delete role")
@@ -290,7 +290,7 @@ def role_delete_page():
     return redirect(url_for("auth.role_page"))
 
 
-@auth.route('/role-set', methods=['POST'])
+@auth.route('/role/set', methods=['POST'])
 @login_required
 @app.form_required(SetRoleForm, "assign user a role")
 @app.role_required("ConfigureSystem", "assign user a role")
