@@ -115,27 +115,28 @@
 
 {% block javascript %}
     {{ super() }}
-    <script src="{{ url_for('static', filename='editor.md/editormd.min.js') }}"></script>
-    <script type="text/javascript">
-        $(function() {
-            let editor = editormd("editor", {
-                height: document.documentElement.clientHeight * 0.5,
-                path: "{{ url_for('static',filename='editor.md/lib/') }}",
-                placeholder: "请写下你的日志...",
-                saveHTMLToTextarea: true,
-                codeFold: true,
-                emoji: true,
-                taskList: true,
-                tex: true,
-                flowChart: true,
-                sequenceDiagram: true,
-                onfullscreen() {
-                    document.getElementById("ReadBlogList").style.visibility = 'hidden';
-                    document.getElementById("ReadBlogPageList").style.visibility = 'hidden';},
-                onfullscreenExit() {
-                    document.getElementById("ReadBlogList").style.visibility = 'visible';
-                    document.getElementById("ReadBlogPageList").style.visibility = 'visible';},
+
+    {% if form and current_user.check_role("WriteBlog") %}
+        <script src="{{ url_for('static', filename='editor.md/editormd.js') }}"></script>
+        <script type="text/javascript">
+            $(function() {
+                let editor = editormd("editor", {
+                    height: document.documentElement.clientHeight * 0.5,
+                    path: "{{ url_for('static',filename='editor.md/lib/') }}",
+                    placeholder: "请写下你的日志...",
+                    codeFold: true,
+                    emoji: true,
+                    taskList: true,
+                    tex: true,
+                    sequenceDiagram: true,
+                    onfullscreen() {
+                        document.getElementById("ReadBlogList").style.visibility = 'hidden';
+                        document.getElementById("ReadBlogPageList").style.visibility = 'hidden';},
+                    onfullscreenExit() {
+                        document.getElementById("ReadBlogList").style.visibility = 'visible';
+                        document.getElementById("ReadBlogPageList").style.visibility = 'visible';},
+                });
             });
-        });
-    </script>
+        </script>
+    {% endif %}
 {% endblock %}
