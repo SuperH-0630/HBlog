@@ -108,19 +108,28 @@
         {{ conf['FOOT'] }}
     </footer>
     <script>
-        let context = document.getElementById('context')
-        let foot = document.getElementById('foot')
-        let context_height = context.getBoundingClientRect().bottom
-        let win_height = 0
-        if (window.innerHeight)
-            win_height = window.innerHeight;
-        else if ((document.body) && (document.body.clientHeight))
-            win_height = document.body.clientHeight;
+        function SetFooter (mutationsList, observer) {
+            let foot = document.getElementById('foot')
+            let context_height = context.getBoundingClientRect().bottom
+            let win_height = 0
+            if (window.innerHeight)
+                win_height = window.innerHeight;
+            else if ((document.body) && (document.body.clientHeight))
+                win_height = document.body.clientHeight;
 
-        if (win_height - context_height - foot.clientHeight <= 0)
-            foot.style.marginTop = "0"
-        else
-            foot.style.marginTop = (win_height - context_height - foot.clientHeight).toString() + "px"
+            if (win_height - context_height - foot.clientHeight <= 0)
+                foot.style.marginTop = "0"
+            else
+                foot.style.marginTop = (win_height - context_height - foot.clientHeight).toString() + "px"
+        }
+        let MutationObserver = window.MutationObserver;
+        let observer = new MutationObserver(SetFooter);
+        let context = document.getElementById('context')
+        observer.observe(context, {
+            attributes: true, // 属性的变动
+            subtree: true, // 是否将观察器应用于该节点的所有后代节点
+        });
+        SetFooter()
     </script>
 {% endblock %}
 
