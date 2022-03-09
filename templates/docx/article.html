@@ -14,7 +14,7 @@
             {# 检查是否具有读取权限 #}
             <div class="row">
                 <article class="col-12">
-                    <h1> {{ article.title }} <small> {{ article.subtitle }} <small> {{ article.update_time}} </small> </small> </h1>
+                    <h1> {{ article.title }} <small> {{ article.subtitle }} <small> {{ article.update_time}} / {{ article.create_time}} </small> </small> </h1>
                     {% for archive in article.archive %}
                         <span class="badge badge-info"> {{ archive.name }} </span>
                     {% endfor %}
