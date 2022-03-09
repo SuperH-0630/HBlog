@@ -190,7 +190,7 @@ def update_docx_page():
     else:
         app.HBlogFlask.print_sys_opt_fail_log("update blog")
         flash("博文更新失败")
-    return redirect(url_for("docx.docx_page", page=1))
+    return redirect(url_for("docx.article_page", blog=form.blog_id.data))
 
 
 @docx.route("/article/delete")
