@@ -28,9 +28,10 @@ class WriteBlogForm(EditorMD):
     archive = SelectMultipleField("归档", coerce=int)
     submit = SubmitField("提交博客")
 
-    def __init__(self, **kwargs):
+    def __init__(self, default: bool = False, **kwargs):
         super().__init__(**kwargs)
-        self.context.data = "# Blog Title\n## Blog subtitle\nHello, World"
+        if default:
+            self.context.data = "# Blog Title\n## Blog subtitle\nHello, World"
         archive = Archive.get_archive_list()
         self.archive_res = []
         self.archive_choices = [(-1, "None")]
@@ -89,7 +90,7 @@ def __load_docx_page(page: int, form: WriteBlogForm):
 @docx.route('/')
 def docx_page():
     page = int(request.args.get("page", 1))
-    return __load_docx_page(page, WriteBlogForm())
+    return __load_docx_page(page, WriteBlogForm(True))
 
 
 @docx.route('/archive')
