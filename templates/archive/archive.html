@@ -51,7 +51,7 @@
             <div class="archive mb-3 mr-2 ml-2">
                 <h3> {{ archive[1] }} </h3>
                 <hr>
-                <p> {{ archive[2] }} </p>
+                <p class="archive_describe"> {{ archive[2] }} </p>
                 <p> 篇数: {{ archive[3] }} </p>
                 <a class="btn btn-primary" href="{{ url_for("docx.archive_page", archive=archive[0], page=1) }}"> 进入 </a>
                 {% if show_delete %}

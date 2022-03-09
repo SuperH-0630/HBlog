@@ -18,3 +18,7 @@
     background-color: white;
     border-radius: 10px;
 }
+
+.archive_describe {
+    min-height: 2em;
+}
