@@ -37,7 +37,7 @@ class Database(metaclass=abc.ABCMeta):
         self.logger.setLevel(conf["LOG_LEVEL"])
         if len(conf["LOG_HOME"]) > 0:
             handle = logging.handlers.TimedRotatingFileHandler(
-                os.path.join(conf["LOG_HOME"], f"mysql-{os.getpid()}-{name}@{host}.log"))
+                os.path.join(conf["LOG_HOME"], f"mysql-{name}@{host}.log"))
             handle.setFormatter(logging.Formatter(conf["LOG_FORMAT"]))
             self.logger.addHandler(handle)
 
