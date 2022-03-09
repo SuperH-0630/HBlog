@@ -13,6 +13,7 @@ def read_comment(blog_id: int):
 
 def create_comment(blog_id: int, user_id: int, context: str):
     """ 新建 comment """
+    context = context.replace("'", "''")
     cur = db.insert(table="comment",
                     columns=["BlogID", "Auth", "Context"],
                     values=f"{blog_id}, {user_id}, '{context}'")

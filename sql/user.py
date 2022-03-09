@@ -22,6 +22,7 @@ def read_user(email: str):
 
 def create_user(email: str, passwd: str):
     """ 创建用户 """
+    email = email.replace("'", "''")
     cur = db.search(columns=["count(Email)"], table="user")  # 统计个数
     passwd = object.user.User.get_passwd_hash(passwd)
     if cur is None or cur.rowcount == 0 or cur.fetchone()[0] == 0:
@@ -48,6 +49,7 @@ def delete_user(user_id: int):
 
 
 def create_role(name: str, authority: List[str]):
+    name = name.replace("'", "''")
     cur = db.insert(table="role", columns=["RoleName"], values=f"'{name}'", not_commit=True)
     if cur is None or cur.rowcount == 0:
         return False
@@ -112,6 +114,7 @@ def check_role(role: int, operate: str):
 
 def check_role_by_name(role: str, operate: str):
     """ 检查角色权限（通过角色名） """
+    role = role.replace("'", "''")
     cur = db.search(columns=[operate], table="role", where=f"RoleName='{role}'")
     if cur is None or cur.rowcount == 0:
         return False
@@ -120,6 +123,7 @@ def check_role_by_name(role: str, operate: str):
 
 def get_role_id_by_name(role: str):
     """ 检查角色权限（通过角色名） """
+    role = role.replace("'", "''")
     cur = db.search(columns=["RoleID"], table="role", where=f"RoleName='{role}'")
     if cur is None or cur.rowcount == 0:
         return None

@@ -6,6 +6,9 @@ import object.archive
 def create_blog(auth_id: int, title: str, subtitle: str, context: str,
                 archive_list: List[object.archive.Archive]) -> bool:
     """ 写入新的blog """
+    title = title.replace("'", "''")
+    subtitle = subtitle.replace("'", "''")
+    context = context.replace("'", "''")
     cur = db.insert(table="blog", columns=["Auth", "Title", "SubTitle", "Context"],
                     values=f"{auth_id}, '{title}', '{subtitle}', '{context}'")
     if cur is None or cur.rowcount == 0:
@@ -21,6 +24,7 @@ def create_blog(auth_id: int, title: str, subtitle: str, context: str,
 
 def update_blog(blog_id: int, context: str) -> bool:
     """ 更新博客文章 """
+    context = context.replace("'", "''")
     cur = db.update(table="blog",
                     kw={"UpdateTime": "CURRENT_TIMESTAMP()", "Context": f"'{context}'"},
                     where=f"ID={blog_id}")

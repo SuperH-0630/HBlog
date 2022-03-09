@@ -3,6 +3,7 @@ from typing import Optional
 
 
 def create_msg(auth: int, context: str, secret: bool = False):
+    context = context.replace("'", "''")
     cur = db.insert(table="message",
                     columns=["Auth", "Context", "Secret"],
                     values=f"{auth}, '{context}', {1 if secret else 0}")

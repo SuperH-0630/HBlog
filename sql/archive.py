@@ -4,6 +4,8 @@ from typing import Optional
 
 def create_archive(name: str, describe: str):
     """ 创建新归档 """
+    name = name.replace("'", "''")
+    describe = describe.replace("'", "''")
     cur = db.insert(table="archive",
                     columns=["Name", "DescribeText"],
                     values=f"'{name}', '{describe}'")
