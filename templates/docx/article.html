@@ -157,6 +157,7 @@
                     path: "{{ url_for('static',filename='editor.md/lib/') }}",
                     placeholder: "请写下你的日志...",
                     saveHTMLToTextarea: true,
+                    codeFold: true,
                     emoji: true,
                     taskList: true,
                     tex: true,
@@ -171,6 +172,7 @@
                 let editor = editormd.markdownToHTML("markdown-view", {
                     path: "{{ url_for('static',filename='editor.md/lib/') }}",
                     saveHTMLToTextarea: true,
+                    codeFold: true,
                     emoji: true,
                     taskList: true,
                     tex: true,
