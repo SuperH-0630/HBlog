@@ -1,8 +1,9 @@
 from flask import Blueprint, render_template, abort, redirect, url_for, flash, make_response, g, request
 from flask_wtf import FlaskForm
 from flask_login import login_required, current_user
-from wtforms import TextAreaField, StringField, SelectMultipleField, SubmitField, ValidationError
+from wtforms import HiddenField, TextAreaField, StringField, SelectMultipleField, SubmitField, ValidationError
 from wtforms.validators import DataRequired, Length
+from typing import Optional
 
 import app
 from sql.base import DBBit
@@ -13,7 +14,11 @@ from object.archive import load_archive_by_id, Archive
 docx = Blueprint("docx", __name__)
 
 
-class WriteBlogForm(FlaskForm):
+class EditorMD(FlaskForm):
+    context = TextAreaField("博客内容", validators=[DataRequired(message="必须输入博客文章")])
+
+
+class WriteBlogForm(EditorMD):
     title = StringField("标题", description="博文主标题",
                         validators=[
                             DataRequired(message="必须填写标题"),
@@ -21,7 +26,6 @@ class WriteBlogForm(FlaskForm):
     subtitle = StringField("副标题", description="博文副标题",
                            validators=[Length(-1, 20, message="副标题长度20个字符以内")])
     archive = SelectMultipleField("归档", coerce=int)
-    context = TextAreaField("博客内容", validators=[DataRequired()])
     submit = SubmitField("提交博客")
 
     def __init__(self, **kwargs):
@@ -43,6 +47,17 @@ class WriteBlogForm(FlaskForm):
             for i in field.data:
                 if i not in self.archive_res:
                     raise ValidationError("错误的归档被指定")
+
+
+class UpdateBlogForm(EditorMD):
+    blog_id = HiddenField("ID", validators=[DataRequired()])
+    submit = SubmitField("更新博客")
+
+    def __init__(self, blog: Optional[BlogArticle] = None, **kwargs):
+        super().__init__(**kwargs)
+        if blog is not None:
+            self.blog_id.data = blog.blog_id
+            self.context.data = blog.context
 
 
 class WriteCommentForm(FlaskForm):
@@ -97,17 +112,21 @@ def archive_page():
                            form=None)
 
 
-def __load_article_page(blog_id: int, form: WriteCommentForm):
+def __load_article_page(blog_id: int, form: WriteCommentForm, view: Optional[UpdateBlogForm] = None):
     article = load_blog_by_id(blog_id)
     if article is None:
         app.HBlogFlask.print_user_opt_fail_log(f"Load article with error id({blog_id})")
         abort(404)
         return
     app.HBlogFlask.print_load_page_log(f"article (id: {blog_id})")
+    if view is None:
+        view = UpdateBlogForm(article)
     return render_template("docx/article.html",
                            article=article,
                            archive_list=article.archive,
                            form=form,
+                           view=view,
+                           can_update=current_user.check_role("WriteBlog"),
                            show_delete=current_user.check_role("DeleteComment"),
                            show_email=current_user.check_role("ReadUserInfo"))
 
@@ -157,11 +176,29 @@ def create_docx_page():
     return redirect(url_for("docx.docx_page", page=1))
 
 
+@docx.route('/article/update', methods=["POST"])
+@login_required
+@app.form_required(UpdateBlogForm, "update blog",
+                   lambda form: __load_article_page(int(request.args.get("blog", 1)), WriteCommentForm(), form))
+@app.role_required("WriteBlog", "write blog")
+def update_docx_page():
+    form: UpdateBlogForm = g.form
+    if BlogArticle(form.blog_id.data, None, None, None, None).update(form.context.data):
+        app.HBlogFlask.print_sys_opt_success_log("update blog")
+        flash("博文更新成功")
+    else:
+        app.HBlogFlask.print_sys_opt_fail_log("update blog")
+        flash("博文更新失败")
+    return redirect(url_for("docx.docx_page", page=1))
+
+
 @docx.route("/article/delete")
 @login_required
 @app.role_required("DeleteBlog", "delete blog")
 def delete_blog_page():
-    blog_id = int(request.args.get("blog", 1))
+    blog_id = int(request.args.get("blog", -1))
+    if blog_id == -1:
+        return abort(400)
     if BlogArticle(blog_id, None, None, None, None).delete():
         app.HBlogFlask.print_sys_opt_success_log("delete blog")
         flash("博文删除成功")
@@ -173,7 +210,8 @@ def delete_blog_page():
 
 @docx.route('/comment/create', methods=["POST"])
 @login_required
-@app.form_required(WriteCommentForm, "write comment", __load_article_page)
+@app.form_required(WriteCommentForm, "write comment",
+                   lambda form: __load_article_page(int(request.args.get("blog", 1)), form))
 @app.role_required("WriteComment", "write comment")
 def comment_page():
     blog_id = int(request.args.get("blog", 1))

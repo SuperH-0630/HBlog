@@ -1,6 +1,6 @@
+import pymysql.cursors
 import pymysql
 import threading
-import traceback
 from sql.base import Database, DBException, DBCloseException
 from typing import Optional, Union, List, Tuple, Dict
 
@@ -52,7 +52,7 @@ class MysqlDB(Database):
                offset: Optional[int] = None,
                order_by: Optional[List[Tuple[str, str]]] = None,
                group_by: Optional[List[str]] = None,
-               for_update: bool = False):
+               for_update: bool = False) -> Union[None, pymysql.cursors.Cursor]:
         if type(where) is list and len(where) > 0:
             where: str = " WHERE " + " AND ".join(f"({w})" for w in where)
         elif type(where) is str and len(where) > 0:
@@ -90,7 +90,8 @@ class MysqlDB(Database):
                              f"FROM {table} "
                              f"{where} {group_by} {order_by} {limit} {offset} {for_update};")
 
-    def insert(self, table: str, columns: list, values: Union[str, List[str]], not_commit: bool = False):
+    def insert(self, table: str, columns: list, values: Union[str, List[str]],
+               not_commit: bool = False) -> Union[None, pymysql.cursors.Cursor]:
         columns: str = ", ".join(columns)
         if type(values) is str:
             values: str = f"({values})"
@@ -98,7 +99,8 @@ class MysqlDB(Database):
             values: str = ", ".join(f"{v}" for v in values)
         return self.__done(f"INSERT INTO {table}({columns}) VALUES {values};", not_commit=not_commit)
 
-    def delete(self, table: str, where: Union[str, List[str]] = None, not_commit: bool = False):
+    def delete(self, table: str, where: Union[str, List[str]] = None,
+               not_commit: bool = False) -> Union[None, pymysql.cursors.Cursor]:
         if type(where) is list and len(where) > 0:
             where: str = " AND ".join(f"({w})" for w in where)
         elif type(where) is not str or len(where) == 0:  # 必须指定条件
@@ -106,7 +108,8 @@ class MysqlDB(Database):
 
         return self.__done(f"DELETE FROM {table} WHERE {where};", not_commit=not_commit)
 
-    def update(self, table: str, kw: "Dict[str:str]", where: Union[str, List[str]] = None, not_commit: bool = False):
+    def update(self, table: str, kw: "Dict[str:str]", where: Union[str, List[str]] = None,
+               not_commit: bool = False) -> Union[None, pymysql.cursors.Cursor]:
         if len(kw) == 0:
             return None
 

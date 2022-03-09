@@ -6,6 +6,7 @@ from sql.blog import (get_blog_list,
                       get_archive_blog_count,
                       get_blog_list_not_top,
                       read_blog,
+                      update_blog,
                       create_blog,
                       delete_blog,
                       get_user_user_count)
@@ -73,3 +74,9 @@ class BlogArticle:
 
     def delete(self):
         return delete_blog(self.blog_id)
+
+    def update(self, context: str):
+        if update_blog(self.blog_id, context):
+            self.context = context
+            return True
+        return False

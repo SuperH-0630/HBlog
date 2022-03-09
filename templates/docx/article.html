@@ -21,16 +21,47 @@
                     <a href="{{ url_for('docx.article_down_page', blog=article.blog_id) }}"> 下载 </a>
                     <hr>
 
-                    <div id="markdown-view">
-                        {# 不要插入label #}
-                        <textarea style="display:none;"> {{ article.context }} </textarea>
-                    </div>
+                    <form method="post" action="{{ url_for('docx.update_docx_page') }}">
+                        {% if can_update %}
+                            {{ view.hidden_tag() }}
+                            {{ view.blog_id() }}
+                        {% endif %}
+                        <div id="markdown-view">
+                            {{ view.context(class="form-control mb-2", style="display:none;") }}
+                        </div>
+                        {% for error in view.context.errors %}
+                            <small class="text-danger form-text"> {{ error }} </small>
+                        {% endfor %}
+
+                        {% if can_update %}
+                            <div id="UpdateModal" class="modal fade" role="dialog" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content text-left">
+                                        <div class="modal-header">
+                                            <h4 class="modal-title"> 确认更新博文吗？ </h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p> 是否确认更新博文？请注意校对文本。 </p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            {{ view.submit(class="btn btn-danger", value="确认") }}
+                                            <button type="button" class="btn btn-outline-dark" data-dismiss="modal">取消</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="text-right">
+                                <button type="button" class="btn btn-primary mb-2" data-toggle="modal" data-target="#UpdateModal"> 更新博文 </button>
+                            </div>
+                        {% endif %}
+                    </form>
                 </article>
             </div>
         {% endif %}
 
         {% if current_user.check_role("ReadComment") %}
-            <div class="row">
+            <div id="CommentList" class="row">
                 <article class="col-12">
                     <h1 class="mt-3"> 评论 </h1>
 
@@ -119,16 +150,34 @@
     <script src="{{ url_for('static', filename='editor.md/lib/marked.min.js') }}"></script>
     <script src="{{ url_for('static', filename='editor.md/lib/prettify.min.js') }}"></script>
     <script type="text/javascript">
-        $(function() {
-            let editor = editormd.markdownToHTML("markdown-view", {
-                path: "{{ url_for('static',filename='editor.md/lib/') }}",
-                saveHTMLToTextarea: true,
-                emoji: true,
-                taskList: true,
-                tex: true,
-                flowChart: true,
-                sequenceDiagram: true,
+        {% if can_update %}
+            $(function() {
+                let editor = editormd("markdown-view", {
+                    height: document.documentElement.clientHeight * 0.5,
+                    path: "{{ url_for('static',filename='editor.md/lib/') }}",
+                    placeholder: "请写下你的日志...",
+                    saveHTMLToTextarea: true,
+                    emoji: true,
+                    taskList: true,
+                    tex: true,
+                    flowChart: true,
+                    sequenceDiagram: true,
+                    onfullscreen() {document.getElementById("CommentList").style.visibility = 'hidden';},
+                    onfullscreenExit() {document.getElementById("CommentList").style.visibility = 'visible';},
+                });
             });
-        });
+        {% else %}
+            $(function() {
+                let editor = editormd.markdownToHTML("markdown-view", {
+                    path: "{{ url_for('static',filename='editor.md/lib/') }}",
+                    saveHTMLToTextarea: true,
+                    emoji: true,
+                    taskList: true,
+                    tex: true,
+                    flowChart: true,
+                    sequenceDiagram: true,
+                });
+            });
+        {% endif %}
     </script>
 {% endblock %}
