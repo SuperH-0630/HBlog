@@ -1,4 +1,5 @@
 from sql import db
+from sql.archive import add_blog_to_archive
 from typing import Optional, List
 import object.archive
 
@@ -15,9 +16,7 @@ def create_blog(auth_id: int, title: str, subtitle: str, content: str,
         return False
     blog_id = cur.lastrowid
     for archive in archive_list:
-        cur = db.insert(table="blog_archive", columns=["BlogID", "ArchiveID"],
-                        values=f"{blog_id}, {archive.archive_id}")
-        if cur is None or cur.rowcount == 0:
+        if not add_blog_to_archive(blog_id, archive.archive_id):
             return False
     return True
 

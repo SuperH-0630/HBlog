@@ -61,6 +61,35 @@ class UpdateBlogForm(EditorMD):
             self.content.data = blog.content
 
 
+class UpdateBlogArchiveForm(FlaskForm):
+    blog_id = HiddenField("ID", validators=[DataRequired()])
+    archive = SelectMultipleField("归档", coerce=int)
+    add = SubmitField("加入归档")
+    sub = SubmitField("去除归档")
+
+    def __init__(self, blog: Optional[BlogArticle] = None, **kwargs):
+        super().__init__(**kwargs)
+        archive = Archive.get_archive_list()
+        self.archive_res = []
+        self.archive_choices = []
+        for i in archive:
+            self.archive_res.append(i[0])
+            self.archive_choices.append((i[0], f"{i[1]} ({i[3]})"))
+        self.archive.choices = self.archive_choices
+        if blog is not None:
+            self.archive_data = []
+            self.archive.data = self.archive_data
+            for a in blog.archive:
+                a: Archive
+                self.archive_data.append(a)
+            self.blog_id.data = blog.blog_id
+
+    def validate_archive(self, field):
+        for i in field.data:
+            if i not in self.archive_res:
+                raise ValidationError("错误的归档被指定")
+
+
 class WriteCommentForm(FlaskForm):
     content = TextAreaField("", description="评论正文",
                             validators=[DataRequired(message="请输入评论的内容"),
@@ -113,7 +142,9 @@ def archive_page():
                            form=None)
 
 
-def __load_article_page(blog_id: int, form: WriteCommentForm, view: Optional[UpdateBlogForm] = None):
+def __load_article_page(blog_id: int, form: WriteCommentForm,
+                        view: Optional[UpdateBlogForm] = None,
+                        archive: Optional[UpdateBlogArchiveForm] = None):
     article = load_blog_by_id(blog_id)
     if article is None:
         app.HBlogFlask.print_user_opt_fail_log(f"Load article with error id({blog_id})")
@@ -122,11 +153,14 @@ def __load_article_page(blog_id: int, form: WriteCommentForm, view: Optional[Upd
     app.HBlogFlask.print_load_page_log(f"article (id: {blog_id})")
     if view is None:
         view = UpdateBlogForm(article)
+    if archive is None:
+        archive = UpdateBlogArchiveForm(article)
     return render_template("docx/article.html",
                            article=article,
                            archive_list=article.archive,
                            form=form,
                            view=view,
+                           archive=archive,
                            can_update=current_user.check_role("WriteBlog"),
                            show_delete=current_user.check_role("DeleteComment"),
                            show_email=current_user.check_role("ReadUserInfo"))
@@ -180,7 +214,7 @@ def create_docx_page():
 @docx.route('/article/update', methods=["POST"])
 @login_required
 @app.form_required(UpdateBlogForm, "update blog",
-                   lambda form: __load_article_page(int(request.args.get("blog", 1)), WriteCommentForm(), form))
+                   lambda form: __load_article_page(form.blog_id.data, WriteCommentForm(), form))
 @app.role_required("WriteBlog", "write blog")
 def update_docx_page():
     form: UpdateBlogForm = g.form
@@ -223,7 +257,25 @@ def set_blog_top_page():
     else:
         app.HBlogFlask.print_sys_opt_fail_log(f"set blog top ({top})")
         flash(f"博文{'取消' if not top else ''}置顶失败")
-    return redirect(url_for("docx.docx_page", page=1))
+    return redirect(url_for("docx.article_page", blog=blog_id))
+
+
+@docx.route("/article/set/archive", methods=["POST"])
+@login_required
+@app.form_required(UpdateBlogArchiveForm, "update archive",
+                   lambda form: __load_article_page(form.blog_id.data, WriteCommentForm(), UpdateBlogForm(), form))
+@app.role_required("WriteBlog", "update archive")
+def update_archive_page():
+    form: UpdateBlogArchiveForm = g.form
+    article = BlogArticle(form.blog_id.data, None, None, None, None)
+    add = request.args.get("add", '0') != '0'
+    for i in form.archive.data:
+        if add:
+            article.add_to_archive(i)
+        else:
+            article.sub_from_archive(i)
+    flash("归档设定完成")
+    return redirect(url_for("docx.article_page", blog=form.blog_id.data))
 
 
 @docx.route('/comment/create', methods=["POST"])

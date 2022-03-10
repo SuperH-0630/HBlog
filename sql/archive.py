@@ -33,6 +33,28 @@ def delete_archive(archive_id: int):
     return True
 
 
+def add_blog_to_archive(blog_id: int, archive_id: int):
+    cur = db.search(columns=["BlogID"], table="blog_archive", where=f"BlogID={blog_id} AND ArchiveID={archive_id}")
+    if cur is None:
+        print("H1")
+        return False
+    if cur.rowcount > 0:
+        print("H2")
+        return True
+    cur = db.insert(table="blog_archive", columns=["BlogID", "ArchiveID"], values=f"{blog_id}, {archive_id}")
+    if cur is None or cur.rowcount != 1:
+        print("H3")
+        return False
+    return True
+
+
+def sub_blog_from_archive(blog_id: int, archive_id: int):
+    cur = db.delete(table="blog_archive", where=f"BlogID={blog_id} AND ArchiveID={archive_id}")
+    if cur is None:
+        return False
+    return True
+
+
 def get_archive_list(limit: Optional[int] = None, offset: Optional[int] = None):
     """ 获取归档列表 """
     cur = db.search(columns=["ID", "Name", "DescribeText", "Count"], table="archive_with_count",

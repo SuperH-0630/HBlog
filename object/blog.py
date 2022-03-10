@@ -12,6 +12,7 @@ from sql.blog import (get_blog_list,
                       delete_blog,
                       set_blog_top,
                       get_user_user_count)
+from sql.archive import add_blog_to_archive, sub_blog_from_archive
 import object.user
 import object.archive
 import object.comment
@@ -88,3 +89,9 @@ class BlogArticle:
 
     def set_top(self, top: bool):
         set_blog_top(self.blog_id, top)
+
+    def add_to_archive(self, archive_id: int):
+        return add_blog_to_archive(self.blog_id, archive_id)
+
+    def sub_from_archive(self, archive_id: int):
+        return sub_blog_from_archive(self.blog_id, archive_id)

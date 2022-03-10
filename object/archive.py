@@ -1,6 +1,12 @@
 from typing import Optional
 
-from sql.archive import get_archive_name_by_id, create_archive, get_archive_list, read_archive, delete_archive
+from sql.archive import (get_archive_name_by_id,
+                         create_archive,
+                         get_archive_list,
+                         read_archive,
+                         delete_archive,
+                         add_blog_to_archive,
+                         sub_blog_from_archive)
 
 
 def load_archive_by_id(archive_id: int) -> "Optional[Archive]":
@@ -33,3 +39,9 @@ class Archive:
 
     def delete(self):
         return delete_archive(self.archive_id)
+
+    def add_blog(self, blog_id: int):
+        add_blog_to_archive(blog_id, self.archive_id)
+
+    def sub_blog(self, blog_id: int):
+        sub_blog_from_archive(blog_id, self.archive_id)
