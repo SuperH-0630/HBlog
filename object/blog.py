@@ -1,5 +1,6 @@
 from typing import Optional
 
+from sql.base import DBBit
 from sql.blog import (get_blog_list,
                       get_blog_count,
                       get_archive_blog_list,
@@ -9,6 +10,7 @@ from sql.blog import (get_blog_list,
                       update_blog,
                       create_blog,
                       delete_blog,
+                      set_blog_top,
                       get_user_user_count)
 import object.user
 import object.archive
@@ -34,14 +36,15 @@ def load_blog_by_id(blog_id) -> "Optional[BlogArticle]":
     content = blog[3]
     update_time = blog[4]
     create_time = blog[5]
-    top = blog[6]
+    top = blog[6] == DBBit.BIT_1
     comment = object.comment.load_comment_list(blog_id)
     archive = object.archive.Archive.get_blog_archive(blog_id)
     return BlogArticle(blog_id, auth, title, subtitle, content, update_time, create_time, top, comment, archive)
 
 
 class BlogArticle:
-    def __init__(self, blog_id, auth, title, subtitle, content, update_time=None, create_time=None, top=False, comment=None, archive=None):
+    def __init__(self, blog_id, auth, title, subtitle, content, update_time=None, create_time=None, top=False,
+                 comment=None, archive=None):
         self.blog_id = blog_id
         self.user = auth
         self.title = title
@@ -82,3 +85,6 @@ class BlogArticle:
             self.content = content
             return True
         return False
+
+    def set_top(self, top: bool):
+        set_blog_top(self.blog_id, top)

@@ -56,6 +56,13 @@ def delete_blog(blog_id: int):
     return True
 
 
+def set_blog_top(blog_id: int, top: bool = True):
+    cur = db.update(table="blog", kw={"Top": "1" if top else "0"}, where=f"ID={blog_id}")
+    if cur is None or cur.rowcount != 1:
+        return False
+    return True
+
+
 def get_blog_list(limit: Optional[int] = None, offset: Optional[int] = None) -> list:
     """ 获得 blog 列表 """
     cur = db.search(columns=["ID", "Title", "SubTitle", "UpdateTime", "CreateTime", "Top"], table="blog_with_top",

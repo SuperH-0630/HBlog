@@ -50,12 +50,18 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="text-right">
-                                <button type="button" class="btn btn-primary mb-2" data-toggle="modal" data-target="#UpdateModal"> 更新博文 </button>
-                            </div>
                         {% endif %}
                     </form>
+                        {% if can_update %}
+                            <div class="text-right mb-2">
+                                <a type="button" class="btn btn-primary" data-toggle="modal" data-target="#UpdateModal"> 更新博文 </a>
+                                {% if article.top %}
+                                    <a class="btn btn-danger" href="{{ url_for("docx.set_blog_top_page", blog=article.blog_id, top='0') }}"> 取消置顶 </a>
+                                {% else %}
+                                    <a class="btn btn-danger" href="{{ url_for("docx.set_blog_top_page", blog=article.blog_id, top='1') }}"> 置顶文章 </a>
+                                {% endif %}
+                            </div>
+                        {% endif %}
                 </article>
             </div>
         {% endif %}

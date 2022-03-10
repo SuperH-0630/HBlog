@@ -209,6 +209,23 @@ def delete_blog_page():
     return redirect(url_for("docx.docx_page", page=1))
 
 
+@docx.route("/article/set/top")
+@login_required
+@app.role_required("WriteBlog", "set blog top")
+def set_blog_top_page():
+    blog_id = int(request.args.get("blog", -1))
+    top = request.args.get("top", '0') != '0'
+    if blog_id == -1:
+        return abort(400)
+    if BlogArticle(blog_id, None, None, None, None).set_top(top):
+        app.HBlogFlask.print_sys_opt_success_log(f"set blog top ({top})")
+        flash(f"博文{'取消' if not top else ''}置顶成功")
+    else:
+        app.HBlogFlask.print_sys_opt_fail_log(f"set blog top ({top})")
+        flash(f"博文{'取消' if not top else ''}置顶失败")
+    return redirect(url_for("docx.docx_page", page=1))
+
+
 @docx.route('/comment/create', methods=["POST"])
 @login_required
 @app.form_required(WriteCommentForm, "write comment",
