@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='editor.md/css/editormd.min.css') }}" />
 {% endblock %}
 
-{% block context %}
+{% block content %}
     <section id="base" class="container mt-3">
         {% if form and current_user.check_role("WriteBlog") %}
             {# 判断是否有权限写博客 #}
@@ -21,9 +21,9 @@
                             {{ macro.render_field(form.subtitle) }}
                             {{ macro.render_field(form.archive) }}
                             <div id="editor">
-                                {{ form.context(class="form-control mb-2", style="display:none;") }}
+                                {{ form.content(class="form-control mb-2", style="display:none;") }}
                             </div>
-                            {% for error in form.context.errors %}
+                            {% for error in form.content.errors %}
                                 <small class="text-danger form-text"> {{ error }} </small>
                             {% endfor %}
 

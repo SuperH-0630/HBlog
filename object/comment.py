@@ -16,11 +16,11 @@ class Comment:
     def __init__(self, comment_id,
                  blog_id: Optional[int],
                  auth: "Optional[object.user.User]",
-                 context: Optional[str], update_time=None):
+                 content: Optional[str], update_time=None):
         self.comment_id = comment_id
         self.blog_id = blog_id
         self.auth = auth
-        self.context = context
+        self.content = content
         self.update_time = update_time
 
     @staticmethod
@@ -28,7 +28,7 @@ class Comment:
         return get_user_comment_count(auth.get_user_id())
 
     def create(self):
-        return create_comment(self.blog_id, self.auth.get_user_id(), self.context)
+        return create_comment(self.blog_id, self.auth.get_user_id(), self.content)
 
     def delete(self):
         return delete_comment(self.comment_id)

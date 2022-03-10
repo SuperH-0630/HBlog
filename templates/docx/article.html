@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='editor.md/css/editormd.min.css') }}" />
 {% endblock %}
 
-{% block context %}
+{% block content %}
     <section id="base" class="container mt-3">
         {% if current_user.check_role("ReadBlog") %}
             {# 检查是否具有读取权限 #}
@@ -27,9 +27,9 @@
                             {{ view.blog_id() }}
                         {% endif %}
                         <div id="markdown-view">
-                            {{ view.context(class="form-control mb-2", style="display:none;") }}
+                            {{ view.content(class="form-control mb-2", style="display:none;") }}
                         </div>
-                        {% for error in view.context.errors %}
+                        {% for error in view.content.errors %}
                             <small class="text-danger form-text"> {{ error }} </small>
                         {% endfor %}
 
@@ -68,8 +68,8 @@
                     <section class="col-12 text-right">
                         <form action="{{ url_for('docx.comment_page', blog=article.blog_id) }}" method="post">
                             {{ form.hidden_tag() }}
-                            {{ form.context(class="form-control mb-2", rows="3") }}
-                            {% for error in form.context.errors %}
+                            {{ form.content(class="form-control mb-2", rows="3") }}
+                            {% for error in form.content.errors %}
                                 <small class="text-danger form-text text-left"> {{ error }} </small>
                             {% endfor %}
 
@@ -134,7 +134,7 @@
                                     <br>
                                     <small> {{ comment.update_time }} </small>
                                 </p>
-                                <p> {{ comment.context.replace('\n', '<br>') | safe  }} </p>
+                                <p> {{ comment.content.replace('\n', '<br>') | safe  }} </p>
                             </div>
                         </section>
                     {% endfor %}

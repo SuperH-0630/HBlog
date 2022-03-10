@@ -13,10 +13,10 @@ def load_message_list(limit: Optional[int] = None, offset: Optional[int] = None,
 
 
 class Message:
-    def __init__(self, msg_id, auth: "Optional[object.user.User]", context, secret=False, update_time=None):
+    def __init__(self, msg_id, auth: "Optional[object.user.User]", content, secret=False, update_time=None):
         self.msg_id = msg_id
         self.auth = auth
-        self.context = context
+        self.content = content
         self.secret = secret
         self.update_time = update_time
 
@@ -27,7 +27,7 @@ class Message:
         return get_user_msg_count(auth.get_user_id())
 
     def create(self):
-        return create_msg(self.auth.get_user_id(), self.context, self.secret)
+        return create_msg(self.auth.get_user_id(), self.content, self.secret)
 
     def delete(self):
         return delete_msg(self.msg_id)

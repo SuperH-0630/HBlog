@@ -7,7 +7,7 @@
     <link href="{{ url_for('static', filename='styles/index/index.css') }}" rel="stylesheet">
 {% endblock %}
 
-{% block context %}
+{% block content %}
     <section id="base" class="container mt-3">
         <div class="row">
             <article class="col-12">
@@ -61,7 +61,7 @@
                                 {% endif %}
                                 <br> <small>
                                 {{ msg.update_time }} </small> </p>
-                            <p> {{ msg.context.replace('\n', '<br>') | safe }} </p>
+                            <p> {{ msg.content.replace('\n', '<br>') | safe }} </p>
                         </div>
                     {% endfor %}
                     </aside>
@@ -77,7 +77,7 @@
                                 {% endif %}
                                 <br> <small>
                                 {{ msg.update_time }} </small> </p>
-                            <p> {{ msg.context.replace('\n', '<br>') | safe }} </p>
+                            <p> {{ msg.content.replace('\n', '<br>') | safe }} </p>
                         </div>
                     {% endfor %}
                     </aside>

@@ -7,7 +7,7 @@
     <link href="{{ url_for('static', filename='styles/archive/archive.css') }}" rel="stylesheet">
 {% endblock %}
 
-{% block context %}
+{% block content %}
     {% if form and current_user.check_role("WriteBlog") %}
         <div class="container">
             <div class="row">

@@ -15,7 +15,7 @@ class WriteForm(FlaskForm):
     """
     写新内容表单
     """
-    context = TextAreaField("", description="留言正文",
+    content = TextAreaField("", description="留言正文",
                             validators=[
                                 DataRequired("请输入留言的内容"),
                                 Length(1, 100, message="留言长度1-100个字符")])
@@ -56,9 +56,9 @@ def msg_page():
 @app.role_required("WriteMsg", "write msg")
 def write_msg_page():
     form: WriteForm = g.form
-    context = form.context.data
+    content = form.content.data
     secret = form.secret.data
-    if Message(None, current_user, context, secret, None).create():
+    if Message(None, current_user, content, secret, None).create():
         app.HBlogFlask.print_user_opt_success_log("write msg")
         flash("留言成功")
     else:

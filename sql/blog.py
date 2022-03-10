@@ -3,14 +3,14 @@ from typing import Optional, List
 import object.archive
 
 
-def create_blog(auth_id: int, title: str, subtitle: str, context: str,
+def create_blog(auth_id: int, title: str, subtitle: str, content: str,
                 archive_list: List[object.archive.Archive]) -> bool:
     """ 写入新的blog """
     title = title.replace("'", "''")
     subtitle = subtitle.replace("'", "''")
-    context = context.replace("'", "''")
-    cur = db.insert(table="blog", columns=["Auth", "Title", "SubTitle", "Context"],
-                    values=f"{auth_id}, '{title}', '{subtitle}', '{context}'")
+    content = content.replace("'", "''")
+    cur = db.insert(table="blog", columns=["Auth", "Title", "SubTitle", "Content"],
+                    values=f"{auth_id}, '{title}', '{subtitle}', '{content}'")
     if cur is None or cur.rowcount == 0:
         return False
     blog_id = cur.lastrowid
@@ -22,11 +22,11 @@ def create_blog(auth_id: int, title: str, subtitle: str, context: str,
     return True
 
 
-def update_blog(blog_id: int, context: str) -> bool:
+def update_blog(blog_id: int, content: str) -> bool:
     """ 更新博客文章 """
-    context = context.replace("'", "''")
+    content = content.replace("'", "''")
     cur = db.update(table="blog",
-                    kw={"UpdateTime": "CURRENT_TIMESTAMP()", "Context": f"'{context}'"},
+                    kw={"UpdateTime": "CURRENT_TIMESTAMP()", "Content": f"'{content}'"},
                     where=f"ID={blog_id}")
     if cur is None or cur.rowcount != 1:
         return False
@@ -35,7 +35,7 @@ def update_blog(blog_id: int, context: str) -> bool:
 
 def read_blog(blog_id: int) -> list:
     """ 读取blog内容 """
-    cur = db.search(columns=["Auth", "Title", "SubTitle", "Context", "UpdateTime", "CreateTime", "Top"],
+    cur = db.search(columns=["Auth", "Title", "SubTitle", "Content", "UpdateTime", "CreateTime", "Top"],
                     table="blog",
                     where=f"ID={blog_id}")
     if cur is None or cur.rowcount == 0:

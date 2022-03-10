@@ -7,14 +7,14 @@
     <link href="{{ url_for('static', filename='styles/msg/msg.css') }}" rel="stylesheet">
 {% endblock %}
 
-{% block context %}
+{% block content %}
     <section id="base" class="container mt-3">
         <div class="row">
             <section class="col-12 text-right">
                 <form class="writer clearfix" action="{{ url_for('msg.write_msg_page', page=page) }}" method="post">
                     {{ form.hidden_tag() }}
-                    {{ form.context(class="form-control mb-2", rows="5") }}
-                    {% for error in form.context.errors %}
+                    {{ form.content(class="form-control mb-2", rows="5") }}
+                    {% for error in form.content.errors %}
                         <small class="text-danger form-text text-left"> {{ error }} </small>
                     {% endfor %}
                     {{ form.secret() }} {{ form.secret.label }}
@@ -85,7 +85,7 @@
                                     {% endif %}
                                 </small>
                             </p>
-                            <p> {{ msg.context.replace('\n', '<br>') | safe }} </p>
+                            <p> {{ msg.content.replace('\n', '<br>') | safe }} </p>
                         </div>
                     {% endfor %}
                 </section>

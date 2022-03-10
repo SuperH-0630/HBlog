@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS blog -- 创建博客表
     Auth       INT      NOT NULL,                           -- 作者
     Title      char(20) NOT NULL,                           -- 标题
     SubTitle   char(20) NOT NULL,                           -- 副标题
-    Context    TEXT     NOT NULL,                           -- 内容
+    Content    TEXT     NOT NULL,                           -- 内容
     CreateTime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, -- 创建的时间
     UpdateTime DATETIME NOT NULL DEFAULT (CreateTime),      -- 创建的时间
     Top        BIT      NOT NULL DEFAULT 0,                 -- 置顶
@@ -109,7 +109,7 @@ SELECT blog.ID          AS BlogID,
        Auth,
        Title,
        SubTitle,
-       Context,
+       Content,
        CreateTime,
        UpdateTime,
        Top
@@ -121,7 +121,7 @@ CREATE TABLE IF NOT EXISTS comment -- 评论表
     ID         INT PRIMARY KEY AUTO_INCREMENT,              -- 评论 ID
     BlogID     INT      NOT NULL,                           -- 博客 ID
     Auth       INT      NOT NULL,                           -- 作者
-    Context    TEXT     NOT NULL,                           -- 内容
+    Content    TEXT     NOT NULL,                           -- 内容
     CreateTime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, -- 创建的时间
     UpdateTime DATETIME NOT NULL DEFAULT (CreateTime),      -- 创建的时间
     FOREIGN KEY (BlogID) REFERENCES blog (ID),
@@ -129,7 +129,7 @@ CREATE TABLE IF NOT EXISTS comment -- 评论表
 );
 
 CREATE VIEW comment_user AS
-SELECT comment.ID as CommentID, BlogID, Auth, user.Email as Email, Context, CreateTime, UpdateTime
+SELECT comment.ID as CommentID, BlogID, Auth, user.Email as Email, Content, CreateTime, UpdateTime
 FROM comment
          LEFT JOIN user on user.ID = comment.Auth
 ORDER BY UpdateTime DESC;
@@ -138,7 +138,7 @@ CREATE TABLE IF NOT EXISTS message -- 留言表
 (
     ID         INT PRIMARY KEY AUTO_INCREMENT,              -- 留言 ID
     Auth       INT      NOT NULL,                           -- 作者
-    Context    TEXT     NOT NULL,                           -- 内容
+    Content    TEXT     NOT NULL,                           -- 内容
     Secret     BIT      NOT NULL DEFAULT 0,                 -- 私密内容
     CreateTime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, -- 创建的时间
     UpdateTime DATETIME NOT NULL DEFAULT (CreateTime),      -- 创建的时间
@@ -147,7 +147,7 @@ CREATE TABLE IF NOT EXISTS message -- 留言表
 
 
 CREATE VIEW message_user AS
-SELECT message.ID as MsgID, Auth, user.Email as Email, Context, CreateTime, UpdateTime, Secret
+SELECT message.ID as MsgID, Auth, user.Email as Email, Content, CreateTime, UpdateTime, Secret
 FROM message
          LEFT JOIN user on user.ID = message.Auth
 ORDER BY UpdateTime DESC;

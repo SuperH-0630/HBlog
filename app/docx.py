@@ -15,7 +15,7 @@ docx = Blueprint("docx", __name__)
 
 
 class EditorMD(FlaskForm):
-    context = TextAreaField("博客内容", validators=[DataRequired(message="必须输入博客文章")])
+    content = TextAreaField("博客内容", validators=[DataRequired(message="必须输入博客文章")])
 
 
 class WriteBlogForm(EditorMD):
@@ -31,7 +31,7 @@ class WriteBlogForm(EditorMD):
     def __init__(self, default: bool = False, **kwargs):
         super().__init__(**kwargs)
         if default:
-            self.context.data = "# Blog Title\n## Blog subtitle\nHello, World"
+            self.content.data = "# Blog Title\n## Blog subtitle\nHello, World"
         archive = Archive.get_archive_list()
         self.archive_res = []
         self.archive_choices = [(-1, "None")]
@@ -58,11 +58,11 @@ class UpdateBlogForm(EditorMD):
         super().__init__(**kwargs)
         if blog is not None:
             self.blog_id.data = blog.blog_id
-            self.context.data = blog.context
+            self.content.data = blog.content
 
 
 class WriteCommentForm(FlaskForm):
-    context = TextAreaField("", description="评论正文",
+    content = TextAreaField("", description="评论正文",
                             validators=[DataRequired(message="请输入评论的内容"),
                                         Length(1, 100, message="请输入1-100个字的评论")])
     submit = SubmitField("评论")
@@ -147,7 +147,7 @@ def article_down_page():
         abort(404)
         return
 
-    response = make_response(article.context)
+    response = make_response(article.content)
     response.headers["Content-Disposition"] = f"attachment;filename={article.title.encode().decode('latin-1')}.md"
     app.HBlogFlask.print_load_page_log(f"download article (id: {blog_id})")
     return response
@@ -168,7 +168,7 @@ def create_docx_page():
             if i is not None:
                 archive.append(i)
 
-    if BlogArticle(None, current_user, title, subtitle, form.context.data, archive=archive).create():
+    if BlogArticle(None, current_user, title, subtitle, form.content.data, archive=archive).create():
         app.HBlogFlask.print_sys_opt_success_log("write blog")
         flash(f"博客 {title} 发表成功")
     else:
@@ -184,7 +184,7 @@ def create_docx_page():
 @app.role_required("WriteBlog", "write blog")
 def update_docx_page():
     form: UpdateBlogForm = g.form
-    if BlogArticle(form.blog_id.data, None, None, None, None).update(form.context.data):
+    if BlogArticle(form.blog_id.data, None, None, None, None).update(form.content.data):
         app.HBlogFlask.print_sys_opt_success_log("update blog")
         flash("博文更新成功")
     else:
@@ -217,8 +217,8 @@ def delete_blog_page():
 def comment_page():
     blog_id = int(request.args.get("blog", 1))
     form: WriteCommentForm = g.form
-    context = form.context.data
-    if Comment(None, blog_id, current_user, context).create():
+    content = form.content.data
+    if Comment(None, blog_id, current_user, content).create():
         app.HBlogFlask.print_user_opt_success_log("comment")
         flash("评论成功")
     else:

@@ -3,7 +3,7 @@ from sql import db
 
 def read_comment(blog_id: int):
     """ 读取文章的 comment """
-    cur = db.search(columns=["CommentID", "Auth", "Email", "Context", "UpdateTime"],
+    cur = db.search(columns=["CommentID", "Auth", "Email", "Content", "UpdateTime"],
                     table="comment_user",
                     where=f"BlogID={blog_id}")
     if cur is None or cur.rowcount == 0:
@@ -11,12 +11,12 @@ def read_comment(blog_id: int):
     return cur.fetchall()
 
 
-def create_comment(blog_id: int, user_id: int, context: str):
+def create_comment(blog_id: int, user_id: int, content: str):
     """ 新建 comment """
-    context = context.replace("'", "''")
+    content = content.replace("'", "''")
     cur = db.insert(table="comment",
-                    columns=["BlogID", "Auth", "Context"],
-                    values=f"{blog_id}, {user_id}, '{context}'")
+                    columns=["BlogID", "Auth", "Content"],
+                    values=f"{blog_id}, {user_id}, '{content}'")
     if cur is None or cur.rowcount == 0:
         return False
     return True

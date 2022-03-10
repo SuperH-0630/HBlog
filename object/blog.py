@@ -31,22 +31,22 @@ def load_blog_by_id(blog_id) -> "Optional[BlogArticle]":
 
     title = blog[1]
     subtitle = blog[2]
-    context = blog[3]
+    content = blog[3]
     update_time = blog[4]
     create_time = blog[5]
     top = blog[6]
     comment = object.comment.load_comment_list(blog_id)
     archive = object.archive.Archive.get_blog_archive(blog_id)
-    return BlogArticle(blog_id, auth, title, subtitle, context, update_time, create_time, top, comment, archive)
+    return BlogArticle(blog_id, auth, title, subtitle, content, update_time, create_time, top, comment, archive)
 
 
 class BlogArticle:
-    def __init__(self, blog_id, auth, title, subtitle, context, update_time=None, create_time=None, top=False, comment=None, archive=None):
+    def __init__(self, blog_id, auth, title, subtitle, content, update_time=None, create_time=None, top=False, comment=None, archive=None):
         self.blog_id = blog_id
         self.user = auth
         self.title = title
         self.subtitle = subtitle
-        self.context = context
+        self.content = content
         self.update_time = update_time
         self.create_time = create_time
         self.top = top
@@ -72,13 +72,13 @@ class BlogArticle:
     def create(self):
         if self.blog_id is not None:  # 只有 blog_id为None时才使用
             return False
-        return create_blog(self.user.get_user_id(), self.title, self.subtitle, self.context, self.archive)
+        return create_blog(self.user.get_user_id(), self.title, self.subtitle, self.content, self.archive)
 
     def delete(self):
         return delete_blog(self.blog_id)
 
-    def update(self, context: str):
-        if update_blog(self.blog_id, context):
-            self.context = context
+    def update(self, content: str):
+        if update_blog(self.blog_id, content):
+            self.content = content
             return True
         return False

@@ -2,11 +2,11 @@ from sql import db
 from typing import Optional
 
 
-def create_msg(auth: int, context: str, secret: bool = False):
-    context = context.replace("'", "''")
+def create_msg(auth: int, content: str, secret: bool = False):
+    content = content.replace("'", "''")
     cur = db.insert(table="message",
-                    columns=["Auth", "Context", "Secret"],
-                    values=f"{auth}, '{context}', {1 if secret else 0}")
+                    columns=["Auth", "Content", "Secret"],
+                    values=f"{auth}, '{content}', {1 if secret else 0}")
     return cur is not None and cur.rowcount == 1
 
 
@@ -16,7 +16,7 @@ def read_msg(limit: Optional[int] = None, offset: Optional[int] = None, show_sec
     else:
         where = "Secret=0"
 
-    cur = db.search(columns=["MsgID", "Auth", "Email", "Context", "UpdateTime", "Secret"], table="message_user",
+    cur = db.search(columns=["MsgID", "Auth", "Email", "Content", "UpdateTime", "Secret"], table="message_user",
                     limit=limit,
                     where=where,
                     offset=offset)
