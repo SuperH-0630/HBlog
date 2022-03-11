@@ -49,7 +49,7 @@ class HBlogFlask(Flask):
         self.logger.propagate = False
         if len(conf["LOG_HOME"]) > 0:
             handle = logging.handlers.TimedRotatingFileHandler(
-                os.path.join(conf["LOG_HOME"], f"flask-.log"))
+                os.path.join(conf["LOG_HOME"], f"flask.log"))
             handle.setFormatter(logging.Formatter(conf["LOG_FORMAT"]))
             self.logger.addHandler(handle)
         if conf["LOG_STDERR"]:
