@@ -182,7 +182,7 @@ class MysqlDB(Database):
         try:
             self._lock.acquire()
             if not self.is_connect():
-                self.logger.error(f"MySQL({self._name}@{self._host}) SQL {sql} connect error")
+                self.logger.error(f"MySQL({self._name}@{self._host}) connect error")
                 return
             self._db.commit()
         except pymysql.MySQLError:
