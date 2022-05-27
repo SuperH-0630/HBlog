@@ -1,4 +1,4 @@
-from configure import configure, conf
+from configure import configure
 import os
 import logging
 
