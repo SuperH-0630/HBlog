@@ -16,7 +16,8 @@ def create_archive(name: str, describe: str):
 
 def read_archive(archive_id: int):
     """ 获取归档 ID """
-    cur = db.search(columns=["Name", "DescribeText"], table="archive",
+    cur = db.search(columns=["Name", "DescribeText"],
+                    table="archive",
                     where=f"ID={archive_id}")
     if cur is None or cur.rowcount == 0:
         return ["", ""]
@@ -25,11 +26,13 @@ def read_archive(archive_id: int):
 
 def get_blog_archive(blog_id: int):
     """ 获取文章的归档 """
-    cur = db.search(columns=["ArchiveID", "ArchiveName", "DescribeText"], table="blog_archive_with_name",
-                    where=f"BlogID={blog_id}")
+    cur = db.search(columns=["ArchiveID"],
+                    table="blog_archive_with_name",
+                    where=f"BlogID={blog_id}",
+                    order_by=[("ArchiveName", "ASC")])
     if cur is None or cur.rowcount == 0:
         return []
-    return cur.fetchall()
+    return [i[0] for i in cur.fetchall()]
 
 
 def delete_archive(archive_id: int):

@@ -14,10 +14,9 @@ class _Archive:
 
     @staticmethod
     def get_blog_archive(blog_id: int):
-        archive = get_blog_archive(blog_id)
         archive_list = []
-        for i in archive:
-            archive_list.append(Archive(i[1]))
+        for i in get_blog_archive(blog_id):
+            archive_list.append(Archive(i))
         return archive_list
 
     @staticmethod
