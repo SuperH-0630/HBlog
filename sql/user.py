@@ -14,21 +14,27 @@ role_authority = ["WriteBlog", "WriteComment", "WriteMsg", "CreateUser",
 def read_user(email: str):
     """ 读取用户 """
     cur = db.search(columns=["PasswdHash", "Role", "ID"], table="user", where=f"Email='{email}'")
-    if cur is None or cur.rowcount == 0:
-        return []
-    assert cur.rowcount == 1
+    if cur is None or cur.rowcount != 1:
+        return ["", -1, -1]
     return cur.fetchone()
 
 
 def create_user(email: str, passwd: str):
     """ 创建用户 """
     email = email.replace("'", "''")
+    if len(email) == 0:
+        return None
+
     cur = db.search(columns=["count(Email)"], table="user")  # 统计个数
     passwd = object.user.User.get_passwd_hash(passwd)
     if cur is None or cur.rowcount == 0 or cur.fetchone()[0] == 0:
-        db.insert(table='user', columns=['Email', 'PasswdHash', 'Role'], values=f"'{email}', '{passwd}', 1")  # 创建为管理员用户
+        # 创建为管理员用户
+        cur = db.insert(table='user', columns=['Email', 'PasswdHash', 'Role'], values=f"'{email}', '{passwd}', 1")
     else:
-        db.insert(table='user', columns=['Email', 'PasswdHash'], values=f"'{email}', '{passwd}'")
+        cur = db.insert(table='user', columns=['Email', 'PasswdHash'], values=f"'{email}', '{passwd}'")
+    if cur is None or cur.rowcount != 1:
+        return None
+    return cur.lastrowid
 
 
 def delete_user(user_id: int):

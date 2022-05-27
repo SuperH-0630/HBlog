@@ -7,9 +7,9 @@ from typing import Optional
 
 import app
 from sql.base import DBBit
-from object.blog import BlogArticle, load_blog_by_id
+from object.blog import BlogArticle
 from object.comment import Comment
-from object.archive import load_archive_by_id, Archive
+from object.archive import Archive
 
 docx = Blueprint("docx", __name__)
 
@@ -57,7 +57,7 @@ class UpdateBlogForm(EditorMD):
     def __init__(self, blog: Optional[BlogArticle] = None, **kwargs):
         super().__init__(**kwargs)
         if blog is not None:
-            self.blog_id.data = blog.blog_id
+            self.blog_id.data = blog.id
             self.content.data = blog.content
 
 
@@ -82,7 +82,7 @@ class UpdateBlogArchiveForm(FlaskForm):
             for a in blog.archive:
                 a: Archive
                 self.archive_data.append(a)
-            self.blog_id.data = blog.blog_id
+            self.blog_id.data = blog.id
 
     def validate_archive(self, field):
         for i in field.data:
@@ -145,7 +145,7 @@ def archive_page():
 def __load_article_page(blog_id: int, form: WriteCommentForm,
                         view: Optional[UpdateBlogForm] = None,
                         archive: Optional[UpdateBlogArchiveForm] = None):
-    article = load_blog_by_id(blog_id)
+    article = BlogArticle(blog_id)
     if article is None:
         app.HBlogFlask.print_user_opt_fail_log(f"Load article with error id({blog_id})")
         abort(404)
@@ -175,7 +175,7 @@ def article_page():
 @docx.route('/article/download')
 def article_down_page():
     blog_id = int(request.args.get("blog", 1))
-    article = load_blog_by_id(blog_id)
+    article = BlogArticle(blog_id)
     if article is None:
         app.HBlogFlask.print_user_opt_fail_log(f"Download article with error id({blog_id})")
         abort(404)
@@ -198,11 +198,11 @@ def create_docx_page():
     archive = []
     if -1 not in form.archive.data:
         for i in form.archive.data:
-            i = load_archive_by_id(i)
+            i = Archive(i)
             if i is not None:
                 archive.append(i)
 
-    if BlogArticle(None, current_user, title, subtitle, form.content.data, archive=archive).create():
+    if BlogArticle.create(title, subtitle, form.content.data, archive, current_user):
         app.HBlogFlask.print_sys_opt_success_log("write blog")
         flash(f"博客 {title} 发表成功")
     else:
@@ -214,11 +214,11 @@ def create_docx_page():
 @docx.route('/article/update', methods=["POST"])
 @login_required
 @app.form_required(UpdateBlogForm, "update blog",
-                   lambda form: __load_article_page(form.blog_id.data, WriteCommentForm(), form))
+                   lambda form: __load_article_page(form.id.data, WriteCommentForm(), form))
 @app.role_required("WriteBlog", "write blog")
 def update_docx_page():
     form: UpdateBlogForm = g.form
-    if BlogArticle(form.blog_id.data, None, None, None, None).update(form.content.data):
+    if BlogArticle(form.blog_id.data).update(form.content.data):
         app.HBlogFlask.print_sys_opt_success_log("update blog")
         flash("博文更新成功")
     else:
@@ -234,7 +234,7 @@ def delete_blog_page():
     blog_id = int(request.args.get("blog", -1))
     if blog_id == -1:
         return abort(400)
-    if BlogArticle(blog_id, None, None, None, None).delete():
+    if BlogArticle(blog_id).delete():
         app.HBlogFlask.print_sys_opt_success_log("delete blog")
         flash("博文删除成功")
     else:
@@ -251,7 +251,8 @@ def set_blog_top_page():
     top = request.args.get("top", '0') != '0'
     if blog_id == -1:
         return abort(400)
-    if BlogArticle(blog_id, None, None, None, None).set_top(top):
+    BlogArticle(blog_id).top = top
+    if top:
         app.HBlogFlask.print_sys_opt_success_log(f"set blog top ({top})")
         flash(f"博文{'取消' if not top else ''}置顶成功")
     else:
@@ -263,11 +264,11 @@ def set_blog_top_page():
 @docx.route("/article/set/archive", methods=["POST"])
 @login_required
 @app.form_required(UpdateBlogArchiveForm, "update archive",
-                   lambda form: __load_article_page(form.blog_id.data, WriteCommentForm(), UpdateBlogForm(), form))
+                   lambda form: __load_article_page(form.id.data, WriteCommentForm(), UpdateBlogForm(), form))
 @app.role_required("WriteBlog", "update archive")
 def update_archive_page():
     form: UpdateBlogArchiveForm = g.form
-    article = BlogArticle(form.blog_id.data, None, None, None, None)
+    article = BlogArticle(form.blog_id.data)
     add = request.args.get("add", '0') != '0'
     for i in form.archive.data:
         if add:
@@ -287,7 +288,7 @@ def comment_page():
     blog_id = int(request.args.get("blog", 1))
     form: WriteCommentForm = g.form
     content = form.content.data
-    if Comment(None, blog_id, current_user, content).create():
+    if Comment.create(BlogArticle(blog_id), current_user, content):
         app.HBlogFlask.print_user_opt_success_log("comment")
         flash("评论成功")
     else:
@@ -301,7 +302,7 @@ def comment_page():
 @app.role_required("DeleteComment", "delete comment")
 def delete_comment_page():
     comment_id = int(request.args.get("comment", 1))
-    if Comment(comment_id, None, None, None).delete():
+    if Comment(comment_id).delete():
         app.HBlogFlask.print_sys_opt_success_log("delete comment")
         flash("博文评论成功")
     else:

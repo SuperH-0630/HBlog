@@ -1,33 +1,58 @@
 from typing import Optional
 
-from sql.msg import read_msg, get_msg_count, create_msg, get_user_msg_count, delete_msg
+from sql.msg import read_msg_list, get_msg_count, create_msg, read_msg, get_user_msg_count, delete_msg
 import object.user
 
 
 def load_message_list(limit: Optional[int] = None, offset: Optional[int] = None, show_secret: bool = False):
-    msg = read_msg(limit=limit, offset=offset, show_secret=show_secret)
     ret = []
-    for i in msg:
-        ret.append(Message(i[0], object.user.User(i[2], None, None, i[1]), i[3], i[5], i[4]))
+    for i in read_msg_list(limit=limit, offset=offset, show_secret=show_secret):
+        ret.append(Message(i))
     return ret
 
 
-class Message:
-    def __init__(self, msg_id, auth: "Optional[object.user.User]", content, secret=False, update_time=None):
-        self.msg_id = msg_id
-        self.auth = auth
-        self.content = content
-        self.secret = secret
-        self.update_time = update_time
-
+class _Message:
     @staticmethod
     def get_msg_count(auth: "object.user" = None):
         if auth is None:
             return get_msg_count()
-        return get_user_msg_count(auth.get_user_id())
+        return get_user_msg_count(auth.id)
 
-    def create(self):
-        return create_msg(self.auth.get_user_id(), self.content, self.secret)
+    @staticmethod
+    def create(auth: "object.user.User", content, secret: bool = False):
+        ret = create_msg(auth.id, content, secret)
+        if ret is not None:
+            return Message(ret)
+        return None
+
+
+class Message(_Message):
+    def __init__(self, msg_id):
+        self.id = msg_id
+
+    @property
+    def info(self):
+        return read_msg(self.id)
+
+    @property
+    def auth(self):
+        return object.user.User(self.info[0])
+
+    @property
+    def content(self):
+        return self.info[1]
+
+    @property
+    def update_time(self):
+        return self.info[2]
+
+    @property
+    def secret(self):
+        return self.info[3]
+
+    @property
+    def is_delete(self):
+        return not self.auth.is_authenticated and len(self.content) != 0
 
     def delete(self):
-        return delete_msg(self.msg_id)
+        return delete_msg(self.id)

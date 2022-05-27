@@ -16,7 +16,7 @@ def create_blog(auth_id: int, title: str, subtitle: str, content: str,
         return False
     blog_id = cur.lastrowid
     for archive in archive_list:
-        if not add_blog_to_archive(blog_id, archive.archive_id):
+        if not add_blog_to_archive(blog_id, archive.id):
             return False
     return True
 
@@ -38,7 +38,7 @@ def read_blog(blog_id: int) -> list:
                     table="blog",
                     where=f"ID={blog_id}")
     if cur is None or cur.rowcount == 0:
-        return []
+        return [-1, "", "", "", 0, -1, False]
     return cur.fetchone()
 
 

@@ -58,7 +58,7 @@ def write_msg_page():
     form: WriteForm = g.form
     content = form.content.data
     secret = form.secret.data
-    if Message(None, current_user, content, secret, None).create():
+    if Message.create(current_user, content, secret):
         app.HBlogFlask.print_user_opt_success_log("write msg")
         flash("留言成功")
     else:
@@ -72,7 +72,7 @@ def write_msg_page():
 @app.role_required("DeleteMsg", "delete msg")
 def delete_msg_page():
     msg_id = int(request.args.get("msg", 1))
-    if Message(msg_id, None, None).delete():
+    if Message(msg_id).delete():
         app.HBlogFlask.print_user_opt_success_log("delete msg")
         flash("留言删除成功")
     else:

@@ -1,6 +1,5 @@
-from typing import Optional
+from typing import List
 
-from sql.base import DBBit
 from sql.blog import (get_blog_list,
                       get_blog_count,
                       get_archive_blog_list,
@@ -13,6 +12,7 @@ from sql.blog import (get_blog_list,
                       set_blog_top,
                       get_user_user_count)
 from sql.archive import add_blog_to_archive, sub_blog_from_archive
+from sql.user import get_user_email
 import object.user
 import object.archive
 import object.comment
@@ -22,41 +22,7 @@ class LoadBlogError(Exception):
     pass
 
 
-def load_blog_by_id(blog_id) -> "Optional[BlogArticle]":
-    blog_id = blog_id
-    blog = read_blog(blog_id)
-    if len(blog) == 0:
-        return None
-
-    auth = object.user.load_user_by_id(blog[0])
-    if auth is None:
-        return None
-
-    title = blog[1]
-    subtitle = blog[2]
-    content = blog[3]
-    update_time = blog[4]
-    create_time = blog[5]
-    top = blog[6] == DBBit.BIT_1
-    comment = object.comment.load_comment_list(blog_id)
-    archive = object.archive.Archive.get_blog_archive(blog_id)
-    return BlogArticle(blog_id, auth, title, subtitle, content, update_time, create_time, top, comment, archive)
-
-
-class BlogArticle:
-    def __init__(self, blog_id, auth, title, subtitle, content, update_time=None, create_time=None, top=False,
-                 comment=None, archive=None):
-        self.blog_id = blog_id
-        self.user = auth
-        self.title = title
-        self.subtitle = subtitle
-        self.content = content
-        self.update_time = update_time
-        self.create_time = create_time
-        self.top = top
-        self.comment = [] if comment is None else comment
-        self.archive = [] if archive is None else archive
-
+class _BlogArticle:
     @staticmethod
     def get_blog_list(archive_id=None, limit=None, offset=None, not_top=False):
         if archive_id is None:
@@ -71,27 +37,76 @@ class BlogArticle:
             return get_blog_count()
         if auth is None:
             return get_archive_blog_count(archive_id)
-        return get_user_user_count(auth.get_user_id())
+        return get_user_user_count(auth.id)
 
-    def create(self):
-        if self.blog_id is not None:  # 只有 blog_id为None时才使用
-            return False
-        return create_blog(self.user.get_user_id(), self.title, self.subtitle, self.content, self.archive)
+    @staticmethod
+    def create(title, subtitle, content, archive: "List[object.archive.Archive]", user: "object.user.User"):
+        return create_blog(user.id, title, subtitle, content, archive)
+
+
+class BlogArticle(_BlogArticle):
+    def __init__(self, blog_id):
+        self.id = blog_id
+
+    @property
+    def info(self):
+        return read_blog(self.id)
+
+    @property
+    def user(self):
+        return object.user.User(get_user_email(self.info[0]))
+
+    @property
+    def title(self):
+        return self.info[1]
+
+    @property
+    def subtitle(self):
+        return self.info[2]
+
+    @property
+    def content(self):
+        return self.info[3]
+
+    @property
+    def update_time(self):
+        return self.info[4]
+
+    @property
+    def create_time(self):
+        return self.info[5]
+
+    @property
+    def top(self):
+        return self.info[6]
+
+    @top.setter
+    def top(self, top: bool):
+        set_blog_top(self.id, top)
+
+    @property
+    def comment(self):
+        return object.comment.load_comment_list(self.id)
+
+    @property
+    def archive(self):
+        return object.archive.Archive.get_blog_archive(self.id)
+
+    @property
+    def is_delete(self):
+        return not self.user.is_authenticated and len(self.content) != 0
 
     def delete(self):
-        return delete_blog(self.blog_id)
+        return delete_blog(self.id)
 
     def update(self, content: str):
-        if update_blog(self.blog_id, content):
-            self.content = content
+        if update_blog(self.id, content):
             return True
         return False
 
-    def set_top(self, top: bool):
-        set_blog_top(self.blog_id, top)
-
     def add_to_archive(self, archive_id: int):
-        return add_blog_to_archive(self.blog_id, archive_id)
+        return add_blog_to_archive(self.id, archive_id)
 
     def sub_from_archive(self, archive_id: int):
-        return sub_blog_from_archive(self.blog_id, archive_id)
+        return sub_blog_from_archive(self.id, archive_id)
+

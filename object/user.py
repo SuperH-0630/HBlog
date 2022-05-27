@@ -2,13 +2,10 @@ from flask_login import UserMixin, AnonymousUserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import URLSafeTimedSerializer as Serializer
 from itsdangerous.exc import BadData
-from typing import Optional
 
-import sql.user
 from configure import conf
 from sql.user import (read_user,
                       check_role,
-                      get_user_email,
                       create_user,
                       get_role_name,
                       delete_user,
@@ -16,7 +13,8 @@ from sql.user import (read_user,
                       create_role,
                       delete_role,
                       set_user_role,
-                      get_role_list)
+                      get_role_list,
+                      role_authority)
 import object.blog
 import object.comment
 import object.msg
@@ -32,83 +30,17 @@ class AnonymousUser(AnonymousUserMixin):
     def check_role(self, operate: str):
         return check_role(self.role, operate)
 
+    @property
+    def id(self):
+        return 0
+
+
+class _User(UserMixin):
     @staticmethod
-    def get_user_id():
-        return 0
-
-
-def load_user_by_email(email: str) -> "Optional[User]":
-    user = read_user(email)
-    if len(user) == 0:
+    def create(email, passwd_hash):
+        if create_user(email, passwd_hash) is not None:
+            return User(email)
         return None
-    passwd_hash = user[0]
-    role = user[1]
-    user_id = user[2]
-    return User(email, passwd_hash, role, user_id)
-
-
-def load_user_by_id(user_id):
-    email = get_user_email(user_id)
-    if email is None:
-        return None
-    return load_user_by_email(email)
-
-
-class User(UserMixin):
-    RoleAuthorize = sql.user.role_authority
-
-    def __init__(self, email, passwd_hash, role, user_id):
-        self.email = email
-        self.passwd_hash = passwd_hash
-        self.role = role
-        if role is not None:
-            self.role_name = get_role_name(role)
-        else:
-            self.role_name = None
-        self.user_id = user_id
-
-    def count_info(self):
-        msg = object.msg.Message.get_msg_count(self)
-        comment = object.comment.Comment.get_user_comment_count(self)
-        blog = object.blog.BlogArticle.get_blog_count(None, self)
-        return msg, comment, blog
-
-    @property
-    def s_email(self):
-        if len(self.email) <= 4:
-            return f"{self.email[0]}****"
-        else:
-            email = f"{self.email[0]}****{self.email[5:]}"
-            return email
-
-    @property
-    def comment_count(self):
-        return 0
-
-    @property
-    def blog_count(self):
-        return 0
-
-    @property
-    def msg_count(self):
-        return 0
-
-    @property
-    def is_active(self):
-        """Flask要求的属性, 表示用户是否激活(可登录), HGSSystem没有封禁用户系统, 所有用户都是被激活的"""
-        return True
-
-    @property
-    def is_authenticated(self):
-        """Flask要求的属性, 表示登录的凭据是否正确, 这里检查是否能 load_user_by_id"""
-        return True
-
-    def get_id(self):
-        """Flask要求的方法"""
-        return self.email
-
-    def get_user_id(self):
-        return self.user_id
 
     @staticmethod
     def creat_token(email: str, passwd_hash: str):
@@ -128,21 +60,6 @@ class User(UserMixin):
     def get_passwd_hash(passwd: str):
         return generate_password_hash(passwd)
 
-    def check_passwd(self, passwd: str):
-        return check_password_hash(self.passwd_hash, passwd)
-
-    def check_role(self, operate: str):
-        return check_role(self.role, operate)
-
-    def create(self):
-        return create_user(self.email, self.passwd_hash)
-
-    def delete(self):
-        return delete_user(self.user_id)
-
-    def change_passwd(self, passwd):
-        return change_passwd_hash(self.user_id, self.get_passwd_hash(passwd))
-
     @staticmethod
     def create_role(name: str, authority):
         return create_role(name, authority)
@@ -151,9 +68,77 @@ class User(UserMixin):
     def delete_role(role_id: int):
         return delete_role(role_id)
 
-    def set_user_role(self, role_id: int):
-        return set_user_role(role_id, self.user_id)
-
     @staticmethod
     def get_role_list():
         return get_role_list()
+
+
+class User(_User):
+    RoleAuthorize = role_authority
+
+    def __init__(self, email):
+        self.email = email
+
+    def get_id(self):
+        """Flask要求的方法"""
+        return self.email
+
+    @property
+    def is_active(self):
+        """Flask要求的属性, 表示用户是否激活(可登录), HGSSystem没有封禁用户系统, 所有用户都是被激活的"""
+        return self.id != -1
+
+    @property
+    def is_authenticated(self):
+        """Flask要求的属性, 表示登录的凭据是否正确, 这里检查是否能 load_user_by_id"""
+        return self.is_active
+
+    @property
+    def star_email(self):
+        if len(self.email) <= 4:
+            return f"{self.email[0]}****"
+        else:
+            email = f"{self.email[0]}****{self.email[5:]}"
+            return email
+
+    @property
+    def info(self):
+        return read_user(self.email)
+
+    @property
+    def passwd_hash(self):
+        return self.info[0]
+
+    @property
+    def role(self):
+        return self.info[1]
+
+    @property
+    def role_name(self):
+        return get_role_name(self.info[1])
+
+    @property
+    def id(self):
+        return self.info[2]
+
+    @property
+    def count(self):
+        msg = object.msg.Message.get_msg_count(self)
+        comment = object.comment.Comment.get_user_comment_count(self)
+        blog = object.blog.BlogArticle.get_blog_count(None, self)
+        return msg, comment, blog
+
+    def check_passwd(self, passwd: str):
+        return check_password_hash(self.passwd_hash, passwd)
+
+    def check_role(self, operate: str):
+        return check_role(self.role, operate)
+
+    def delete(self):
+        return delete_user(self.id)
+
+    def change_passwd(self, passwd):
+        return change_passwd_hash(self.id, self.get_passwd_hash(passwd))
+
+    def set_user_role(self, role_id: int):
+        return set_user_role(role_id, self.id)

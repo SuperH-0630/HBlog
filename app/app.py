@@ -1,7 +1,7 @@
 import os
 import sys
 
-from flask import Flask, url_for, request, current_app, g, render_template
+from flask import Flask, url_for, request, current_app, render_template
 from flask_mail import Mail
 from flask_login import LoginManager, current_user
 from flask.logging import default_handler
@@ -12,7 +12,7 @@ import logging
 from bs4 import BeautifulSoup
 
 from configure import conf
-from object.user import AnonymousUser, load_user_by_email
+from object.user import AnonymousUser, User
 
 from .index import index
 from .archive import archive
@@ -59,7 +59,7 @@ class HBlogFlask(Flask):
 
         @self.login_manager.user_loader
         def user_loader(email: str):
-            return load_user_by_email(email)
+            return User(email)
 
         func = {"render_template": render_template, "self": self}
         for i in [400, 401, 403, 404, 405, 408, 410, 413, 414, 423, 500, 501, 502]:
@@ -171,4 +171,3 @@ class HBlogFlask(Flask):
 
 
 Hblog = Union[HBlogFlask, Flask]
-

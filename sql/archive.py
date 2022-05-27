@@ -10,11 +10,20 @@ def create_archive(name: str, describe: str):
                     columns=["Name", "DescribeText"],
                     values=f"'{name}', '{describe}'")
     if cur is None or cur.rowcount == 0:
-        return False
-    return True
+        return None
+    return cur.lastrowid
 
 
-def read_archive(blog_id: int):
+def read_archive(archive_id: int):
+    """ 获取归档 ID """
+    cur = db.search(columns=["Name", "DescribeText"], table="archive",
+                    where=f"ID={archive_id}")
+    if cur is None or cur.rowcount == 0:
+        return ["", ""]
+    return cur.fetchone()
+
+
+def get_blog_archive(blog_id: int):
     """ 获取文章的归档 """
     cur = db.search(columns=["ArchiveID", "ArchiveName", "DescribeText"], table="blog_archive_with_name",
                     where=f"BlogID={blog_id}")
@@ -59,16 +68,8 @@ def get_archive_list(limit: Optional[int] = None, offset: Optional[int] = None):
     """ 获取归档列表 """
     cur = db.search(columns=["ID", "Name", "DescribeText", "Count"], table="archive_with_count",
                     limit=limit,
-                    offset=offset)
+                    offset=offset,
+                    order_by=[("Count", "DESC"), ("Name", "ASC")])
     if cur is None or cur.rowcount == 0:
         return []
     return cur.fetchall()
-
-
-def get_archive_name_by_id(archive_id: int):
-    """ 获取归档 ID """
-    cur = db.search(columns=["Name", "DescribeText"], table="archive",
-                    where=f"ID={archive_id}")
-    if cur is None or cur.rowcount == 0:
-        return None, None
-    return cur.fetchone()

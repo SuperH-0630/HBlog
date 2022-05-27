@@ -12,7 +12,7 @@ from wtforms import (EmailField,
 from wtforms.validators import DataRequired, Length, Regexp, EqualTo
 
 import app
-from object.user import User, load_user_by_email
+from object.user import User
 from send_email import send_msg
 
 auth = Blueprint("auth", __name__)
@@ -58,7 +58,7 @@ class RegisterForm(EmailPasswd):
     submit = SubmitField("注册")
 
     def validate_email(self, field):
-        if load_user_by_email(field.data) is not None:
+        if User(field.data) is not None:
             raise ValidationError("邮箱已被注册")
 
 
@@ -82,7 +82,7 @@ class DeleteUserForm(AuthField):
         self.email_user = None
 
     def validate_email(self, field):
-        self.email_user = load_user_by_email(field.data)
+        self.email_user = User(field.data)
         if self.email_user is None:
             raise ValidationError("邮箱用户不存在")
 
@@ -123,7 +123,7 @@ class SetRoleForm(RoleForm):
         self.email_user = None
 
     def validate_email(self, field):
-        self.email_user = load_user_by_email(field.data)
+        self.email_user = User(field.data)
         if self.email_user is None:
             raise ValidationError("邮箱用户不存在")
 
@@ -131,7 +131,7 @@ class SetRoleForm(RoleForm):
 @auth.route('/user/yours')
 @login_required
 def yours_page():
-    msg_count, comment_count, blog_count = current_user.count_info()
+    msg_count, comment_count, blog_count = current_user.count
     app.HBlogFlask.print_load_page_log("user info")
     return render_template("auth/yours.html", msg_count=msg_count, comment_count=comment_count, blog_count=blog_count)
 
@@ -144,7 +144,7 @@ def login_page():
 
     form = LoginForm()
     if form.validate_on_submit():
-        user = load_user_by_email(form.email.data)
+        user = User(form.email.data)
         if user is not None and user.check_passwd(form.passwd.data):
             login_user(user, form.remember.data)
             next_page = request.args.get("next")
@@ -193,12 +193,12 @@ def confirm_page():
         abort(404)
         return
 
-    if load_user_by_email(token[0]) is not None:
+    if User(token[0]) is not None:
         app.HBlogFlask.print_user_opt_fail_log(f"Confirm (bad token)")
         abort(404)
         return
 
-    User(token[0], token[1], None, None).create()
+    User.create(token[0], token[1])
     current_app.logger.info(f"{token[0]} confirm success")
     app.HBlogFlask.print_import_user_opt_success_log(f"confirm {token[0]}")
     flash(f"用户{token[0]}认证完成")

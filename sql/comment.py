@@ -1,14 +1,15 @@
 from sql import db
 
 
-def read_comment(blog_id: int):
+def read_comment_list(blog_id: int):
     """ 读取文章的 comment """
-    cur = db.search(columns=["CommentID", "Auth", "Email", "Content", "UpdateTime"],
+    cur = db.search(columns=["CommentID"],
                     table="comment_user",
-                    where=f"BlogID={blog_id}")
+                    where=f"BlogID={blog_id}",
+                    order_by=[("UpdateTime", "DESC")])
     if cur is None or cur.rowcount == 0:
         return []
-    return cur.fetchall()
+    return [i[0] for i in cur.fetchall()]
 
 
 def create_comment(blog_id: int, user_id: int, content: str):
@@ -20,6 +21,16 @@ def create_comment(blog_id: int, user_id: int, content: str):
     if cur is None or cur.rowcount == 0:
         return False
     return True
+
+
+def read_comment(comment_id: int):
+    """ 读取 comment """
+    cur = db.search(columns=["BlogID", "Email", "Content", "UpdateTime"],
+                    table="comment_user",
+                    where=f"CommentID={comment_id}")
+    if cur is None or cur.rowcount == 0:
+        return [-1, "", "", 0]
+    return cur.fetchone()
 
 
 def delete_comment(comment_id):

@@ -48,7 +48,7 @@ def create_archive_page():
     form: CreateArchiveForm = g.form
     name = form.name.data
     describe = form.describe.data
-    if Archive(name, describe, None).create():
+    if Archive.create(name, describe):
         app.HBlogFlask.print_sys_opt_success_log(f"Create archive {name}")
         flash(f"创建归档 {name} 成功")
     else:
@@ -62,7 +62,7 @@ def create_archive_page():
 @app.role_required("DeleteBlog", "delete archive")
 def delete_archive_page():
     archive_id = int(request.args.get("archive", 1))
-    if Archive(None, None, archive_id).delete():
+    if Archive(archive_id).delete():
         app.HBlogFlask.print_sys_opt_success_log(f"Delete archive {archive_id}")
         flash("归档删除成功")
     else:

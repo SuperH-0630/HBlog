@@ -5,6 +5,10 @@ from sql.base import Database, DBException, DBCloseException
 from typing import Optional, Union, List, Tuple, Dict
 
 
+class MysqlConnectException(DBCloseException):
+    """Mysql Connect error"""
+
+
 class MysqlDB(Database):
     def __init__(self,
                  host: Optional[str],
@@ -27,19 +31,18 @@ class MysqlDB(Database):
         self.logger.info(f"MySQL({self._name}@{self._host}) connect")
 
     def close(self):
-        if self._cursor is not None:
-            self._cursor.close()
-        if self._db is not None:
-            self._db.close()
-        self._db = None
-        self._cursor = None
-        self._lock = None
-        self.logger.warning(f"MySQL({self._name}@{self._host}) connect close")
+        self._close()
 
     def is_connect(self) -> bool:
         if self._cursor is None or self._db is None:
             return False
-        return True
+
+        try:
+            self._db.ping(False)
+        except Exception:
+            return False
+        else:
+            return True
 
     def get_cursor(self) -> pymysql.cursors.Cursor:
         if self._cursor is None or self._db is None:
@@ -122,30 +125,29 @@ class MysqlDB(Database):
         kw_str = ", ".join(kw_list)
         return self.__done(f"UPDATE {table} SET {kw_str} WHERE {where};", not_commit=not_commit)
 
-    def __search(self, sql) -> Union[None, pymysql.cursors.Cursor]:
-        if self._cursor is None or self._db is None:
-            raise DBCloseException
+    def commit(self):
+        self._commit()
 
+    def __search(self, sql) -> Union[None, pymysql.cursors.Cursor]:
         try:
             self._lock.acquire()  # 上锁
+            self._connect()
             self._cursor.execute(sql)
         except pymysql.MySQLError:
-            self.logger.error(f"MySQL({self._name}@{self._host}) SQL {sql} error", exc_info=True)
+            self.logger.error(f"MySQL({self._name}@{self._host}) SQL {sql} error", exc_info=True, stack_info=True)
             return None
         finally:
             self._lock.release()  # 释放锁
         return self._cursor
 
     def __done(self, sql, not_commit: bool = False) -> Union[None, pymysql.cursors.Cursor]:
-        if self._cursor is None or self._db is None:
-            raise DBCloseException
-
         try:
             self._lock.acquire()
+            self._connect()
             self._cursor.execute(sql)
         except pymysql.MySQLError:
             self._db.rollback()
-            self.logger.error(f"MySQL({self._name}@{self._host}) SQL {sql} error", exc_info=True)
+            self.logger.error(f"MySQL({self._name}@{self._host}) SQL {sql} error", exc_info=True, stack_info=True)
             return None
         finally:
             if not not_commit:
@@ -153,9 +155,29 @@ class MysqlDB(Database):
             self._lock.release()
         return self._cursor
 
-    def commit(self):
+    def _connect(self):
+        if self._db is None:
+            raise MysqlConnectException
+
+        try:
+            self._db.ping(False)
+        except Exception:
+            raise MysqlConnectException
+
+    def _close(self):
+        if self._cursor is not None:
+            self._cursor.close()
+        if self._db is not None:
+            self._db.close()
+        self._db = None
+        self._cursor = None
+        self._lock = None
+        self.logger.warning(f"MySQL({self._name}@{self._host}) connect close")
+
+    def _commit(self):
         try:
             self._lock.acquire()
+            self._connect()
             self._db.commit()
         except pymysql.MySQLError:
             self.logger.error(f"MySQL({self._name}@{self._host}) commit error", exec_info=True)
