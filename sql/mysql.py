@@ -131,11 +131,13 @@ class MysqlDB(Database):
     def __search(self, sql) -> Union[None, pymysql.cursors.Cursor]:
         try:
             self._lock.acquire()  # 上锁
-            self._connect()
+            if not self.is_connect():
+                self.logger.error(f"MySQL({self._name}@{self._host}) SQL {sql} connect error")
+                return
             self._cursor.execute(sql)
         except pymysql.MySQLError:
             self.logger.error(f"MySQL({self._name}@{self._host}) SQL {sql} error", exc_info=True, stack_info=True)
-            return None
+            return
         finally:
             self._lock.release()  # 释放锁
         return self._cursor
@@ -143,12 +145,14 @@ class MysqlDB(Database):
     def __done(self, sql, not_commit: bool = False) -> Union[None, pymysql.cursors.Cursor]:
         try:
             self._lock.acquire()
-            self._connect()
+            if not self.is_connect():
+                self.logger.error(f"MySQL({self._name}@{self._host}) SQL {sql} connect error")
+                return
             self._cursor.execute(sql)
         except pymysql.MySQLError:
             self._db.rollback()
             self.logger.error(f"MySQL({self._name}@{self._host}) SQL {sql} error", exc_info=True, stack_info=True)
-            return None
+            return
         finally:
             if not not_commit:
                 self._db.commit()
@@ -177,7 +181,9 @@ class MysqlDB(Database):
     def _commit(self):
         try:
             self._lock.acquire()
-            self._connect()
+            if not self.is_connect():
+                self.logger.error(f"MySQL({self._name}@{self._host}) SQL {sql} connect error")
+                return
             self._db.commit()
         except pymysql.MySQLError:
             self.logger.error(f"MySQL({self._name}@{self._host}) commit error", exec_info=True)
