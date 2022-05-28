@@ -38,7 +38,7 @@ class MysqlDB(Database):
             return False
 
         try:
-            self._db.ping(False)
+            self._db.ping(True)
         except Exception:
             return False
         else:
