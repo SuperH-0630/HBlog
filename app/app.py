@@ -59,7 +59,10 @@ class HBlogFlask(Flask):
 
         @self.login_manager.user_loader
         def user_loader(email: str):
-            return User(email)
+            user = User(email)
+            if user.info[2] == -1:
+                return None
+            return user
 
         func = {"render_template": render_template, "self": self}
         for i in [400, 401, 403, 404, 405, 408, 410, 413, 414, 423, 500, 501, 502]:

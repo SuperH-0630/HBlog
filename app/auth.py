@@ -86,8 +86,7 @@ class DeleteUserForm(AuthField):
         self.email_user = None
 
     def validate_email(self, field):
-        self.email_user = User(field.data)
-        if self.email_user is None:
+        if User(field.data).info[2] == -1:
             raise ValidationError("邮箱用户不存在")
 
 
@@ -127,8 +126,7 @@ class SetRoleForm(RoleForm):
         self.email_user = None
 
     def validate_email(self, field):
-        self.email_user = User(field.data)
-        if self.email_user is None:
+        if User(field.data).info[2] == -1:
             raise ValidationError("邮箱用户不存在")
 
 
@@ -149,7 +147,7 @@ def login_page():
     form = LoginForm()
     if form.validate_on_submit():
         user = User(form.email.data)
-        if user is not None and user.check_passwd(form.passwd.data):
+        if user.info[2] != -1 and user.check_passwd(form.passwd.data):
             login_user(user, form.remember.data)
             next_page = request.args.get("next")
             if next_page is None or not next_page.startswith('/'):
@@ -197,7 +195,7 @@ def confirm_page():
         abort(404)
         return
 
-    if User(token[0]) is not None:
+    if User(token[0]).info[2] == -1:
         app.HBlogFlask.print_user_opt_fail_log(f"Confirm (bad token)")
         abort(404)
         return
