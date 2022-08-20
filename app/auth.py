@@ -195,7 +195,7 @@ def confirm_page():
         abort(404)
         return
 
-    if User(token[0]).info[2] == -1:
+    if User(token[0]).info[2] != -1:
         app.HBlogFlask.print_user_opt_fail_log(f"Confirm (bad token)")
         abort(404)
         return
