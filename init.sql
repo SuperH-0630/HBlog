@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS role -- 角色表
 
     ConfigureSystem bit DEFAULT 0, -- 配置系统
     ReadSystem      bit DEFAULT 0  -- 读系统信息
-);
+) CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS user -- 创建用户表
 (
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS user -- 创建用户表
     PasswdHash char(128) NOT NULL,
     Role       INT       NOT NULL DEFAULT 3,
     FOREIGN KEY (Role) REFERENCES role (RoleID)
-);
+) CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 
 INSERT INTO role (RoleID,
                   RoleName,
@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS blog -- 创建博客表
     UpdateTime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,      -- 创建的时间
     Top        BIT      NOT NULL DEFAULT 0,                 -- 置顶
     FOREIGN KEY (Auth) REFERENCES user (ID)
-);
+) CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 
 CREATE VIEW blog_with_top AS
 SELECT *
@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS archive -- 归档表
     ID           INT PRIMARY KEY AUTO_INCREMENT, -- 归档 ID
     Name         CHAR(30)  NOT NULL UNIQUE,      -- 归档名称
     DescribeText char(100) NOT NULL              -- 描述
-);
+) CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS blog_archive -- 归档表
 (
@@ -92,7 +92,7 @@ CREATE TABLE IF NOT EXISTS blog_archive -- 归档表
     ArchiveID INT, -- 归档ID
     FOREIGN KEY (BlogID) REFERENCES blog (ID),
     FOREIGN KEY (ArchiveID) REFERENCES archive (ID)
-);
+) CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 
 CREATE VIEW archive_with_count AS
 SELECT ID, Name, DescribeText, (SELECT Count(ArchiveID) FROM blog_archive WHERE blog_archive.ArchiveID = archive.ID) AS Count
@@ -126,7 +126,7 @@ CREATE TABLE IF NOT EXISTS comment -- 评论表
     UpdateTime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,      -- 创建的时间
     FOREIGN KEY (BlogID) REFERENCES blog (ID),
     FOREIGN KEY (Auth) REFERENCES user (ID)
-);
+) CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 
 CREATE VIEW comment_user AS
 SELECT comment.ID as CommentID, BlogID, Auth, user.Email as Email, Content, CreateTime, UpdateTime
@@ -143,7 +143,7 @@ CREATE TABLE IF NOT EXISTS message -- 留言表
     CreateTime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, -- 创建的时间
     UpdateTime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,      -- 创建的时间
     FOREIGN KEY (Auth) REFERENCES user (ID)
-);
+) CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 
 
 CREATE VIEW message_user AS
