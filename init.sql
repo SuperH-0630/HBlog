@@ -69,7 +69,7 @@ CREATE TABLE IF NOT EXISTS blog -- 创建博客表
     SubTitle   char(20) NOT NULL,                           -- 副标题
     Content    TEXT     NOT NULL,                           -- 内容
     CreateTime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, -- 创建的时间
-    UpdateTime DATETIME NOT NULL DEFAULT (CreateTime),      -- 创建的时间
+    UpdateTime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,      -- 创建的时间
     Top        BIT      NOT NULL DEFAULT 0,                 -- 置顶
     FOREIGN KEY (Auth) REFERENCES user (ID)
 );
@@ -123,7 +123,7 @@ CREATE TABLE IF NOT EXISTS comment -- 评论表
     Auth       INT      NOT NULL,                           -- 作者
     Content    TEXT     NOT NULL,                           -- 内容
     CreateTime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, -- 创建的时间
-    UpdateTime DATETIME NOT NULL DEFAULT (CreateTime),      -- 创建的时间
+    UpdateTime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,      -- 创建的时间
     FOREIGN KEY (BlogID) REFERENCES blog (ID),
     FOREIGN KEY (Auth) REFERENCES user (ID)
 );
@@ -141,7 +141,7 @@ CREATE TABLE IF NOT EXISTS message -- 留言表
     Content    TEXT     NOT NULL,                           -- 内容
     Secret     BIT      NOT NULL DEFAULT 0,                 -- 私密内容
     CreateTime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, -- 创建的时间
-    UpdateTime DATETIME NOT NULL DEFAULT (CreateTime),      -- 创建的时间
+    UpdateTime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,      -- 创建的时间
     FOREIGN KEY (Auth) REFERENCES user (ID)
 );
 
