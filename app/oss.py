@@ -4,6 +4,7 @@ from flask_wtf import FlaskForm
 from wtforms import FileField, StringField, SubmitField
 from wtforms.validators import DataRequired, Length
 
+import configure
 from aliyun import aliyun
 import app
 
@@ -52,7 +53,7 @@ def upload_page():
         path += file.filename
         aliyun.upload_file(path, file)
         app.HBlogFlask.print_sys_opt_success_log(f"Upload file {path}")
-        flash(f"文件 {file.filename} 已上传: {url_for('oss.get_page', name=path, _external=True)}")
+        flash(f"文件 {file.filename} 已上传: {configure.conf['URL_NAME'] + url_for('oss.get_page', name=path)}")
         return redirect(url_for("oss.upload_page"))
     app.HBlogFlask.print_load_page_log(f"OSS upload")
     return render_template("oss/upload.html", UploadForm=form)

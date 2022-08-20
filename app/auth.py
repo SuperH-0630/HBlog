@@ -14,6 +14,7 @@ from wtforms.validators import DataRequired, Length, Regexp, EqualTo
 import app
 from object.user import User
 from send_email import send_msg
+from configure import conf
 
 auth = Blueprint("auth", __name__)
 
@@ -171,7 +172,7 @@ def register_page():
     form = RegisterForm()
     if form.validate_on_submit():
         token = User.creat_token(form.email.data, form.passwd.data)
-        register_url = url_for("auth.confirm_page", token=token, _external=True)
+        register_url = conf["URL_NAME"] + url_for("auth.confirm_page", token=token)
         hblog: app.Hblog = current_app
         send_msg("注册确认", hblog.mail, form.email.data, "register", register_url=register_url)
         flash("注册提交成功, 请进入邮箱点击确认注册链接")
