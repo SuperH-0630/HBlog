@@ -58,7 +58,7 @@ class RegisterForm(EmailPasswd):
     submit = SubmitField("注册")
 
     def validate_email(self, field):
-        if User(field.data) is not None:
+        if User(field.data).info[2] != -1:
             raise ValidationError("邮箱已被注册")
 
 
