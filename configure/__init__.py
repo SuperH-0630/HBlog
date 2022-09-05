@@ -34,6 +34,7 @@ conf = {
                   "%(message)s",
     "LOG_LEVEL": logging.INFO,
     "LOG_STDERR": True,
+    "LOGO": "logo.jpg",
 }
 
 
