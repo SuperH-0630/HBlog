@@ -35,6 +35,7 @@ conf = {
     "LOG_LEVEL": logging.INFO,
     "LOG_STDERR": True,
     "LOGO": "logo.jpg",
+    "ICP": None,
 }
 
 

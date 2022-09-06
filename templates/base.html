@@ -110,6 +110,9 @@
     <footer id="foot">
         <hr>
         {{ conf['FOOT'] }}
+        {% if conf["ICP"] %}
+            <br> <a id="ICP" href="https://beian.miit.gov.cn"> {{ conf['ICP'] }} </a>
+        {% endif %}
     </footer>
     <script>
         function SetFooter (mutationsList, observer) {
