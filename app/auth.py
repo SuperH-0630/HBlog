@@ -25,8 +25,8 @@ class AuthField(FlaskForm):
         return EmailField(name, description=description,
                           validators=[
                               DataRequired(f"必须填写{name}"),
-                              Length(1, 20, message=f"{name}长度1-20个字符"),
-                              Regexp(r"^[a-zA-Z0-9_\.]+@[a-zA-Z0-9_]+(\.[a-zA-Z0-9_\.]+)+$",
+                              Length(1, 32, message=f"{name}长度1-32个字符"),
+                              Regexp(r"^[a-zA-Z0-9_\.\-]+@[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\.]+)+$",
                                      message=f"{name}不满足正则表达式")])
 
     @staticmethod
