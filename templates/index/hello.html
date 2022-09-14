@@ -29,7 +29,16 @@
     {% if conf["ICP"] %}
         <footer id="foot">
             <a id="ICP" href="https://beian.miit.gov.cn"> {{ conf['ICP'] }} </a>
+            {% if conf["GONG_AN"] %}
+                <br> <a id="GONG_AN" target="_blank"
+                   href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=44011402000783"
+                   style="display:inline-block;text-decoration:none;height:20px;line-height:20px;">
+                    <img src="{{ url_for('static', filename='wangan.png') }}" style="float:left;"/>
+                    {{ conf["GONG_AN"] }}
+                </a>
+            {% endif %}
         </footer>
+
         <script>
             function SetFooter (mutationsList, observer) {
                 let foot = document.getElementById('foot')

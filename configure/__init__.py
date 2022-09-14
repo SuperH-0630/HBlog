@@ -36,6 +36,7 @@ conf = {
     "LOG_STDERR": True,
     "LOGO": "logo.jpg",
     "ICP": None,
+    "GONG_AN": None,
 }
 
 
