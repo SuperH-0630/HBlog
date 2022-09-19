@@ -27,6 +27,7 @@ conf = {
     "ALIYUN_SECRET": "",
     "ALIYUN_BUCKET_ENDPOINT": "",
     "ALIYUN_BUCKET_NAME": "",
+    "ALIYUN_BUCKET_IS_CNAME": False,
     "LOG_HOME": "",
     "LOG_FORMAT": "[%(levelname)s]:%(name)s:%(asctime)s "
                   "(%(filename)s:%(lineno)d %(funcName)s) "

@@ -6,11 +6,11 @@ import os
 
 
 class Aliyun:
-    def __init__(self, key, secret, endpoint, name):
+    def __init__(self, key, secret, endpoint, name, is_cname):
         self.key = key
         self.secret = secret
         self.auth = oss2.Auth(key, secret)
-        self.bucket = oss2.Bucket(self.auth, endpoint, name)
+        self.bucket = oss2.Bucket(self.auth, endpoint, name, is_cname=is_cname)
         self.logger = logging.getLogger("main.aliyun")
         self.logger.setLevel(conf["LOG_LEVEL"])
         if len(conf["LOG_HOME"]) > 0:
@@ -38,6 +38,7 @@ if conf["USE_ALIYUN"]:
     aliyun = Aliyun(conf["ALIYUN_KEY"],
                     conf["ALIYUN_SECRET"],
                     conf["ALIYUN_BUCKET_ENDPOINT"],
-                    conf["ALIYUN_BUCKET_NAME"])
+                    conf["ALIYUN_BUCKET_NAME"],
+                    conf["ALIYUN_BUCKET_IS_CNAME"])
 else:
     aliyun = None
