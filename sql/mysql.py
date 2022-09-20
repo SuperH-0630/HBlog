@@ -3,6 +3,7 @@ import pymysql
 import threading
 from sql.base import Database, DBException, DBCloseException
 from typing import Optional, Union, List, Tuple, Dict
+import inspect
 
 
 class MysqlConnectException(DBCloseException):
@@ -136,7 +137,8 @@ class MysqlDB(Database):
                 return
             self._cursor.execute(sql)
         except pymysql.MySQLError:
-            self.logger.error(f"MySQL({self._name}@{self._host}) SQL {sql} error", exc_info=True, stack_info=True)
+            self.logger.error(f"MySQL({self._name}@{self._host}) SQL {sql} error {inspect.stack()[2][2]} "
+                              f"{inspect.stack()[2][1]} {inspect.stack()[2][3]}", exc_info=True, stack_info=True)
             return
         finally:
             self._lock.release()  # 释放锁
@@ -151,7 +153,8 @@ class MysqlDB(Database):
             self._cursor.execute(sql)
         except pymysql.MySQLError:
             self._db.rollback()
-            self.logger.error(f"MySQL({self._name}@{self._host}) SQL {sql} error", exc_info=True, stack_info=True)
+            self.logger.error(f"MySQL({self._name}@{self._host}) SQL {sql} error {inspect.stack()[2][2]} "
+                              f"{inspect.stack()[2][1]} {inspect.stack()[2][3]}", exc_info=True, stack_info=True)
             return
         finally:
             if not not_commit:
