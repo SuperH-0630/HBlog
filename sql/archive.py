@@ -48,14 +48,11 @@ def delete_archive(archive_id: int):
 def add_blog_to_archive(blog_id: int, archive_id: int):
     cur = db.search(columns=["BlogID"], table="blog_archive", where=f"BlogID={blog_id} AND ArchiveID={archive_id}")
     if cur is None:
-        print("H1")
         return False
     if cur.rowcount > 0:
-        print("H2")
         return True
     cur = db.insert(table="blog_archive", columns=["BlogID", "ArchiveID"], values=f"{blog_id}, {archive_id}")
     if cur is None or cur.rowcount != 1:
-        print("H3")
         return False
     return True
 
