@@ -28,7 +28,9 @@
 {% block footer %}
     {% if conf["ICP"] %}
         <footer id="foot">
-            <a id="ICP" href="https://beian.miit.gov.cn"> {{ conf['ICP'] }} </a>
+            <a id="ICP" href="https://beian.miit.gov.cn" target="_blank"
+                style="display:inline-block;text-decoration:none;height:20px;line-height:20px;" >
+                {{ conf['ICP'] }} </a>
             {% if conf["GONG_AN"] %}
                 <br> <a id="GONG_AN" target="_blank"
                    href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=44011402000783"
