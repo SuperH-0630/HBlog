@@ -60,7 +60,7 @@ class HBlogFlask(Flask):
         @self.login_manager.user_loader
         def user_loader(email: str):
             user = User(email)
-            if user.info[2] == -1:
+            if user.info.id == -1:
                 return None
             return user
 
@@ -73,19 +73,22 @@ class HBlogFlask(Flask):
             self.errorhandler(i)(func[f"error_{i}"])
 
     def update_configure(self):
+        """ 更新配置 """
         self.config.update(conf)
         about_me_page = conf["ABOUT_ME_PAGE"]
         if len(about_me_page) > 0 and os.path.exists(about_me_page):
             with open(about_me_page, "r", encoding='utf-8') as f:
                 bs = BeautifulSoup(f.read(), "html.parser")
-            self.about_me = str(bs.find("body").find("div", class_="about-me"))
+            self.about_me = str(bs.find("body").find("div", class_="about-me"))  # 提取about-me部分的内容
 
     @staticmethod
     def get_max_page(count: int, count_page: int):
+        """ 计算页码数 (共计count个元素, 每页count_page个元素) """
         return (count // count_page) + (0 if count % count_page == 0 else 1)
 
     @staticmethod
     def get_page(url, page: int, count: int):
+        """ 计算页码的按钮 """
         if count <= 9:
             page_list = [[f"{i + 1}", url_for(url, page=i + 1)] for i in range(count)]
         elif page <= 5:

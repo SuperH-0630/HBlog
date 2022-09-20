@@ -22,6 +22,7 @@ auth = Blueprint("auth", __name__)
 class AuthField(FlaskForm):
     @staticmethod
     def email_field(name: str, description: str):
+        """ 提前定义 email 字段的生成函数，供下文调用 """
         return EmailField(name, description=description,
                           validators=[
                               DataRequired(f"必须填写{name}"),
@@ -31,6 +32,7 @@ class AuthField(FlaskForm):
 
     @staticmethod
     def passwd_field(name: str, description: str):
+        """ 提前定义 passwd 字段的生成函数，供下文调用 """
         return PasswordField(name, description=description,
                              validators=[
                                  DataRequired(f"必须填写{name}"),
@@ -38,6 +40,7 @@ class AuthField(FlaskForm):
 
     @staticmethod
     def passwd_again_field(name: str, description: str, passwd: str = "passwd"):
+        """ 提前定义 passwd again 字段的生成函数，供下文调用 """
         return PasswordField(f"重复{name}", description=description,
                              validators=[
                                  DataRequired(message=f"必须再次填写{name}"),
@@ -59,10 +62,12 @@ class RegisterForm(EmailPasswd):
     submit = SubmitField("注册")
 
     def validate_email(self, field):
+        """ 检验email是否合法 """
         if User(field.data).info[2] != -1:
             raise ValidationError("邮箱已被注册")
 
     def validate_passwd_again(self, field):
+        """ 检验两次输入的密码是否相同 """
         if field.data != self.passwd.data:
             raise ValidationError("两次输入的密码不一样")
 
@@ -74,6 +79,7 @@ class ChangePasswdForm(AuthField):
     submit = SubmitField("修改密码")
 
     def validate_passwd(self, field):
+        """ 检验新旧密码是否相同 """
         if field.data == self.old_passwd.data:
             raise ValidationError("新旧密码不能相同")
 
@@ -87,6 +93,7 @@ class DeleteUserForm(AuthField):
         self.email_user = None
 
     def validate_email(self, field):
+        """ 检验用户是否存在 """
         if User(field.data).info[2] == -1:
             raise ValidationError("邮箱用户不存在")
 
@@ -110,6 +117,7 @@ class RoleForm(AuthField):
         self.name.choices = self.name_choices
 
     def validate_name(self, field):
+        """ 检验角色是否存在 """
         if field.data not in self.name_res:
             raise ValidationError("角色不存在")
 
@@ -141,7 +149,7 @@ def yours_page():
 
 @auth.route('/user/login', methods=["GET", "POST"])
 def login_page():
-    if current_user.is_authenticated:
+    if current_user.is_authenticated:  # 用户已经成功登陆
         app.HBlogFlask.print_user_not_allow_opt_log("login")
         return redirect(url_for("auth.yours_page"))
 
@@ -311,4 +319,5 @@ def role_set_page():
 
 @auth.context_processor
 def inject_base():
+    """ auth 默认模板变量 """
     return {"top_nav": ["", "", "", "", "", "active"]}

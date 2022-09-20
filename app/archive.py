@@ -73,4 +73,5 @@ def delete_archive_page():
 
 @archive.context_processor
 def inject():
+    """ archive 默认模板变量 """
     return {"top_nav": ["", "active", "", "", "", ""]}

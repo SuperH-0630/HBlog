@@ -13,4 +13,5 @@ def about_me_page():
 
 @about_me.context_processor
 def inject_base():
+    """ about me 默认模板变量 """
     return {"top_nav": ["", "", "", "", "active", ""]}

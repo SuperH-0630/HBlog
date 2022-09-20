@@ -28,11 +28,13 @@ def index_page():
 
 @index.context_processor
 def inject_base():
+    """ index默认模板变量, 覆盖app变量 """
     return {"top_nav": ["active", "", "", "", "", ""]}
 
 
 @index.app_context_processor
 def inject_base():
+    """ app默认模板变量 """
     return {"blog_name": conf['BLOG_NAME'],
             "top_nav": ["", "", "", "", "", ""],
             "blog_describe": conf['BLOG_DESCRIBE'],

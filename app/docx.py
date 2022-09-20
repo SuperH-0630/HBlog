@@ -313,4 +313,5 @@ def delete_comment_page():
 
 @docx.context_processor
 def inject_base():
+    """ docx 默认模板变量 """
     return {"top_nav": ["", "", "active", "", "", ""]}

@@ -83,4 +83,5 @@ def delete_msg_page():
 
 @msg.context_processor
 def inject_base():
+    """ msg 默认模板变量 """
     return {"top_nav": ["", "", "", "active", "", ""]}
