@@ -3,6 +3,7 @@ import oss2
 import logging.handlers
 import logging
 import os
+from urllib.parse import urljoin
 
 
 class Aliyun:
@@ -29,7 +30,10 @@ class Aliyun:
     def shared_obj(self, name, time=15):
         if not self.bucket.object_exists(name):
             return None
-        url = self.bucket.sign_url('GET', name, time, slash_safe=True)
+        if conf["ALIYUN_BUCKET_USE_SIGN_URL"]:
+            url = self.bucket.sign_url('GET', name, time, slash_safe=True)
+        else:
+            url = urljoin(conf["ALIYUN_BUCKET_ENDPOINT"], name)
         self.logger.debug(f"Get url {url} name: {name} time: {time}s key: {self.key}")
         return url
 

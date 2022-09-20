@@ -50,6 +50,8 @@ def upload_page():
         path: str = form.path.data
         if len(path) > 0 and not path.endswith('/'):
             path += "/"
+        if path.startswith('/'):
+            path = path[1:]
         path += file.filename
         aliyun.upload_file(path, file)
         app.HBlogFlask.print_sys_opt_success_log(f"Upload file {path}")

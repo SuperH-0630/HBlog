@@ -28,6 +28,7 @@ conf = {
     "ALIYUN_BUCKET_ENDPOINT": "",
     "ALIYUN_BUCKET_NAME": "",
     "ALIYUN_BUCKET_IS_CNAME": False,
+    "ALIYUN_BUCKET_USE_SIGN_URL": True,
     "LOG_HOME": "",
     "LOG_FORMAT": "[%(levelname)s]:%(name)s:%(asctime)s "
                   "(%(filename)s:%(lineno)d %(funcName)s) "
