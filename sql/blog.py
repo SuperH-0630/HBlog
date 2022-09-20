@@ -94,7 +94,8 @@ def get_blog_count() -> int:
 
 def get_archive_blog_list(archive_id, limit: Optional[int] = None, offset: Optional[int] = None) -> list:
     """ 获得指定归档的 blog 列表 """
-    cur = db.search(columns=["BlogID", "Title", "SubTitle", "UpdateTime", "CreateTime", "Top"], table="blog_with_archive",
+    cur = db.search(columns=["BlogID", "Title", "SubTitle", "UpdateTime", "CreateTime", "Top"],
+                    table="blog_with_archive",
                     order_by=[("CreateTime", "DESC"), ("Title", "ASC"), ("SubTitle", "ASC")],
                     where=f"ArchiveID={archive_id}",
                     limit=limit,
@@ -106,7 +107,7 @@ def get_archive_blog_list(archive_id, limit: Optional[int] = None, offset: Optio
 
 def get_archive_blog_count(archive_id) -> int:
     """ 统计指定归档的 blog 个数 """
-    cur = db.search(columns=["count(ID)"], table="blog_with_archive",
+    cur = db.search(columns=["count(BlogID)"], table="blog_with_archive",
                     where=f"ArchiveID={archive_id}")
     if cur is None or cur.rowcount == 0:
         return 0
