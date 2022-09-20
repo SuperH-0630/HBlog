@@ -1,7 +1,7 @@
 import os
 import sys
 
-from flask import Flask, url_for, request, current_app, render_template
+from flask import Flask, url_for, request, current_app, render_template, Response
 from flask_mail import Mail
 from flask_login import LoginManager, current_user
 from flask.logging import default_handler
@@ -64,11 +64,12 @@ class HBlogFlask(Flask):
                 return None
             return user
 
-        func = {"render_template": render_template, "self": self}
+        func = {"render_template": render_template, "Response": Response, "self": self}
         for i in [400, 401, 403, 404, 405, 408, 410, 413, 414, 423, 500, 501, 502]:
             exec(f"def error_{i}(e):\n"
                  f"\tself.print_load_page_log('{i}')\n"
-                 f"\treturn render_template('error.html', error_code='{i}', error_info=e)", func)
+                 f"\tdata = render_template('error.html', error_code='{i}', error_info=e)\n"
+                 f"\treturn Response(response=data, status={i})", func)
             self.errorhandler(i)(func[f"error_{i}"])
 
     def update_configure(self):
