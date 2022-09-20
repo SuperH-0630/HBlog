@@ -1,3 +1,5 @@
+from collections import namedtuple
+
 from sql.comment import read_comment_list, create_comment, get_user_comment_count, delete_comment, read_comment
 import object.user
 import object.blog
@@ -11,6 +13,8 @@ def load_comment_list(blog_id: int):
 
 
 class _Comment:
+    comment_tuple = namedtuple("Comment", "blog email content update_time")
+
     @staticmethod
     def get_user_comment_count(auth: "object.user"):
         return get_user_comment_count(auth.id)
@@ -26,23 +30,23 @@ class Comment(_Comment):
 
     @property
     def info(self):
-        return read_comment(self.id)
+        return Comment.comment_tuple(*read_comment(self.id))
 
     @property
     def blog(self):
-        return object.blog.BlogArticle(self.info[0])
+        return object.blog.BlogArticle(self.info.blog)
 
     @property
     def auth(self):
-        return object.user.User(self.info[1])
+        return object.user.User(self.info.email)
 
     @property
     def content(self):
-        return self.info[2]
+        return self.info.content
 
     @property
     def update_time(self):
-        return self.info[3]
+        return self.info.update_time
 
     def is_delete(self):
         return not self.auth.is_authenticated and self.blog.is_delete  and len(self.content) != 0

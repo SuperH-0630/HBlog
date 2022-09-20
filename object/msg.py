@@ -1,4 +1,5 @@
 from typing import Optional
+from collections import namedtuple
 
 from sql.msg import read_msg_list, get_msg_count, create_msg, read_msg, get_user_msg_count, delete_msg
 import object.user
@@ -12,8 +13,10 @@ def load_message_list(limit: Optional[int] = None, offset: Optional[int] = None,
 
 
 class _Message:
+    message_tuple = namedtuple("Message", "email content update_time secret")
+
     @staticmethod
-    def get_msg_count(auth: "object.user" = None):
+    def get_msg_count(auth: "object.user.User" = None):
         if auth is None:
             return get_msg_count()
         return get_user_msg_count(auth.id)
@@ -32,23 +35,23 @@ class Message(_Message):
 
     @property
     def info(self):
-        return read_msg(self.id)
+        return Message.message_tuple(*read_msg(self.id))
 
     @property
     def auth(self):
-        return object.user.User(self.info[0])
+        return object.user.User(self.info.email)
 
     @property
     def content(self):
-        return self.info[1]
+        return self.info.content
 
     @property
     def update_time(self):
-        return self.info[2]
+        return self.info.update_time
 
     @property
     def secret(self):
-        return self.info[3]
+        return self.info.secret
 
     @property
     def is_delete(self):

@@ -1,4 +1,5 @@
 from typing import List
+from collections import namedtuple
 
 from sql.blog import (get_blog_list,
                       get_blog_count,
@@ -23,6 +24,8 @@ class LoadBlogError(Exception):
 
 
 class _BlogArticle:
+    article_tuple = namedtuple("Article", "auth title subtitle content update_time create_time top")
+
     @staticmethod
     def get_blog_list(archive_id=None, limit=None, offset=None, not_top=False):
         if archive_id is None:
@@ -50,35 +53,35 @@ class BlogArticle(_BlogArticle):
 
     @property
     def info(self):
-        return read_blog(self.id)
+        return BlogArticle.article_tuple(*read_blog(self.id))
 
     @property
     def user(self):
-        return object.user.User(get_user_email(self.info[0]))
+        return object.user.User(get_user_email(self.info.auth))
 
     @property
     def title(self):
-        return self.info[1]
+        return self.info.title
 
     @property
     def subtitle(self):
-        return self.info[2]
+        return self.info.subtitle
 
     @property
     def content(self):
-        return self.info[3]
+        return self.info.content
 
     @property
     def update_time(self):
-        return self.info[4]
+        return self.info.update_time
 
     @property
     def create_time(self):
-        return self.info[5]
+        return self.info.create_time
 
     @property
     def top(self):
-        return self.info[6]
+        return self.info.top
 
     @top.setter
     def top(self, top: bool):
@@ -109,4 +112,3 @@ class BlogArticle(_BlogArticle):
 
     def sub_from_archive(self, archive_id: int):
         return sub_blog_from_archive(self.id, archive_id)
-

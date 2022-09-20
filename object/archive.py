@@ -1,3 +1,5 @@
+from collections import namedtuple
+
 from sql.archive import (read_archive,
                          create_archive,
                          get_archive_list,
@@ -8,6 +10,8 @@ from sql.archive import (read_archive,
 
 
 class _Archive:
+    archive_tuple = namedtuple('Archive', 'name describe')
+
     @staticmethod
     def get_archive_list():
         return get_archive_list()
@@ -33,15 +37,15 @@ class Archive(_Archive):
 
     @property
     def info(self):
-        return read_archive(self.id)
+        return Archive.archive_tuple(*read_archive(self.id))
 
     @property
     def name(self):
-        return self.info[0]
+        return self.info.name
 
     @property
     def describe(self):
-        return self.info[1]
+        return self.info.describe
 
     def is_delete(self):
         return len(self.name) != 0

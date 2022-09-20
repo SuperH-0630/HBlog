@@ -2,6 +2,7 @@ from flask_login import UserMixin, AnonymousUserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import URLSafeTimedSerializer as Serializer
 from itsdangerous.exc import BadData
+from collections import namedtuple
 
 from configure import conf
 from sql.user import (read_user,
@@ -36,6 +37,8 @@ class AnonymousUser(AnonymousUserMixin):
 
 
 class _User(UserMixin):
+    user_tuple = namedtuple("User", "passwd role id")
+
     @staticmethod
     def create(email, passwd_hash):
         if create_user(email, passwd_hash) is not None:
@@ -103,23 +106,23 @@ class User(_User):
 
     @property
     def info(self):
-        return read_user(self.email)
+        return User.user_tuple(*read_user(self.email))
 
     @property
     def passwd_hash(self):
-        return self.info[0]
+        return self.info.passwd
 
     @property
     def role(self):
-        return self.info[1]
+        return self.info.role
 
     @property
     def role_name(self):
-        return get_role_name(self.info[1])
+        return get_role_name(self.info.role)
 
     @property
     def id(self):
-        return self.info[2]
+        return self.info.id
 
     @property
     def count(self):
