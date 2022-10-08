@@ -15,16 +15,20 @@ class MysqlDB(Database):
                  host: Optional[str],
                  name: Optional[str],
                  passwd: Optional[str],
-                 port: Optional[str]):
+                 port: Optional[str],
+                 database: str = "HBlog"):
         if host is None or name is None:
             raise DBException
+
         super(MysqlDB, self).__init__(host=host, name=name, passwd=passwd, port=port)
+        self.database = database
+
         try:
             self._db = pymysql.connect(user=self._name,
                                        password=self._passwd,
                                        host=self._host,
                                        port=self._port,
-                                       database="HBlog")
+                                       database=self.database)
         except pymysql.err.OperationalError:
             raise
         self._cursor = self._db.cursor()
