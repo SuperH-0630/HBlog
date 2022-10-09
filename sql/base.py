@@ -64,41 +64,37 @@ class Database(metaclass=abc.ABCMeta):
         ...
 
     @abc.abstractmethod
-    def search(self, sql: str, *args):
+    def search(self, sql: str, *args, not_commit: bool = False):
         """
         执行 查询 SQL语句
         :parm sql: SQL语句
+        :return:
         """
         ...
 
     @abc.abstractmethod
-    def insert(self, table: str, columns: list, values: Union[str, List[str]]):
+    def insert(self, sql: str, *args, not_commit: bool = False):
         """
         执行 插入 SQL语句, 并提交
-        :param table: 表
-        :param columns: 列名称
-        :param values: 数据
+        :parm sql: SQL语句
         :return:
         """
         ...
 
     @abc.abstractmethod
-    def delete(self, table: str, where: Union[str, List[str]] = None):
+    def delete(self, sql: str, *args, not_commit: bool = False):
         """
         执行 删除 SQL语句, 并提交
-        :param table: 表
-        :param where: 条件
+        :parm sql: SQL语句
         :return:
         """
         ...
 
     @abc.abstractmethod
-    def update(self, table: str, kw: "Dict[str:str]", where: Union[str, List[str]] = None):
+    def update(self, sql: str, *args, not_commit: bool = False):
         """
         执行 更新 SQL语句, 并提交
-        :param table: 表
-        :param kw: 键值对
-        :param where: 条件
+        :parm sql: SQL语句
         :return:
         """
         ...

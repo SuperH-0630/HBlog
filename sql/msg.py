@@ -34,9 +34,8 @@ def read_msg_list(limit: Optional[int] = None, offset: Optional[int] = None, sho
 
 def create_msg(auth: int, content: str, secret: bool = False):
     content = content.replace("'", "''")
-    cur = db.insert(table="message",
-                    columns=["Auth", "Content", "Secret"],
-                    values=f"{auth}, '{content}', {1 if secret else 0}")
+    cur = db.insert("INSERT INTO message(Auth, Content, Secret) "
+                    "VALUES (%s, %s, %s)", auth, content, 1 if secret else 0)
     if cur is None or cur.rowcount != 1:
         return None
     return cur.lastrowid
@@ -52,7 +51,7 @@ def read_msg(msg_id: int):
 
 
 def delete_msg(msg_id: int):
-    cur = db.delete(table="message", where=f"ID={msg_id}")
+    cur = db.delete("DELETE FROM message WHERE ID=%s", msg_id)
     if cur is None or cur.rowcount == 0:
         return False
     return True

@@ -10,8 +10,8 @@ def create_blog(auth_id: int, title: str, subtitle: str, content: str,
     title = title.replace("'", "''")
     subtitle = subtitle.replace("'", "''")
     content = content.replace("'", "''")
-    cur = db.insert(table="blog", columns=["Auth", "Title", "SubTitle", "Content"],
-                    values=f"{auth_id}, '{title}', '{subtitle}', '{content}'")
+    cur = db.insert("INSERT INTO blog(Auth, Title, SubTitle, Content) "
+                    "VALUES (%s, %s, %s, %s)", auth_id, title, subtitle, content)
     if cur is None or cur.rowcount == 0:
         return False
     blog_id = cur.lastrowid
@@ -24,9 +24,9 @@ def create_blog(auth_id: int, title: str, subtitle: str, content: str,
 def update_blog(blog_id: int, content: str) -> bool:
     """ 更新博客文章 """
     content = content.replace("'", "''")
-    cur = db.update(table="blog",
-                    kw={"UpdateTime": "CURRENT_TIMESTAMP()", "Content": f"'{content}'"},
-                    where=f"ID={blog_id}")
+    cur = db.update("Update blog "
+                    "SET UpdateTime=CURRENT_TIMESTAMP(), Content=%s "
+                    "WHERE ID=%s", content, blog_id)
     if cur is None or cur.rowcount != 1:
         return False
     return True
@@ -43,20 +43,22 @@ def read_blog(blog_id: int) -> list:
 
 
 def delete_blog(blog_id: int):
-    cur = db.delete(table="blog_archive", where=f"BlogID={blog_id}")
+    cur = db.delete("DELETE FROM blog_archive WHERE BlogID=%s", blog_id)
     if cur is None:
         return False
-    cur = db.delete(table="comment", where=f"BlogID={blog_id}")
+    cur = db.delete("DELETE FROM comment WHERE BlogID=%s", blog_id)
     if cur is None:
         return False
-    cur = db.delete(table="blog", where=f"ID={blog_id}")
+    cur = db.delete("DELETE FROM blog WHERE ID=%s", blog_id)
     if cur is None or cur.rowcount == 0:
         return False
     return True
 
 
 def set_blog_top(blog_id: int, top: bool = True):
-    cur = db.update(table="blog", kw={"Top": "1" if top else "0"}, where=f"ID={blog_id}")
+    cur = db.update("UPDATE blog "
+                    "SET Top=%s "
+                    "WHERE ID=%s", 1 if top else 0, blog_id)
     if cur is None or cur.rowcount != 1:
         return False
     return True

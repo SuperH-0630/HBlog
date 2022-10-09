@@ -6,9 +6,8 @@ def create_archive(name: str, describe: str):
     """ 创建新归档 """
     name = name.replace("'", "''")
     describe = describe.replace("'", "''")
-    cur = db.insert(table="archive",
-                    columns=["Name", "DescribeText"],
-                    values=f"'{name}', '{describe}'")
+    cur = db.insert("INSERT INTO archive(Name, DescribeText) "
+                    "VALUES (%s, %s)", name, describe)
     if cur is None or cur.rowcount == 0:
         return None
     return cur.lastrowid
@@ -35,10 +34,10 @@ def get_blog_archive(blog_id: int):
 
 
 def delete_archive(archive_id: int):
-    cur = db.delete(table="blog_archive", where=f"ArchiveID={archive_id}")
+    cur = db.delete("DELETE FROM blog_archive WHERE ArchiveID=%s", archive_id)
     if cur is None:
         return False
-    cur = db.delete(table="archive", where=f"ID={archive_id}")
+    cur = db.delete("DELETE FROM archive WHERE ID=%s", archive_id)
     if cur is None or cur.rowcount == 0:
         return False
     return True
@@ -50,14 +49,14 @@ def add_blog_to_archive(blog_id: int, archive_id: int):
         return False
     if cur.rowcount > 0:
         return True
-    cur = db.insert(table="blog_archive", columns=["BlogID", "ArchiveID"], values=f"{blog_id}, {archive_id}")
+    cur = db.insert("INSERT INTO blog_archive(BlogID, ArchiveID) VALUES (%s, %s)", blog_id, archive_id)
     if cur is None or cur.rowcount != 1:
         return False
     return True
 
 
 def sub_blog_from_archive(blog_id: int, archive_id: int):
-    cur = db.delete(table="blog_archive", where=f"BlogID={blog_id} AND ArchiveID={archive_id}")
+    cur = db.delete("DELETE FROM blog_archive WHERE BlogID=%s AND ArchiveID=%s", blog_id, archive_id)
     if cur is None:
         return False
     return True

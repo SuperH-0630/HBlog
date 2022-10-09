@@ -15,9 +15,8 @@ def read_comment_list(blog_id: int):
 def create_comment(blog_id: int, user_id: int, content: str):
     """ 新建 comment """
     content = content.replace("'", "''")
-    cur = db.insert(table="comment",
-                    columns=["BlogID", "Auth", "Content"],
-                    values=f"{blog_id}, {user_id}, '{content}'")
+    cur = db.insert("INSERT INTO comment(BlogID, Auth, Content) "
+                    "VALUES (%s, %s, %s)", blog_id, user_id, content)
     if cur is None or cur.rowcount == 0:
         return False
     return True
@@ -33,7 +32,7 @@ def read_comment(comment_id: int):
 
 def delete_comment(comment_id):
     """ 删除评论 """
-    cur = db.delete(table="comment", where=f"ID={comment_id}")
+    cur = db.delete("DELETE FROM comment WHERE ID=%s", comment_id)
     if cur is None or cur.rowcount == 0:
         return False
     return True
