@@ -54,49 +54,8 @@ class MysqlDB(Database):
             raise DBCloseException
         return self._cursor
 
-    def search(self, columns: List[str], table: str,
-               where: Union[str, List[str]] = None,
-               limit: Optional[int] = None,
-               offset: Optional[int] = None,
-               order_by: Optional[List[Tuple[str, str]]] = None,
-               group_by: Optional[List[str]] = None,
-               for_update: bool = False) -> Union[None, pymysql.cursors.Cursor]:
-        if type(where) is list and len(where) > 0:
-            where: str = " WHERE " + " AND ".join(f"({w})" for w in where)
-        elif type(where) is str and len(where) > 0:
-            where = " WHERE " + where
-        else:
-            where: str = ""
-
-        if order_by is None:
-            order_by: str = ""
-        else:
-            by = [f" {i[0]} {i[1]} " for i in order_by]
-            order_by: str = " ORDER BY" + ", ".join(by)
-
-        if limit is None or limit == 0:
-            limit: str = ""
-        else:
-            limit = f" LIMIT {limit}"
-
-        if offset is None:
-            offset: str = ""
-        else:
-            offset = f" OFFSET {offset}"
-
-        if group_by is None:
-            group_by: str = ""
-        else:
-            group_by = "GROUP BY " + ", ".join(group_by)
-
-        columns: str = ", ".join(columns)
-        if for_update:
-            for_update = "FOR UPDATE"
-        else:
-            for_update = ""
-        return self.__search(f"SELECT {columns} "
-                             f"FROM {table} "
-                             f"{where} {group_by} {order_by} {limit} {offset} {for_update};")
+    def search(self, sql: str, *args) -> Union[None, pymysql.cursors.Cursor]:
+        return self.__search(sql, args)
 
     def insert(self, table: str, columns: list, values: Union[str, List[str]],
                not_commit: bool = False) -> Union[None, pymysql.cursors.Cursor]:
@@ -133,15 +92,15 @@ class MysqlDB(Database):
     def commit(self):
         self._commit()
 
-    def __search(self, sql) -> Union[None, pymysql.cursors.Cursor]:
+    def __search(self, sql, args) -> Union[None, pymysql.cursors.Cursor]:
         try:
             self._lock.acquire()  # 上锁
             if not self.is_connect():
-                self.logger.error(f"MySQL({self._name}@{self._host}) SQL {sql} connect error")
+                self.logger.error(f"MySQL({self._name}@{self._host}) connect error")
                 return
-            self._cursor.execute(sql)
+            self._cursor.execute(query=sql, args=args)
         except pymysql.MySQLError:
-            self.logger.error(f"MySQL({self._name}@{self._host}) SQL {sql} error {inspect.stack()[2][2]} "
+            self.logger.error(f"MySQL({self._name}@{self._host}) SQL {sql} with {args} error {inspect.stack()[2][2]} "
                               f"{inspect.stack()[2][1]} {inspect.stack()[2][3]}", exc_info=True, stack_info=True)
             return
         finally:
@@ -152,7 +111,7 @@ class MysqlDB(Database):
         try:
             self._lock.acquire()
             if not self.is_connect():
-                self.logger.error(f"MySQL({self._name}@{self._host}) SQL {sql} connect error")
+                self.logger.error(f"MySQL({self._name}@{self._host}) connect error")
                 return
             self._cursor.execute(sql)
         except pymysql.MySQLError:

@@ -64,20 +64,10 @@ class Database(metaclass=abc.ABCMeta):
         ...
 
     @abc.abstractmethod
-    def search(self, columns: List[str], table: str,
-               where: Union[str, List[str]] = None,
-               limit: Optional[int] = None,
-               offset: Optional[int] = None,
-               order_by: Optional[List[Tuple[str, str]]] = None):
+    def search(self, sql: str, *args):
         """
         执行 查询 SQL语句
-        :param columns: 列名称
-        :param table: 表
-        :param where: 条件
-        :param limit: 限制行数
-        :param offset: 偏移
-        :param order_by: 排序方式
-        :return:
+        :parm sql: SQL语句
         """
         ...
 

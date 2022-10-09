@@ -34,9 +34,9 @@ def update_blog(blog_id: int, content: str) -> bool:
 
 def read_blog(blog_id: int) -> list:
     """ 读取blog内容 """
-    cur = db.search(columns=["Auth", "Title", "SubTitle", "Content", "UpdateTime", "CreateTime", "Top"],
-                    table="blog",
-                    where=f"ID={blog_id}")
+    cur = db.search("SELECT Auth, Title, SubTitle, Content, UpdateTime, CreateTime, Top "
+                    "FROM blog "
+                    "WHERE ID=%s", blog_id)
     if cur is None or cur.rowcount == 0:
         return [-1, "", "", "", 0, -1, False]
     return cur.fetchone()
@@ -64,10 +64,15 @@ def set_blog_top(blog_id: int, top: bool = True):
 
 def get_blog_list(limit: Optional[int] = None, offset: Optional[int] = None) -> list:
     """ 获得 blog 列表 """
-    cur = db.search(columns=["ID", "Title", "SubTitle", "UpdateTime", "CreateTime", "Top"], table="blog_with_top",
-                    order_by=[("Top", "DESC"), ("CreateTime", "DESC"), ("Title", "ASC"), ("SubTitle", "ASC")],
-                    limit=limit,
-                    offset=offset)
+    if limit is not None and offset is not None:
+        cur = db.search("SELECT ID, Title, SubTitle, UpdateTime, CreateTime, Top "
+                        "FROM blog_with_top "  # TODO: 去除blog_with_top
+                        "ORDER BY Top DESC, CreateTime DESC, Title, SubTitle "
+                        "LIMIT %s OFFSET %s", limit, offset)
+    else:
+        cur = db.search("SELECT ID, Title, SubTitle, UpdateTime, CreateTime, Top "
+                        "FROM blog_with_top "  # TODO: 去除blog_with_top
+                        "ORDER BY Top DESC, CreateTime DESC, Title, SubTitle")
     if cur is None or cur.rowcount == 0:
         return []
     return cur.fetchall()
@@ -75,10 +80,15 @@ def get_blog_list(limit: Optional[int] = None, offset: Optional[int] = None) -> 
 
 def get_blog_list_not_top(limit: Optional[int] = None, offset: Optional[int] = None) -> list:
     """ 获得blog列表 忽略置顶 """
-    cur = db.search(columns=["ID", "Title", "SubTitle", "UpdateTime", "CreateTime"], table="blog",
-                    order_by=[("CreateTime", "DESC"), ("Title", "ASC"), ("SubTitle", "ASC")],
-                    limit=limit,
-                    offset=offset)
+    if limit is not None and offset is not None:
+        cur = db.search("SELECT ID, Title, SubTitle, UpdateTime, CreateTime "
+                        "FROM blog "
+                        "ORDER BY CreateTime DESC, Title, SubTitle "
+                        "LIMIT %s OFFSET %s", limit, offset)
+    else:
+        cur = db.search("SELECT ID, Title, SubTitle, UpdateTime, CreateTime "
+                        "FROM blog "
+                        "ORDER BY CreateTime DESC, Title, SubTitle")
     if cur is None or cur.rowcount == 0:
         return []
     return cur.fetchall()
@@ -86,7 +96,7 @@ def get_blog_list_not_top(limit: Optional[int] = None, offset: Optional[int] = N
 
 def get_blog_count() -> int:
     """ 统计 blog 个数 """
-    cur = db.search(columns=["count(ID)"], table="blog")
+    cur = db.search("SELECT COUNT(*) FROM blog")
     if cur is None or cur.rowcount == 0:
         return 0
     return cur.fetchone()[0]
@@ -94,12 +104,17 @@ def get_blog_count() -> int:
 
 def get_archive_blog_list(archive_id, limit: Optional[int] = None, offset: Optional[int] = None) -> list:
     """ 获得指定归档的 blog 列表 """
-    cur = db.search(columns=["BlogID", "Title", "SubTitle", "UpdateTime", "CreateTime", "Top"],
-                    table="blog_with_archive",
-                    order_by=[("Top", "DESC"), ("CreateTime", "DESC"), ("Title", "ASC"), ("SubTitle", "ASC")],
-                    where=f"ArchiveID={archive_id}",
-                    limit=limit,
-                    offset=offset)
+    if limit is not None and offset is not None:
+        cur = db.search("SELECT BlogID, Title, SubTitle, UpdateTime, CreateTime, Top "
+                        "FROM blog_with_archive "
+                        "WHERE ArchiveID=%s "
+                        "ORDER BY Top DESC, CreateTime DESC, Title, SubTitle "
+                        "LIMIT %s OFFSET %s", archive_id, limit, offset)
+    else:
+        cur = db.search("SELECT BlogID, Title, SubTitle, UpdateTime, CreateTime, Top "
+                        "FROM blog_with_archive "
+                        "WHERE ArchiveID=%s "
+                        "ORDER BY Top DESC, CreateTime DESC, Title, SubTitle")
     if cur is None or cur.rowcount == 0:
         return []
     return cur.fetchall()
@@ -107,8 +122,7 @@ def get_archive_blog_list(archive_id, limit: Optional[int] = None, offset: Optio
 
 def get_archive_blog_count(archive_id) -> int:
     """ 统计指定归档的 blog 个数 """
-    cur = db.search(columns=["count(BlogID)"], table="blog_with_archive",
-                    where=f"ArchiveID={archive_id}")
+    cur = db.search("SELECT COUNT(*) FROM blog_with_archive WHERE ArchiveID=%s", archive_id)
     if cur is None or cur.rowcount == 0:
         return 0
     return cur.fetchone()[0]
@@ -116,8 +130,7 @@ def get_archive_blog_count(archive_id) -> int:
 
 def get_user_user_count(user_id: int) -> int:
     """ 获得指定用户的 blog 个数 """
-    cur = db.search(columns=["count(ID)"], table="blog",
-                    where=f"Auth={user_id}")
+    cur = db.search("SELECT COUNT(*) FROM blog WHERE Auth=%s", user_id)
     if cur is None or cur.rowcount == 0:
         return 0
     return cur.fetchone()[0]

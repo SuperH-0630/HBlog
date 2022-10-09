@@ -4,7 +4,6 @@ import object.user
 
 from typing import List
 
-
 role_authority = ["WriteBlog", "WriteComment", "WriteMsg", "CreateUser",
                   "ReadBlog", "ReadComment", "ReadMsg", "ReadSecretMsg", "ReadUserInfo",
                   "DeleteBlog", "DeleteComment", "DeleteMsg", "DeleteUser",
@@ -13,7 +12,7 @@ role_authority = ["WriteBlog", "WriteComment", "WriteMsg", "CreateUser",
 
 def read_user(email: str):
     """ 读取用户 """
-    cur = db.search(columns=["PasswdHash", "Role", "ID"], table="user", where=f"Email='{email}'")
+    cur = db.search("SELECT PasswdHash, Role, ID FROM user WHERE Email=%s", email)
     if cur is None or cur.rowcount != 1:
         return ["", -1, -1]
     return cur.fetchone()
@@ -25,7 +24,7 @@ def create_user(email: str, passwd: str):
     if len(email) == 0:
         return None
 
-    cur = db.search(columns=["count(Email)"], table="user")  # 统计个数
+    cur = db.search("SELECT COUNT(*) FROM user")
     passwd = object.user.User.get_passwd_hash(passwd)
     if cur is None or cur.rowcount == 0 or cur.fetchone()[0] == 0:
         # 创建为管理员用户
@@ -96,7 +95,7 @@ def change_passwd_hash(user_id: int, passwd_hash: str):
 
 def get_user_email(user_id):
     """ 获取用户邮箱 """
-    cur = db.search(columns=["Email"], table="user", where=f"ID='{user_id}'")
+    cur = db.search("SELECT Email FROM user WHERE ID=%s", user_id)
     if cur is None or cur.rowcount == 0:
         return None
     return cur.fetchone()[0]
@@ -104,15 +103,35 @@ def get_user_email(user_id):
 
 def get_role_name(role: int):
     """ 获取用户角色名称 """
-    cur = db.search(columns=["RoleName"], table="role", where=f"RoleID={role}")
+    cur = db.search("SELECT RoleName FROM role WHERE RoleID=%s", role)
     if cur is None or cur.rowcount == 0:
         return None
     return cur.fetchone()[0]
 
 
+def __check_operate(operate):
+    return operate in ["WriteBlog",
+                       "WriteComment",
+                       "WriteMsg",
+                       "CreateUser",
+                       "ReadBlog",
+                       "ReadComment",
+                       "ReadMsg",
+                       "ReadSecretMsg",
+                       "ReadUserInfo",
+                       "DeleteBlog",
+                       "DeleteComment",
+                       "DeleteMsg",
+                       "DeleteUser",
+                       "ConfigureSystem",
+                       "ReadSystem"]
+
+
 def check_role(role: int, operate: str):
     """ 检查角色权限（通过角色ID） """
-    cur = db.search(columns=[operate], table="role", where=f"RoleID={role}")
+    if not __check_operate(operate):  # 检查, 防止SQL注入
+        return False
+    cur = db.search(f"SELECT {operate} FROM role WHERE RoleID=%s", role)
     if cur is None or cur.rowcount == 0:
         return False
     return cur.fetchone()[0] == DBBit.BIT_1
@@ -120,8 +139,10 @@ def check_role(role: int, operate: str):
 
 def check_role_by_name(role: str, operate: str):
     """ 检查角色权限（通过角色名） """
+    if not __check_operate(operate):  # 检查, 防止SQL注入
+        return False
     role = role.replace("'", "''")
-    cur = db.search(columns=[operate], table="role", where=f"RoleName='{role}'")
+    cur = db.search(f"SELECT {operate} FROM role WHERE RoleName=%s", role)
     if cur is None or cur.rowcount == 0:
         return False
     return cur.fetchone()[0] == DBBit.BIT_1
@@ -130,7 +151,7 @@ def check_role_by_name(role: str, operate: str):
 def get_role_id_by_name(role: str):
     """ 检查角色权限（通过角色名） """
     role = role.replace("'", "''")
-    cur = db.search(columns=["RoleID"], table="role", where=f"RoleName='{role}'")
+    cur = db.search("SELECT RoleID FROM role WHERE RoleName=%s", role)
     if cur is None or cur.rowcount == 0:
         return None
     return cur.fetchone()[0]
@@ -138,7 +159,7 @@ def get_role_id_by_name(role: str):
 
 def get_role_list():
     """ 获取归档列表 """
-    cur = db.search(columns=["RoleID", "RoleName"], table="role")
+    cur = db.search("SELECT RoleID, RoleName FROM role")
     if cur is None or cur.rowcount == 0:
         return []
     return cur.fetchall()

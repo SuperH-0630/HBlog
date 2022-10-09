@@ -16,9 +16,9 @@ def create_archive(name: str, describe: str):
 
 def read_archive(archive_id: int):
     """ 获取归档 ID """
-    cur = db.search(columns=["Name", "DescribeText"],
-                    table="archive",
-                    where=f"ID={archive_id}")
+    cur = db.search("SELECT Name, DescribeText "
+                    "FROM archive "
+                    "WHERE ID=%s", archive_id)
     if cur is None or cur.rowcount == 0:
         return ["", ""]
     return cur.fetchone()
@@ -26,10 +26,9 @@ def read_archive(archive_id: int):
 
 def get_blog_archive(blog_id: int):
     """ 获取文章的归档 """
-    cur = db.search(columns=["ArchiveID"],
-                    table="blog_archive_with_name",
-                    where=f"BlogID={blog_id}",
-                    order_by=[("ArchiveName", "ASC")])
+    cur = db.search("SELECT ArchiveID FROM blog_archive_with_name "
+                    "WHERE BlogID=%s "
+                    "ORDER BY ArchiveName", blog_id)
     if cur is None or cur.rowcount == 0:
         return []
     return [i[0] for i in cur.fetchall()]
@@ -46,7 +45,7 @@ def delete_archive(archive_id: int):
 
 
 def add_blog_to_archive(blog_id: int, archive_id: int):
-    cur = db.search(columns=["BlogID"], table="blog_archive", where=f"BlogID={blog_id} AND ArchiveID={archive_id}")
+    cur = db.search("SELECT BlogID FROM blog_archive WHERE BlogID=%s AND ArchiveID=%s", blog_id, archive_id)
     if cur is None:
         return False
     if cur.rowcount > 0:
@@ -66,10 +65,17 @@ def sub_blog_from_archive(blog_id: int, archive_id: int):
 
 def get_archive_list(limit: Optional[int] = None, offset: Optional[int] = None):
     """ 获取归档列表 """
-    cur = db.search(columns=["ID", "Name", "DescribeText", "Count"], table="archive_with_count",
-                    limit=limit,
-                    offset=offset,
-                    order_by=[("Count", "DESC"), ("Name", "ASC")])
+    if limit is not None and offset is not None:
+        cur = db.search("SELECT ID, Name, DescribeText, Count "
+                        "FROM archive_with_count "
+                        "ORDER BY Count DESC , Name "
+                        "LIMIT %s "
+                        "OFFSET %s ", limit, offset)
+    else:
+        cur = db.search("SELECT ID, Name, DescribeText, Count "
+                        "FROM archive_with_count "
+                        "ORDER BY Count DESC , Name")
+
     if cur is None or cur.rowcount == 0:
         return []
     return cur.fetchall()
