@@ -99,12 +99,6 @@
     {% block content %} {% endblock %}
 </div>
 
-{% block javascript %}
-    <script src="https://cdn.staticfile.org/popper.js/0.2.0/popper.min.js"></script>
-    <script src="https://cdn.staticfile.org/jquery/1.10.0/jquery.min.js"></script>
-    <script src="https://cdn.staticfile.org/bootstrap/4.6.1/js/bootstrap.min.js"></script>
-{% endblock %}
-
 {% block footer %}
     {# footer 最后加载 #}
     <footer id="foot">
@@ -148,6 +142,12 @@
         });
         SetFooter()
     </script>
+{% endblock %}
+
+{% block javascript %}
+    <script src="https://cdn.staticfile.org/popper.js/0.2.0/popper.min.js"></script>
+    <script src="https://cdn.staticfile.org/jquery/1.10.0/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/bootstrap/4.6.1/js/bootstrap.min.js"></script>
 {% endblock %}
 
 </body>
