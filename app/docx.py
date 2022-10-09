@@ -104,6 +104,10 @@ def __load_docx_page(page: int, form: WriteBlogForm):
         return
 
     blog_list = BlogArticle.get_blog_list(limit=20, offset=(page - 1) * 20)
+    for i in blog_list:
+        print(i[-1])
+
+
     max_page = app.HBlogFlask.get_max_page(BlogArticle.get_blog_count(), 20)
     page_list = app.HBlogFlask.get_page("docx.docx_page", page, max_page)
     app.HBlogFlask.print_load_page_log(f"docx list (page: {page})")

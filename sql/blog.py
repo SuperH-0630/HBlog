@@ -65,7 +65,7 @@ def set_blog_top(blog_id: int, top: bool = True):
 def get_blog_list(limit: Optional[int] = None, offset: Optional[int] = None) -> list:
     """ 获得 blog 列表 """
     cur = db.search(columns=["ID", "Title", "SubTitle", "UpdateTime", "CreateTime", "Top"], table="blog_with_top",
-                    order_by=[("CreateTime", "DESC"), ("Title", "ASC"), ("SubTitle", "ASC")],
+                    order_by=[("Top", "DESC"), ("CreateTime", "DESC"), ("Title", "ASC"), ("SubTitle", "ASC")],
                     limit=limit,
                     offset=offset)
     if cur is None or cur.rowcount == 0:
@@ -96,7 +96,7 @@ def get_archive_blog_list(archive_id, limit: Optional[int] = None, offset: Optio
     """ 获得指定归档的 blog 列表 """
     cur = db.search(columns=["BlogID", "Title", "SubTitle", "UpdateTime", "CreateTime", "Top"],
                     table="blog_with_archive",
-                    order_by=[("CreateTime", "DESC"), ("Title", "ASC"), ("SubTitle", "ASC")],
+                    order_by=[("Top", "DESC"), ("CreateTime", "DESC"), ("Title", "ASC"), ("SubTitle", "ASC")],
                     where=f"ArchiveID={archive_id}",
                     limit=limit,
                     offset=offset)
