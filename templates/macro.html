@@ -1,7 +1,11 @@
-{% macro get_page_list(info_lines) %}
+{% macro get_page_list(info_lines, now_page) %}
     {% for line in info_lines %}
         {% if line %}
-            <li class="page-item"><a class="page-link" href="{{ line[1] }}"> {{ line[0] }} </a></li>
+            {% if now_page == line[0] %}
+                <li class="page-item active"><a class="page-link" href="{{ line[1] }}"> {{ line[0] }} </a></li>
+            {% else %}
+                <li class="page-item"><a class="page-link" href="{{ line[1] }}"> {{ line[0] }} </a></li>
+            {% endif %}
         {% else %}
             <li class="page-item disabled"><a class="page-link"> ... </a></li>
         {% endif %}

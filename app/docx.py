@@ -140,6 +140,7 @@ def archive_page():
     page_list = app.HBlogFlask.get_page("docx.archive_page", page, max_page)
     app.HBlogFlask.print_load_page_log(f"archive-docx list (archive-id: {archive} page: {page})")
     return render_template("docx/docx.html",
+                           page=page,
                            blog_list=blog_list,
                            is_top=DBBit.BIT_1,
                            page_list=page_list,
