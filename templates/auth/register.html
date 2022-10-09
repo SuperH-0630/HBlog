@@ -16,8 +16,8 @@
                 {{ macro.render_field(RegisterForm.email) }}
                 {{ macro.render_field(RegisterForm.passwd) }}
                 {{ macro.render_field(RegisterForm.passwd_again) }}
-                <div class="text-right">
-                    {{ RegisterForm.submit(class='btn btn-success mr-2') }}
+                <div class="text-end">
+                    {{ RegisterForm.submit(class='btn btn-success me-2') }}
                     <a class="btn btn-outline-secondary" href="{{ url_for("auth.login_page") }}"> 前往登录 </a>
                 </div>
             </form>

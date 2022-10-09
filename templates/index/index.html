@@ -11,7 +11,7 @@
     <section id="base" class="container mt-3">
         <div class="row">
             <article class="col-12">
-                <div class="introduce mr-lg-2 ml-lg-2">
+                <div class="introduce mx-lg-2">
                     {% for info in conf['INTRODUCE'] %}
                         <h2> {{ info[0] }} </h2>
                         {{ info[1] | safe }}
@@ -28,7 +28,7 @@
                 {% if current_user.check_role("ReadMsg") %}
                     <article class="col-12 col-lg-8">
                     {% for blog in blog_list %}
-                        <div class="docx ml-lg-2"> <a class="h4"
+                        <div class="docx ms-lg-2"> <a class="h4"
                                                       href="{{ url_for("docx.article_page", blog=blog[0]) }}">
                             {{ blog[1] }}
                                 <small> {{ blog[2] }}
@@ -52,7 +52,7 @@
                 {% if current_user.check_role("ReadBlog") %}
                     <aside class="col-12 col-lg-4">
                     {% for msg in msg_list %}
-                        <div class="msg mr-0 mr-lg-2">
+                        <div class="msg me-0 me-lg-2">
                             <p class="msg-title h5">
                                 {% if show_email %}  {# 判断是否可读取用户信息 #}
                                     {{ msg.auth.email }}

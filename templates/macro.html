@@ -3,17 +3,26 @@
         {% if line %}
             <li class="page-item"><a class="page-link" href="{{ line[1] }}"> {{ line[0] }} </a></li>
         {% else %}
-            <li class="page-item"><a class="page-link" href="#"> ... </a></li>
+            <li class="page-item disabled"><a class="page-link"> ... </a></li>
         {% endif %}
     {% endfor %}
 {% endmacro %}
 
 {% macro render_field(field) %}
-    <div class="form-group">
+    <div class="form-floating my-3">
+        {{ field(class="form-control", placeholder=field.label.text, **kwargs) | safe }}
         {{ field.label }}
-        {{ field(class="form-control", **kwargs) | safe }}
         {% for error in field.errors %}
-            <small class="text-danger form-text"> {{ error }} </small>
+            <div class="invalid-feedback"> {{ error }} </div>
+        {% endfor %}
+    </div>
+{% endmacro %}
+
+{% macro render_select_field(field, height) %}
+    <div class="my-3">
+        {{ field(class="form-select", **kwargs) | safe }}
+        {% for error in field.errors %}
+            <div class="invalid-feedback"> {{ error }} </div>
         {% endfor %}
     </div>
 {% endmacro %}

@@ -6,6 +6,7 @@
     {{ super() }}
     <link href="{{ url_for('static', filename='styles/docx/docx.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='editor.md/css/editormd.min.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='editor.md/css/sons-of-obsidian.css') }}" />
 {% endblock %}
 
 {% block content %}
@@ -19,17 +20,17 @@
                             {{ form.hidden_tag() }}
                             {{ macro.render_field(form.title) }}
                             {{ macro.render_field(form.subtitle) }}
-                            {{ macro.render_field(form.archive) }}
+                            {{ macro.render_select_field(form.archive) }}
                             <div id="editor">
                                 {{ form.content(class="form-control mb-2", style="display:none;") }}
                             </div>
                             {% for error in form.content.errors %}
-                                <small class="text-danger form-text"> {{ error }} </small>
+                                <div class="invalid-feedback"> {{ error }} </div>
                             {% endfor %}
 
                             <div id="CreateModal" class="modal fade" role="dialog" aria-hidden="true">
                                 <div class="modal-dialog">
-                                    <div class="modal-content text-left">
+                                    <div class="modal-content text-start">
                                         <div class="modal-header">
                                             <h4 class="modal-title"> 确认发表？ </h4>
                                         </div>
@@ -38,14 +39,14 @@
                                         </div>
                                         <div class="modal-footer">
                                             {{ form.submit(class="btn btn-danger", value="确认") }}
-                                            <button type="button" class="btn btn-outline-dark" data-dismiss="modal">取消</button>
+                                            <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">取消</button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="text-right">
-                                <button type="button" class="btn btn-primary mb-2" data-toggle="modal" data-target="#CreateModal"> 发表 </button>
+                            <div class="text-end">
+                                <button type="button" class="btn btn-primary mb-2" data-bs-toggle="modal" data-bs-target="#CreateModal"> 发表 </button>
                             </div>
                         </form>
                     </div>
@@ -63,7 +64,7 @@
                         {# 判断是否显示删除模态框 #}
                         <div id="DeleteModal{{blog[0]}}" class="modal fade" role="dialog" aria-hidden="true">
                             <div class="modal-dialog">
-                                <div class="modal-content text-left">
+                                <div class="modal-content text-start">
                                     <div class="modal-header">
                                         <h4 class="modal-title"> 确认删除博文？ </h4>
                                     </div>
@@ -73,7 +74,7 @@
                                     <div class="modal-footer">
                                         <a class="btn btn-danger"
                                            href="{{ url_for("docx.delete_blog_page", blog=blog[0]) }}"> 删除 </a>
-                                        <button type="button" class="btn btn-outline-dark" data-dismiss="modal"> 取消 </button>
+                                        <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal"> 取消 </button>
                                     </div>
                                 </div>
                             </div>
@@ -82,24 +83,26 @@
 
                     {% if blog[5] == is_top %}
                         <div class="docx-top">
-                            {% if show_delete %}
-                                <button type="button" class="btn btn-danger ml-2"
-                                    data-toggle="modal" data-target="#DeleteModal{{blog[0]}}"> &times; </button>
-                            {% endif %}
-                            <a class="h4" href="{{ url_for("docx.article_page", blog=blog[0]) }}">
+                            <a class="h4 my-auto" href="{{ url_for("docx.article_page", blog=blog[0]) }}">
                             {{ blog[1] }}
                                 <small> {{ blog[2] }}
-                                    <small> {{ blog[3] }} / {{ blog[4] }} </small> </small> </a></div>
+                                    <small> {{ blog[3] }} / {{ blog[4] }} </small> </small> </a>
+                            {% if show_delete %}
+                                <button type="button" class="btn btn-sm btn-danger my-auto btn-close float-end"
+                                    data-bs-toggle="modal" data-bs-target="#DeleteModal{{blog[0]}}"> </button>
+                            {% endif %}
+                        </div>
                     {% else %}
                         <div class="docx">
-                            {% if show_delete %}
-                                <button type="button" class="btn btn-danger ml-2"
-                                    data-toggle="modal" data-target="#DeleteModal{{blog[0]}}"> &times; </button>
-                            {% endif %}
-                            <a class="h4" href="{{ url_for("docx.article_page", blog=blog[0]) }}">
+                            <a class="h4 my-auto" href="{{ url_for("docx.article_page", blog=blog[0]) }}">
                             {{ blog[1] }}
                                 <small> {{ blog[2] }}
-                                    <small> {{ blog[3] }} / {{ blog[4] }} </small> </small> </a></div>
+                                    <small> {{ blog[3] }} / {{ blog[4] }} </small> </small> </a>
+                            {% if show_delete %}
+                                <button type="button" class="btn btn-sm btn-danger my-auto btn-close float-end"
+                                    data-bs-toggle="modal" data-bs-target="#DeleteModal{{blog[0]}}"> </button>
+                            {% endif %}
+                        </div>
                     {% endif %}
                 {% endfor %}
                 </article>
@@ -117,6 +120,7 @@
     {{ super() }}
 
     {% if form and current_user.check_role("WriteBlog") %}
+        <script src="https://code.jquery.com/jquery-3.6.1.slim.min.js" integrity="sha256-w8CvhFs7iHNVUtnSP0YKEg00p9Ih13rlL9zGqvLdePA=" crossorigin="anonymous"></script>
         <script src="{{ url_for('static', filename='editor.md/editormd.js') }}"></script>
         <script type="text/javascript">
             $(function() {
@@ -128,7 +132,6 @@
                     emoji: true,
                     taskList: true,
                     tex: true,
-                    sequenceDiagram: true,
                     onfullscreen() {
                         document.getElementById("ReadBlogList").style.visibility = 'hidden';
                         document.getElementById("ReadBlogPageList").style.visibility = 'hidden';},

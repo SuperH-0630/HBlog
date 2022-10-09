@@ -10,18 +10,24 @@
 {% block content %}
     <section id="base" class="container mt-3">
         <div class="row">
-            <section class="col-12 text-right">
+            <section class="col-12 text-end">
                 <form class="writer clearfix" action="{{ url_for('msg.write_msg_page', page=page) }}" method="post">
                     {{ form.hidden_tag() }}
-                    {{ form.content(class="form-control mb-2", rows="5") }}
-                    {% for error in form.content.errors %}
-                        <small class="text-danger form-text text-left"> {{ error }} </small>
-                    {% endfor %}
-                    {{ form.secret() }} {{ form.secret.label }}
+                    <div>
+                        {{ form.content(class="form-control mb-2", rows="5") }}
+                        {% for error in form.content.errors %}
+                            <div class="invalid-feedback"> {{ error }} </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="form-check" style="display: inline-block">
+                        {{ form.secret(class="form-check-input") }}
+                        {{ form.secret.label(class="form-check-label") }}
+                    </div>
 
                     <div id="MsgModal" class="modal fade" role="dialog" aria-hidden="true">
                         <div class="modal-dialog">
-                            <div class="modal-content text-left">
+                            <div class="modal-content text-start">
                                 <div class="modal-header">
                                     <h4 class="modal-title" id="MsgModalLabel"> 确认留言？ </h4>
                                 </div>
@@ -30,13 +36,13 @@
                                 </div>
                                 <div class="modal-footer">
                                     {{ form.submit(class="btn btn-danger", value="确认") }}
-                                    <button type="button" class="btn btn-outline-dark" data-dismiss="modal">取消</button>
+                                    <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">取消</button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <button type="button" class="btn btn-primary mb-2" data-toggle="modal" data-target="#MsgModal"> 留言 </button>
+                    <button type="button" class="btn btn-primary mb-2" data-bs-toggle="modal" data-bs-target="#MsgModal"> 留言 </button>
                 </form>
             </section>
         </div>
@@ -45,11 +51,11 @@
             <div class="row">
                 <section class="col-12">
                     {% for msg in msg_list %}
-                        <div class="msg mr-0">
+                        <div class="msg me-0">
                             {% if show_delete %}
                                 <div id="DeleteModal{{msg.id }}" class="modal fade" role="dialog" aria-hidden="true">
                                     <div class="modal-dialog">
-                                        <div class="modal-content text-left">
+                                        <div class="modal-content text-start">
                                             <div class="modal-header">
                                                 <h4 class="modal-title"> 确认删除留言？ </h4>
                                             </div>
@@ -59,7 +65,7 @@
                                             <div class="modal-footer">
                                                 <a class="btn btn-danger"
                                                    href="{{ url_for("msg.delete_msg_page", msg=msg.id) }}"> 删除 </a>
-                                                <button type="button" class="btn btn-outline-dark" data-dismiss="modal"> 取消 </button>
+                                                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal"> 取消 </button>
                                             </div>
                                         </div>
                                     </div>
@@ -75,7 +81,7 @@
 
                                 {% if show_delete %}
                                     <a class="mb-2"
-                                        data-toggle="modal" data-target="#DeleteModal{{msg.id }}"> &times; </a>
+                                        data-bs-toggle="modal" data-bs-target="#DeleteModal{{msg.id }}"> &times; </a>
                                 {% endif %}
 
                                 <br>

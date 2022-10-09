@@ -15,9 +15,9 @@
                 {{ form.hidden_tag() }}
                 {{ macro.render_field(form.email) }}
                 {{ macro.render_field(form.passwd) }}
-                <div class="text-right">
-                    <a class="btn btn-outline-secondary mr-2" href="{{ url_for("auth.register_page") }}"> 前往注册 </a>
-                    {{ form.submit(class='btn btn-success mr-2') }}
+                <div class="text-end">
+                    <a class="btn btn-outline-secondary me-2" href="{{ url_for("auth.register_page") }}"> 前往注册 </a>
+                    {{ form.submit(class='btn btn-success me-2') }}
                     {{ form.remember() }} {{ form.remember.label }}
                 </div>
             </form>

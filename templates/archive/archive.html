@@ -11,18 +11,18 @@
     {% if form and current_user.check_role("WriteBlog") %}
         <div class="container">
             <div class="row">
-                <section class="col-12 col-lg-6 offset-lg-3 text-right">
+                <section class="col-12 col-lg-6 offset-lg-3 text-end">
                     <div class="create">
                         <form action="{{ url_for('archive.create_archive_page') }}" method="post">
                             {{ form.hidden_tag() }}
-                            <div class="text-left">
+                            <div class="text-start">
                                 {{ macro.render_field(form.name) }}
                                 {{ macro.render_field(form.describe) }}
                             </div>
 
                             <div id="CreateModal" class="modal fade" role="dialog" aria-hidden="true">
                                 <div class="modal-dialog">
-                                    <div class="modal-content text-left">
+                                    <div class="modal-content text-start">
                                         <div class="modal-header">
                                             <h4 class="modal-title"> 创建归档？ </h4>
                                         </div>
@@ -31,14 +31,15 @@
                                         </div>
                                         <div class="modal-footer">
                                             {{ form.submit(class="btn btn-danger", value="确认") }}
-                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <button type="button" class="btn btn-primary mb-2" data-toggle="modal" data-target="#CreateModal"> 创建归档 </button>
-                    </form>
+                            <button type="button" class="btn btn-primary"
+                                    data-bs-toggle="modal" data-bs-target="#CreateModal"> 创建归档 </button>
+                        </form>
                     </div>
                 </section>
             </div>
@@ -48,7 +49,7 @@
 
     <section id="base" class="d-flex mt-3 container justify-content-center flex-wrap">
         {% for archive in archive_list %}
-            <div class="archive mb-3 mr-2 ml-2">
+            <div class="archive mb-3 mx-2">
                 <h3> {{ archive[1] }} </h3>
                 <hr>
                 <p class="archive_describe"> {{ archive[2] }} </p>
@@ -57,7 +58,7 @@
                 {% if show_delete %}
                     <div id="DeleteModal{{archive[0]}}" class="modal fade" role="dialog" aria-hidden="true">
                         <div class="modal-dialog">
-                            <div class="modal-content text-left">
+                            <div class="modal-content text-start">
                                 <div class="modal-header">
                                     <h4 class="modal-title"> 确认删除归档？ </h4>
                                 </div>
@@ -67,14 +68,14 @@
                                 <div class="modal-footer">
                                     <a class="btn btn-danger"
                                        href="{{ url_for("archive.delete_archive_page", archive=archive[0]) }}"> 删除 </a>
-                                    <button type="button" class="btn btn-outline-dark" data-dismiss="modal"> 取消 </button>
+                                    <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal"> 取消 </button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <button type="button" class="btn btn-danger"
-                            data-toggle="modal" data-target="#DeleteModal{{archive[0]}}"> 删除归档 </button>
+                            data-bs-toggle="modal" data-bs-target="#DeleteModal{{archive[0]}}"> 删除归档 </button>
                 {% endif %}
             </div>
         {% endfor %}

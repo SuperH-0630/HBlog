@@ -4,7 +4,7 @@
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
     {% block icon %}
         <link rel="icon" href="{{ url_for('static', filename=conf["LOGO"]) }}" type="image/x-icon"/>
@@ -17,7 +17,7 @@
     {% endblock %}
 
     {% block style %}
-        <link href="https://cdn.staticfile.org/bootstrap/4.6.1/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
         <link href="{{ url_for('static', filename='styles/base.css') }}" rel="stylesheet">
         <style>
             html {
@@ -27,6 +27,10 @@
                 background-color: #f0fcff;
             }
         </style>
+    {% endblock %}
+
+    {% block javascript %}
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
     {% endblock %}
 
     <title>{% block title %} {% endblock %} - {{ blog_name }} </title>
@@ -87,7 +91,7 @@
         <section class="container mt-2 mb-2">
         {% for message in get_flashed_messages() %}
             <div class="alert alert-info">
-                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 {{ message }}
             </div>
         {% endfor %}
@@ -112,7 +116,7 @@
                 <br> <a id="GONG_AN2" target="_blank"
                    href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=44011402000783"
                    style="display:inline-block;text-decoration:none;height:20px;line-height:20px;">
-                    <img src="{{ url_for('static', filename='wangan.png') }}" style="float:left;"/>
+                    <img src="{{ url_for('static', filename='wangan.png') }}" style="float:left;" alt="wangan"/>
                     {{ conf["GONG_AN"] }}
                 </a>
             {% endif %}
@@ -144,11 +148,7 @@
     </script>
 {% endblock %}
 
-{% block javascript %}
-    <script src="https://cdn.staticfile.org/popper.js/0.2.0/popper.min.js"></script>
-    <script src="https://cdn.staticfile.org/jquery/1.10.0/jquery.min.js"></script>
-    <script src="https://cdn.staticfile.org/bootstrap/4.6.1/js/bootstrap.min.js"></script>
-{% endblock %}
+{% block javascript_foot %} {% endblock %}
 
 </body>
 </html>
