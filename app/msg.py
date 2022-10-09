@@ -32,7 +32,7 @@ def __load_msg_page(page: int, form: WriteForm):
     msg_list = load_message_list(20, (page - 1) * 20,
                                  show_secret=current_user.check_role("ReadSecretMsg"))  # 判断是否可读取私密内容
     max_page = app.HBlogFlask.get_max_page(Message.get_msg_count(), 20)
-    page_list = app.HBlogFlask.get_page("docx.docx_page", page, max_page)
+    page_list = app.HBlogFlask.get_page("msg.msg_page", page, max_page)
     app.HBlogFlask.print_load_page_log(f"msg (page: {page})")
     return render_template("msg/msg.html",
                            msg_list=msg_list,
