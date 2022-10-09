@@ -70,11 +70,6 @@ CREATE TABLE IF NOT EXISTS blog -- 创建博客表
     FOREIGN KEY (Auth) REFERENCES user (ID)
 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 
-CREATE VIEW blog_with_top AS
-SELECT *
-FROM blog
-ORDER BY Top DESC, UpdateTime DESC;
-
 CREATE TABLE IF NOT EXISTS archive -- 归档表
 (
     ID           INT PRIMARY KEY AUTO_INCREMENT, -- 归档 ID

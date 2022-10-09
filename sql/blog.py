@@ -66,12 +66,12 @@ def get_blog_list(limit: Optional[int] = None, offset: Optional[int] = None) -> 
     """ 获得 blog 列表 """
     if limit is not None and offset is not None:
         cur = db.search("SELECT ID, Title, SubTitle, UpdateTime, CreateTime, Top "
-                        "FROM blog_with_top "  # TODO: 去除blog_with_top
+                        "FROM blog "
                         "ORDER BY Top DESC, CreateTime DESC, Title, SubTitle "
                         "LIMIT %s OFFSET %s", limit, offset)
     else:
         cur = db.search("SELECT ID, Title, SubTitle, UpdateTime, CreateTime, Top "
-                        "FROM blog_with_top "  # TODO: 去除blog_with_top
+                        "FROM blog "
                         "ORDER BY Top DESC, CreateTime DESC, Title, SubTitle")
     if cur is None or cur.rowcount == 0:
         return []
