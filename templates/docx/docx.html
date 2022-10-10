@@ -16,7 +16,7 @@
             <div class="row">
                 <div class="col-12">
                     <div class="markdown">
-                        <form action="{{ url_for('docx.create_docx_page', page=page) }}" method="post">
+                        <form action="{{ url_for('docx.create_docx_page', page=page) }}" method="post" class="was-validated">
                             {{ form.hidden_tag() }}
                             {{ macro.render_field(form.title) }}
                             {{ macro.render_field(form.subtitle) }}

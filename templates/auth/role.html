@@ -26,7 +26,7 @@
                 <div id="RoleTabDiv">
                     <div id="RoleTabContent" class="tab-content">
                         <div class="tab-pane fade show active" id="create">
-                            <form method="post" action="{{ url_for('auth.role_create_page') }}" class="role-form">
+                            <form method="post" action="{{ url_for('auth.role_create_page') }}" class="role-form was-validated">
                                 {{ CreateRoleForm.hidden_tag() }}
                                 {{ macro.render_field(CreateRoleForm.name) }}
                                 {{ macro.render_field(CreateRoleForm.authority) }}
@@ -57,7 +57,7 @@
                         </div>
 
                         <div class="tab-pane fade" id="drop">
-                            <form method="post" action="{{ url_for('auth.role_delete_page') }}" class="role-form">
+                            <form method="post" action="{{ url_for('auth.role_delete_page') }}" class="role-form was-validated">
                                 {{ DeleteRoleForm.hidden_tag() }}
                                 {{ macro.render_field(DeleteRoleForm.name) }}
 
@@ -87,7 +87,7 @@
                         </div>
 
                         <div class="tab-pane fade" id="set">
-                            <form method="post" action="{{ url_for('auth.role_set_page') }}" class="role-form">
+                            <form method="post" action="{{ url_for('auth.role_set_page') }}" class="role-form was-validated">
                                 {{ SetRoleForm.hidden_tag() }}
                                 {{ macro.render_field(SetRoleForm.email) }}
                                 {{ macro.render_field(SetRoleForm.name) }}

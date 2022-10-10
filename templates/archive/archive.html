@@ -13,7 +13,7 @@
             <div class="row">
                 <section class="col-12 col-lg-6 offset-lg-3 text-end">
                     <div class="create">
-                        <form action="{{ url_for('archive.create_archive_page') }}" method="post">
+                        <form action="{{ url_for('archive.create_archive_page') }}" method="post" class="was-validated">
                             {{ form.hidden_tag() }}
                             <div class="text-start">
                                 {{ macro.render_field(form.name) }}

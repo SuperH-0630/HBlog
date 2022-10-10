@@ -11,7 +11,7 @@
     <section id="base" class="container mt-3">
     <div class="row">
         <div class="col-12 col-lg-6 offset-lg-3">
-            <form method="post" action="{{ url_for("auth.change_passwd_page") }}" class="passwd-form">
+            <form method="post" action="{{ url_for("auth.change_passwd_page") }}" class="passwd-form was-validated">
                 {{ ChangePasswdForm.hidden_tag() }}
                 {{ macro.render_field(ChangePasswdForm.old_passwd) }}
                 {{ macro.render_field(ChangePasswdForm.passwd) }}

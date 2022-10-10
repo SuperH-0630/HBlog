@@ -11,7 +11,7 @@
     <section id="base" class="container mt-3">
         <div class="row">
             <section class="col-12 text-end">
-                <form class="writer clearfix" action="{{ url_for('msg.write_msg_page', page=page) }}" method="post">
+                <form class="writer clearfix was-validated" action="{{ url_for('msg.write_msg_page', page=page) }}" method="post">
                     {{ form.hidden_tag() }}
                     <div>
                         {{ form.content(class="form-control mb-2", rows="5") }}

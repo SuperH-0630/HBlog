@@ -22,7 +22,7 @@
                     <a href="{{ url_for('docx.article_down_page', blog=article.id) }}"> 下载 </a>
                     <hr>
 
-                    <form method="post" action="{{ url_for('docx.update_docx_page') }}">
+                    <form method="post" action="{{ url_for('docx.update_docx_page') }}" class="was-validated">
                         {% if can_update %}
                             {{ view.hidden_tag() }}
                             {{ view.blog_id() }}
@@ -60,7 +60,7 @@
                                         <div class="modal-header">
                                             <h4 class="modal-title"> 更新博客归档信息？ </h4>
                                         </div>
-                                        <form method="post">
+                                        <form method="post" class="was-validated">
                                             <div class="modal-body">
                                                 {{ archive.hidden_tag() }}
                                                 {{ archive.blog_id() }}
@@ -98,7 +98,7 @@
                     <h1 class="mt-3"> 评论 </h1>
 
                     <section class="col-12 text-end">
-                        <form action="{{ url_for('docx.comment_page', blog=article.id) }}" method="post">
+                        <form action="{{ url_for('docx.comment_page', blog=article.id) }}" method="post" class="was-validated">
                             {{ form.hidden_tag() }}
                             <div>
                                 {{ form.content(class="form-control mb-2", rows="3") }}
