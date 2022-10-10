@@ -230,13 +230,18 @@ def logout_page():
 def change_passwd_page():
     form = ChangePasswdForm()
     if form.validate_on_submit():
-        if current_user.change_passwd(form.passwd.data):
+        if not current_user.check_passwd(form.old_passwd.data):
+            app.HBlogFlask.print_user_opt_error_log(f"change passwd")
+            flash("旧密码错误")
+        elif current_user.change_passwd(form.passwd.data):
             app.HBlogFlask.print_user_opt_success_log(f"change passwd")
             flash("密码修改成功")
+            logout_user()
+            return redirect(url_for("auth.login_page"))
         else:
             app.HBlogFlask.print_user_opt_error_log(f"change passwd")
             flash("密码修改失败")
-        return redirect(url_for("auth.yours_page"))
+        return redirect(url_for("auth.change_passwd_page"))
     app.HBlogFlask.print_load_page_log("user change passwd")
     return render_template("auth/passwd.html", ChangePasswdForm=form)
 
