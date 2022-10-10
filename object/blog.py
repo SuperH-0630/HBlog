@@ -14,6 +14,7 @@ from sql.blog import (get_blog_list,
                       get_user_user_count)
 from sql.archive import add_blog_to_archive, sub_blog_from_archive
 from sql.user import get_user_email
+from sql.base import DBBit
 import object.user
 import object.archive
 import object.comment
@@ -81,7 +82,7 @@ class BlogArticle(_BlogArticle):
 
     @property
     def top(self):
-        return self.info.top
+        return self.info.top == DBBit.BIT_1
 
     @top.setter
     def top(self, top: bool):

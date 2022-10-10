@@ -160,6 +160,7 @@ def __load_article_page(blog_id: int, form: WriteCommentForm,
         view = UpdateBlogForm(article)
     if archive is None:
         archive = UpdateBlogArchiveForm(article)
+    print(article.top)
     return render_template("docx/article.html",
                            article=article,
                            archive_list=article.archive,
@@ -256,8 +257,9 @@ def set_blog_top_page():
     top = request.args.get("top", '0') != '0'
     if blog_id == -1:
         return abort(400)
-    BlogArticle(blog_id).top = top
-    if top:
+    blog = BlogArticle(blog_id)
+    blog.top = top
+    if top == blog.top:
         app.HBlogFlask.print_sys_opt_success_log(f"set blog top ({top})")
         flash(f"博文{'取消' if not top else ''}置顶成功")
     else:
