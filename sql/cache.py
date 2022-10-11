@@ -83,6 +83,11 @@ def write_user_msg_count_to_cache(user_id, count):
 
 
 @__try_redis(None)
+def delete_user_msg_count_from_cache(user_id):
+    cache.delete(f"cache:msg_count:{user_id}")
+
+
+@__try_redis(None)
 def delete_all_user_msg_count_from_cache():
     for i in cache.keys("cache:msg_count:*"):
         cache.delete(i)
@@ -244,4 +249,59 @@ def delete_blog_archive_from_cache(blog_id: int):
 @__try_redis(None)
 def delete_all_blog_archive_from_cache():
     for i in cache.keys("cache:blog_archive:*"):
+        cache.delete(i)
+
+
+@__try_redis(None)
+def read_comment_from_cache(comment_id: int):
+    comment = cache.hgetall(f"cache:comment:{comment_id}")
+    if len(comment) != 2:
+        return None
+    return [comment.get("BlogID", ""),
+            comment.get("Email", ""),
+            comment.get("Content", ""),
+            datetime.fromisoformat(comment.get("UpdateTime", "2022-1-1 00:00:00"))]
+
+
+@__try_redis(None)
+def write_comment_to_cache(comment_id: int, blog_id: str, email: str, content: str, update_time: str | datetime):
+    cache_name = f"cache:comment:{comment_id}"
+    cache.delete(cache_name)
+    cache.hset(cache_name, mapping={
+        "BlogID": blog_id,
+        "Email": email,
+        "Content": content,
+        "UpdateTime": str(update_time)
+    })
+    cache.expire(cache_name, 3600)
+
+
+@__try_redis(None)
+def delete_comment_from_cache(comment_id: int):
+    cache.delete(f"cache:comment:{comment_id}")
+
+
+@__try_redis(None)
+def get_user_comment_count_from_cache(user_id: int):
+    count = cache.get(f"cache:comment_count:{user_id}")
+    if count is not None:
+        return int(count)
+
+
+@__try_redis(None)
+def write_user_comment_count_to_cache(user_id, count):
+    cache_name = f"cache:comment_count:{user_id}"
+    count = cache.set(cache_name, str(count))
+    cache.expire(cache_name, 3600)
+    return count
+
+
+@__try_redis(None)
+def delete_user_comment_count_from_cache(user_id: int):
+    cache.delete(f"cache:comment_count:{user_id}")
+
+
+@__try_redis(None)
+def delete_all_user_comment_count_from_cache():
+    for i in cache.keys("cache:comment_count:*"):
         cache.delete(i)
