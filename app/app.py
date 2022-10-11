@@ -33,7 +33,7 @@ class HBlogFlask(Flask):
         self.update_configure()
 
         if conf["DEBUG_PROFILE"]:
-            self.wsgi_app = ProfilerMiddleware(self.wsgi_app)
+            self.wsgi_app = ProfilerMiddleware(self.wsgi_app, sort_by=("cumtime",))
 
         self.register_blueprint(index, url_prefix="/")
         self.register_blueprint(archive, url_prefix="/archive")
