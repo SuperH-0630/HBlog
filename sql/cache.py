@@ -1,8 +1,12 @@
 from sql import cache
+from configure import conf
 
 from redis import RedisError
 from functools import wraps
 from datetime import datetime
+
+
+CACHE_TIME = int(conf["REDIS_EXPIRE"])
 
 
 def __try_redis(ret=None):
@@ -40,7 +44,7 @@ def write_msg_to_cache(msg_id: int, email: str, content: str, update_time: str |
         "UpdateTime": str(update_time),
         "Secret": str(secret)
     })
-    cache.expire(cache_name, 3600)
+    cache.expire(cache_name, CACHE_TIME)
 
 
 @__try_redis(None)
@@ -58,7 +62,7 @@ def get_msg_cout_from_cache():
 @__try_redis(None)
 def write_msg_count_to_cache(count):
     count = cache.set("cache:msg_count", str(count))
-    cache.expire("cache:msg_count", 3600)
+    cache.expire("cache:msg_count", CACHE_TIME)
     return count
 
 
@@ -78,7 +82,7 @@ def get_user_msg_count_from_cache(user_id: int):
 def write_user_msg_count_to_cache(user_id, count):
     cache_name = f"cache:msg_count:{user_id}"
     count = cache.set(cache_name, str(count))
-    cache.expire(cache_name, 3600)
+    cache.expire(cache_name, CACHE_TIME)
     return count
 
 
@@ -121,7 +125,7 @@ def write_blog_to_cache(blog_id: int, auth_id: str, title: str, subtitle: str, c
         "CreateTime": str(create_time),
         "Top": str(top)
     })
-    cache.expire(cache_name, 3600)
+    cache.expire(cache_name, CACHE_TIME)
 
 
 @__try_redis(None)
@@ -140,7 +144,7 @@ def get_blog_count_from_cache():
 @__try_redis(None)
 def write_blog_count_to_cache(count):
     count = cache.set("cache:blog_count", str(count))
-    cache.expire("cache:blog_count", 3600)
+    cache.expire("cache:blog_count", CACHE_TIME)
     return count
 
 
@@ -160,7 +164,7 @@ def get_archive_blog_count_from_cache(archive_id: int):
 def write_archive_blog_count_to_cache(archive_id, count):
     cache_name = f"cache:blog_count:archive:{archive_id}"
     count = cache.set(cache_name, str(count))
-    cache.expire(cache_name, 3600)
+    cache.expire(cache_name, CACHE_TIME)
     return count
 
 
@@ -186,7 +190,7 @@ def get_user_blog_count_from_cache(user_id: int):
 def write_user_blog_count_to_cache(user_id, count):
     cache_name = f"cache:blog_count:user:{user_id}"
     count = cache.set(cache_name, str(count))
-    cache.expire(cache_name, 3600)
+    cache.expire(cache_name, CACHE_TIME)
     return count
 
 
@@ -217,7 +221,7 @@ def write_archive_to_cache(archive_id: int, name: str, describe: str):
         "Name": name,
         "DescribeText": describe,
     })
-    cache.expire(cache_name, 3600)
+    cache.expire(cache_name, CACHE_TIME)
 
 
 @__try_redis(None)
@@ -238,7 +242,7 @@ def write_blog_archive_to_cache(blog_id: int, archive):
     cache_name = f"cache:blog_archive:{blog_id}"
     cache.delete(cache_name)
     cache.rpush(cache_name, *archive)
-    cache.expire(cache_name, 3600)
+    cache.expire(cache_name, CACHE_TIME)
 
 
 @__try_redis(None)
@@ -273,7 +277,7 @@ def write_comment_to_cache(comment_id: int, blog_id: str, email: str, content: s
         "Content": content,
         "UpdateTime": str(update_time)
     })
-    cache.expire(cache_name, 3600)
+    cache.expire(cache_name, CACHE_TIME)
 
 
 @__try_redis(None)
@@ -292,7 +296,7 @@ def get_user_comment_count_from_cache(user_id: int):
 def write_user_comment_count_to_cache(user_id, count):
     cache_name = f"cache:comment_count:{user_id}"
     count = cache.set(cache_name, str(count))
-    cache.expire(cache_name, 3600)
+    cache.expire(cache_name, CACHE_TIME)
     return count
 
 
@@ -326,7 +330,7 @@ def write_user_to_cache(email: str, passwd_hash: str, role: int, user_id: int):
         "Role": role,
         "ID": user_id,
     })
-    cache.expire(cache_name, 3600)
+    cache.expire(cache_name, CACHE_TIME)
 
 
 @__try_redis(None)
@@ -346,7 +350,7 @@ def get_user_email_from_cache(user_id: int):
 def write_user_email_to_cache(user_id: int, email: str):
     cache_name = f"cache:user_email:{user_id}"
     cache.set(cache_name, email)
-    cache.expire(cache_name, 3600)
+    cache.expire(cache_name, CACHE_TIME)
 
 
 @__try_redis(None)
@@ -366,7 +370,7 @@ def get_role_name_from_cache(role_id: int):
 def write_role_name_to_cache(role_id: int, name: str):
     cache_name = f"cache:role_name:{role_id}"
     cache.set(cache_name, name)
-    cache.expire(cache_name, 3600)
+    cache.expire(cache_name, CACHE_TIME)
 
 
 @__try_redis(None)
@@ -385,7 +389,7 @@ def get_role_operate_from_cache(role_id: int, operate: str):
 def write_role_operate_to_cache(role_id: int, operate: str, res: bool):
     cache_name = f"cache:operate:{role_id}:{operate}:"
     cache.set(cache_name, str(res))
-    cache.expire(cache_name, 3600)
+    cache.expire(cache_name, CACHE_TIME)
 
 
 @__try_redis(None)

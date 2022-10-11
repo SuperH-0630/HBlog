@@ -29,7 +29,7 @@
                             <form method="post" action="{{ url_for('auth.role_create_page') }}" class="role-form was-validated">
                                 {{ CreateRoleForm.hidden_tag() }}
                                 {{ macro.render_field(CreateRoleForm.name) }}
-                                {{ macro.render_field(CreateRoleForm.authority) }}
+                                {{ macro.render_select_field(CreateRoleForm.authority) }}
 
                                 <div id="CreateModal" class="modal fade" role="dialog" aria-hidden="true">
                                     <div class="modal-dialog">
