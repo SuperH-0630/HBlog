@@ -22,12 +22,18 @@ from .oss import oss
 from .auth import auth
 from .about_me import about_me
 
+if conf["DEBUG_PROFILE"]:
+    from werkzeug.middleware.profiler import ProfilerMiddleware
+
 
 class HBlogFlask(Flask):
     def __init__(self, import_name: str, *args, **kwargs):
         super(HBlogFlask, self).__init__(import_name, *args, **kwargs)
         self.about_me = ""
         self.update_configure()
+
+        if conf["DEBUG_PROFILE"]:
+            self.wsgi_app = ProfilerMiddleware(self.wsgi_app)
 
         self.register_blueprint(index, url_prefix="/")
         self.register_blueprint(archive, url_prefix="/archive")

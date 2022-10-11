@@ -3,6 +3,7 @@ import logging
 import os
 
 conf = {
+    "DEBUG_PROFILE": False,
     "SECRET_KEY": "HBlog-R-Salt",
     "BLOG_NAME": "HBlog",
     "BLOG_DESCRIBE": "Huan Blog.",
