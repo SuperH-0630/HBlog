@@ -29,20 +29,20 @@
                     <article class="col-12 col-lg-8">
                     {% for blog in blog_list %}
                         <div class="docx ms-lg-2"> <a class="h4"
-                                                      href="{{ url_for("docx.article_page", blog=blog[0]) }}">
-                            {{ blog[1] }}
-                                <small> {{ blog[2] }}
-                                    <small> {{ blog[3] }} / {{ blog[4] }} </small> </small> </a></div>
+                                                      href="{{ url_for("docx.article_page", blog=blog.id) }}">
+                            {{ blog.title }}
+                                <small> {{ blog.subtitle }}
+                                    <small> {{ blog.update_time }} / {{ blog.create_time }} </small> </small> </a></div>
                     {% endfor %}
                     </article>
                 {% else %}
                     <article class="col-12">
                     {% for blog in blog_list %}
                         <div class="docx"> <a class="h4"
-                                              href="{{ url_for("docx.article_page", blog=blog[0]) }}">
-                            {{ blog[1] }}
-                                <small> {{ blog[2] }}
-                                    <small> {{ blog[3] }} / {{ blog[4] }} </small> </small> </a></div>
+                                              href="{{ url_for("docx.article_page", blog=blog.id) }}">
+                            {{ blog.title }}
+                                <small> {{ blog.subtitle }}
+                                    <small> {{ blog.update_time }} / {{ blog.create_time }} </small> </small> </a></div>
                     {% endfor %}
                     </article>
                 {% endif %}

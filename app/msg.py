@@ -6,7 +6,7 @@ from wtforms.validators import DataRequired, Length
 
 import app
 from sql.base import DBBit
-from object.msg import Message, load_message_list
+from object.msg import Message
 
 msg = Blueprint("msg", __name__)
 
@@ -29,8 +29,8 @@ def __load_msg_page(page: int, form: WriteForm):
         abort(404)
         return
 
-    msg_list = load_message_list(20, (page - 1) * 20,
-                                 show_secret=current_user.check_role("ReadSecretMsg"))  # 判断是否可读取私密内容
+    msg_list = Message.get_message_list(20, (page - 1) * 20,
+                                        show_secret=current_user.check_role("ReadSecretMsg"))  # 判断是否可读取私密内容
     max_page = app.HBlogFlask.get_max_page(Message.get_msg_count(), 20)
     page_list = app.HBlogFlask.get_page("msg.msg_page", page, max_page)
     app.HBlogFlask.print_load_page_log(f"msg (page: {page})")

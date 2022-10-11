@@ -5,15 +5,15 @@ from sql.msg import read_msg_list, get_msg_count, create_msg, read_msg, get_user
 import object.user
 
 
-def load_message_list(limit: Optional[int] = None, offset: Optional[int] = None, show_secret: bool = False):
-    ret = []
-    for i in read_msg_list(limit=limit, offset=offset, show_secret=show_secret):
-        ret.append(Message(i))
-    return ret
-
-
 class _Message:
     message_tuple = namedtuple("Message", "email content update_time secret")
+
+    @staticmethod
+    def get_message_list(limit: Optional[int] = None, offset: Optional[int] = None, show_secret: bool = False):
+        ret = []
+        for i in read_msg_list(limit=limit, offset=offset, show_secret=show_secret):
+            ret.append(Message(i))
+        return ret
 
     @staticmethod
     def get_msg_count(auth: "object.user.User" = None):

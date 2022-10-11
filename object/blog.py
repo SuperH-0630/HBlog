@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from collections import namedtuple
 
 from sql.blog import (get_blog_list,
@@ -11,7 +11,7 @@ from sql.blog import (get_blog_list,
                       create_blog,
                       delete_blog,
                       set_blog_top,
-                      get_user_user_count)
+                      get_user_blog_count)
 from sql.archive import add_blog_to_archive, sub_blog_from_archive
 from sql.user import get_user_email
 from sql.base import DBBit
@@ -31,17 +31,24 @@ class _BlogArticle:
     def get_blog_list(archive_id=None, limit=None, offset=None, not_top=False):
         if archive_id is None:
             if not_top:
-                return get_blog_list_not_top(limit=limit, offset=offset)
-            return get_blog_list(limit=limit, offset=offset)
-        return get_archive_blog_list(archive_id, limit=limit, offset=offset)
+                res = get_blog_list_not_top(limit=limit, offset=offset)
+            else:
+                res = get_blog_list(limit=limit, offset=offset)
+        else:
+            res = get_archive_blog_list(archive_id, limit=limit, offset=offset)
+
+        ret = []
+        for i in res:
+            ret.append(BlogArticle(i))
+        return ret
 
     @staticmethod
     def get_blog_count(archive_id=None, auth=None):
-        if archive_id is None:
+        if archive_id is None and auth is None:
             return get_blog_count()
         if auth is None:
             return get_archive_blog_count(archive_id)
-        return get_user_user_count(auth.id)
+        return get_user_blog_count(auth.id)
 
     @staticmethod
     def create(title, subtitle, content, archive: "List[object.archive.Archive]", user: "object.user.User"):

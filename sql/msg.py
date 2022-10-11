@@ -1,7 +1,7 @@
 from sql import db
 from sql.cache import (read_msg_from_cache, write_msg_to_cache, delete_msg_from_cache,
                        get_msg_cout_from_cache, write_msg_count_to_cache, delete_msg_count_from_cache,
-                       get_user_msg_cout_from_cache, write_user_msg_count_to_cache,
+                       get_user_msg_count_from_cache, write_user_msg_count_to_cache,
                        delete_all_user_msg_count_from_cache)
 
 from typing import Optional
@@ -39,6 +39,7 @@ def read_msg_list(limit: Optional[int] = None, offset: Optional[int] = None, sho
 
 
 def create_msg(auth: int, content: str, secret: bool = False):
+    delete_msg_count_from_cache()
     content = content.replace("'", "''")
     cur = db.insert("INSERT INTO message(Auth, Content, Secret) "
                     "VALUES (%s, %s, %s)", auth, content, 1 if secret else 0)
@@ -87,7 +88,7 @@ def get_msg_count():
 
 
 def get_user_msg_count(user_id: int):
-    res = get_user_msg_cout_from_cache(user_id)
+    res = get_user_msg_count_from_cache(user_id)
     if res is not None:
         return res
 

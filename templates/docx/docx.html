@@ -62,18 +62,18 @@
                 {% for blog in blog_list %}
                     {% if show_delete %}
                         {# 判断是否显示删除模态框 #}
-                        <div id="DeleteModal{{blog[0]}}" class="modal fade" role="dialog" aria-hidden="true">
+                        <div id="DeleteModal{{blog.id}}" class="modal fade" role="dialog" aria-hidden="true">
                             <div class="modal-dialog">
                                 <div class="modal-content text-start">
                                     <div class="modal-header">
                                         <h4 class="modal-title"> 确认删除博文？ </h4>
                                     </div>
                                     <div class="modal-body">
-                                        <p> 是否确认删除博文 {{ blog[1] }}？ </p>
+                                        <p> 是否确认删除博文 {{ blog.title }}？ </p>
                                     </div>
                                     <div class="modal-footer">
                                         <a class="btn btn-danger"
-                                           href="{{ url_for("docx.delete_blog_page", blog=blog[0]) }}"> 删除 </a>
+                                           href="{{ url_for("docx.delete_blog_page", blog=blog.id) }}"> 删除 </a>
                                         <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal"> 取消 </button>
                                     </div>
                                 </div>
@@ -81,26 +81,26 @@
                         </div>
                     {% endif %}
 
-                    {% if blog[5] == is_top %}
+                    {% if blog.top %}
                         <div class="docx-top">
-                            <a class="h4 my-auto" href="{{ url_for("docx.article_page", blog=blog[0]) }}">
-                            {{ blog[1] }}
-                                <small> {{ blog[2] }}
-                                    <small> {{ blog[3] }} / {{ blog[4] }} </small> </small> </a>
+                            <a class="h4 my-auto" href="{{ url_for("docx.article_page", blog=blog.id) }}">
+                            {{ blog.title }}
+                                <small> {{ blog.subtitle }}
+                                    <small> {{ blog.update_time }} / {{ blog.create_time }} </small> </small> </a>
                             {% if show_delete %}
                                 <button type="button" class="btn btn-sm btn-danger my-auto btn-close float-end"
-                                    data-bs-toggle="modal" data-bs-target="#DeleteModal{{blog[0]}}"> </button>
+                                    data-bs-toggle="modal" data-bs-target="#DeleteModal{{blog.id}}"> </button>
                             {% endif %}
                         </div>
                     {% else %}
                         <div class="docx">
-                            <a class="h4 my-auto" href="{{ url_for("docx.article_page", blog=blog[0]) }}">
-                            {{ blog[1] }}
-                                <small> {{ blog[2] }}
-                                    <small> {{ blog[3] }} / {{ blog[4] }} </small> </small> </a>
+                            <a class="h4 my-auto" href="{{ url_for("docx.article_page", blog=blog.id) }}">
+                            {{ blog.title }}
+                                <small> {{ blog.subtitle }}
+                                    <small> {{ blog.update_time }} / {{ blog.create_time }} </small> </small> </a>
                             {% if show_delete %}
                                 <button type="button" class="btn btn-sm btn-danger my-auto btn-close float-end"
-                                    data-bs-toggle="modal" data-bs-target="#DeleteModal{{blog[0]}}"> </button>
+                                    data-bs-toggle="modal" data-bs-target="#DeleteModal{{blog.id}}"> </button>
                             {% endif %}
                         </div>
                     {% endif %}

@@ -110,7 +110,6 @@ def __load_docx_page(page: int, form: WriteBlogForm):
     return render_template("docx/docx.html",
                            page=page,
                            blog_list=blog_list,
-                           is_top=DBBit.BIT_1,
                            page_list=page_list,
                            form=form,
                            show_delete=current_user.check_role("DeleteBlog"))
