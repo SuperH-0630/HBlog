@@ -36,8 +36,8 @@ class WriteBlogForm(EditorMD):
         self.archive_res = []
         self.archive_choices = [(-1, "None")]
         for i in archive:
-            self.archive_res.append(i[0])
-            self.archive_choices.append((i[0], f"{i[1]} ({i[3]})"))
+            self.archive_res.append(i.id)
+            self.archive_choices.append((i.id, f"{i.name} ({i.count})"))
         self.archive.choices = self.archive_choices
 
     def validate_archive(self, field):
@@ -73,8 +73,9 @@ class UpdateBlogArchiveForm(FlaskForm):
         self.archive_res = []
         self.archive_choices = []
         for i in archive:
-            self.archive_res.append(i[0])
-            self.archive_choices.append((i[0], f"{i[1]} ({i[3]})"))
+            archive_id = i.id
+            self.archive_res.append(archive_id)
+            self.archive_choices.append((archive_id, f"{i.name} ({i.count})"))
         self.archive.choices = self.archive_choices
         if blog is not None:
             self.archive_data = []

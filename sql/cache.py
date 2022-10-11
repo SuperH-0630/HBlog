@@ -91,7 +91,7 @@ def delete_all_user_msg_count_from_cache():
 @__try_redis(None)
 def read_blog_from_cache(blog_id: int):
     blog = cache.hgetall(f"cache:blog:{blog_id}")
-    if len(blog) != 4:
+    if len(blog) != 7:
         return None
     return [int(blog.get("Auth", -1)),
             blog.get("Title"),
@@ -194,3 +194,54 @@ def delete_all_user_blog_count_from_cache():
 @__try_redis(None)
 def delete_user_blog_count_from_cache(user_id: int):
     cache.delete(f"cache:blog_count:user:{user_id}")
+
+
+@__try_redis(None)
+def read_archive_from_cache(archive_id: int):
+    archive = cache.hgetall(f"cache:archive:{archive_id}")
+    if len(archive) != 2:
+        return None
+    return [archive.get("Name", ""), archive.get("DescribeText")]
+
+
+@__try_redis(None)
+def write_archive_to_cache(archive_id: int, name: str, describe: str):
+    cache_name = f"cache:archive:{archive_id}"
+    cache.delete(cache_name)
+    cache.hset(cache_name, mapping={
+        "Name": name,
+        "DescribeText": describe,
+    })
+    cache.expire(cache_name, 3600)
+
+
+@__try_redis(None)
+def delete_archive_from_cache(archive_id: int):
+    cache.delete(f"cache:archive:{archive_id}")
+
+
+@__try_redis(None)
+def get_blog_archive_from_cache(blog_id: int):
+    blog_archive = cache.lrange(f"cache:blog_archive:{blog_id}", 0, -1)
+    if len(blog_archive) == 0:
+        return None
+    return blog_archive
+
+
+@__try_redis(None)
+def write_blog_archive_to_cache(blog_id: int, archive):
+    cache_name = f"cache:blog_archive:{blog_id}"
+    cache.delete(cache_name)
+    cache.rpush(cache_name, *archive)
+    cache.expire(cache_name, 3600)
+
+
+@__try_redis(None)
+def delete_blog_archive_from_cache(blog_id: int):
+    cache.delete(f"cache:blog_archive:{blog_id}")
+
+
+@__try_redis(None)
+def delete_all_blog_archive_from_cache():
+    for i in cache.keys("cache:blog_archive:*"):
+        cache.delete(i)

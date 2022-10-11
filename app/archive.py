@@ -22,7 +22,7 @@ class CreateArchiveForm(FlaskForm):
         name = field.data
         archive_list = Archive.get_archive_list()
         for i in archive_list:
-            if name == i[1]:
+            if name == i.name:
                 raise ValidationError("归档已经存在")
 
 

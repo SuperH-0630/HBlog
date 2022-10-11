@@ -5,7 +5,8 @@ from sql.cache import (write_blog_to_cache, read_blog_from_cache, delete_blog_fr
                        write_archive_blog_count_to_cache, get_archive_blog_count_from_cache,
                        delete_all_archive_blog_count_from_cache, delete_archive_blog_count_from_cache,
                        write_user_blog_count_to_cache, get_user_blog_count_from_cache,
-                       delete_all_user_blog_count_from_cache, delete_user_blog_count_from_cache)
+                       delete_all_user_blog_count_from_cache, delete_user_blog_count_from_cache,
+                       delete_blog_archive_from_cache)
 import object.archive
 
 
@@ -70,6 +71,7 @@ def delete_blog(blog_id: int):
     delete_all_archive_blog_count_from_cache()
     delete_all_user_blog_count_from_cache()
     delete_blog_from_cache(blog_id)
+    delete_blog_archive_from_cache(blog_id)
 
     cur = db.delete("DELETE FROM blog_archive WHERE BlogID=%s", blog_id)
     if cur is None:

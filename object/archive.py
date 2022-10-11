@@ -1,5 +1,6 @@
 from collections import namedtuple
 
+import sql.blog  # 不用 from import 避免循环导入
 from sql.archive import (read_archive,
                          create_archive,
                          get_archive_list,
@@ -14,7 +15,11 @@ class _Archive:
 
     @staticmethod
     def get_archive_list():
-        return get_archive_list()
+        ret = []
+        for i in get_archive_list():
+            ret.append(Archive(i))
+        return ret
+
 
     @staticmethod
     def get_blog_archive(blog_id: int):
@@ -46,6 +51,10 @@ class Archive(_Archive):
     @property
     def describe(self):
         return self.info.describe
+
+    @property
+    def count(self):
+        return sql.blog.get_archive_blog_count(self.id)
 
     def is_delete(self):
         return len(self.name) != 0
