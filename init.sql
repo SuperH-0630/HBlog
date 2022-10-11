@@ -85,10 +85,6 @@ CREATE TABLE IF NOT EXISTS blog_archive -- 归档表
     FOREIGN KEY (ArchiveID) REFERENCES archive (ID)
 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 
-CREATE VIEW archive_with_count AS
-SELECT ID, Name, DescribeText, (SELECT Count(ArchiveID) FROM blog_archive WHERE blog_archive.ArchiveID = archive.ID) AS Count
-FROM archive;
-
 CREATE VIEW blog_archive_with_name AS
 SELECT BlogID, ArchiveID, archive.Name As ArchiveName, archive.DescribeText AS DescribeText
 FROM blog_archive

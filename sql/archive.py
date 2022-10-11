@@ -87,7 +87,7 @@ def get_archive_list(limit: Optional[int] = None, offset: Optional[int] = None):
     """ 获取归档列表 """
     if limit is not None and offset is not None:
         cur = db.search("SELECT ID "
-                        "FROM archive "  # TODO: 去除 archive_with_count
+                        "FROM archive "
                         "ORDER BY Name "
                         "LIMIT %s "
                         "OFFSET %s ", limit, offset)
