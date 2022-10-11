@@ -31,6 +31,8 @@ class MysqlDB(Database):
                                        database=self.database)
         except pymysql.err.OperationalError:
             raise
+
+        # mysql 不算线程安全的
         self._cursor = self._db.cursor()
         self._lock = threading.RLock()
         self.logger.info(f"MySQL({self._name}@{self._host}) connect")
