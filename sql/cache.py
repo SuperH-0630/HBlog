@@ -305,3 +305,90 @@ def delete_user_comment_count_from_cache(user_id: int):
 def delete_all_user_comment_count_from_cache():
     for i in cache.keys("cache:comment_count:*"):
         cache.delete(i)
+
+
+@__try_redis(None)
+def read_user_from_cache(email: str):
+    user = cache.hgetall(f"cache:user:{email}")
+    if len(user) != 2:
+        return None
+    return [user.get("PasswdHash", ""),
+            int(user.get("Role", "")),
+            int(user.get("ID", ""))]
+
+
+@__try_redis(None)
+def write_user_to_cache(email: str, passwd_hash: str, role: int, user_id: int):
+    cache_name = f"cache:user:{email}"
+    cache.delete(cache_name)
+    cache.hset(cache_name, mapping={
+        "PasswdHash": passwd_hash,
+        "Role": role,
+        "ID": user_id,
+    })
+    cache.expire(cache_name, 3600)
+
+
+@__try_redis(None)
+def delete_user_from_cache(email: str):
+    cache.delete(f"cache:user:{email}")
+
+
+@__try_redis(None)
+def get_user_email_from_cache(user_id: int):
+    email = cache.get(f"cache:user_email:{user_id}")
+    if email is None or len(email) == 0:
+        return None
+    return email
+
+
+@__try_redis(None)
+def write_user_email_to_cache(user_id: int, email: str):
+    cache_name = f"cache:user_email:{user_id}"
+    cache.set(cache_name, email)
+    cache.expire(cache_name, 3600)
+
+
+@__try_redis(None)
+def delete_user_email_from_cache(user_id: int):
+    cache.delete(f"cache:user_email:{user_id}")
+
+
+@__try_redis(None)
+def get_role_name_from_cache(role_id: int):
+    role_name = cache.get(f"cache:role_name:{role_id}")
+    if role_name is None or len(role_name) == 0:
+        return None
+    return role_name
+
+
+@__try_redis(None)
+def write_role_name_to_cache(role_id: int, name: str):
+    cache_name = f"cache:role_name:{role_id}"
+    cache.set(cache_name, name)
+    cache.expire(cache_name, 3600)
+
+
+@__try_redis(None)
+def delete_role_name_from_cache(role_id: int):
+    cache.delete(f"cache:role_name:{role_id}")
+
+
+def get_role_operate_from_cache(role_id: int, operate: str):
+    res = cache.get(f"cache:operate:{role_id}:{operate}")
+    if res is None or len(res) == 0:
+        return None
+    return res == "True"
+
+
+@__try_redis(None)
+def write_role_operate_to_cache(role_id: int, operate: str, res: bool):
+    cache_name = f"cache:operate:{role_id}:{operate}:"
+    cache.set(cache_name, str(res))
+    cache.expire(cache_name, 3600)
+
+
+@__try_redis(None)
+def delete_role_operate_from_cache(role_id: int):
+    for i in cache.keys(f"cache:operate:{role_id}:*"):
+        cache.delete(i)

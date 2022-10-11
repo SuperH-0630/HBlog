@@ -141,7 +141,7 @@ class User(_User):
         return delete_user(self.id)
 
     def change_passwd(self, passwd):
-        return change_passwd_hash(self.id, self.get_passwd_hash(passwd))
+        return change_passwd_hash(self.email, self.get_passwd_hash(passwd))
 
     def set_user_role(self, role_id: int):
         return set_user_role(role_id, self.id)
