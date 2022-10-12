@@ -19,7 +19,6 @@ def create_comment(blog_id: int, user_id: int, content: str):
     """ 新建 comment """
     delete_user_comment_count_from_cache(user_id)
 
-    content = content.replace("'", "''")
     cur = db.insert("INSERT INTO comment(BlogID, Auth, Content) "
                     "VALUES (%s, %s, %s)", blog_id, user_id, content)
     if cur is None or cur.rowcount == 0:

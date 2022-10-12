@@ -7,8 +7,6 @@ from typing import Optional
 
 def create_archive(name: str, describe: str):
     """ 创建新归档 """
-    name = name.replace("'", "''")
-    describe = describe.replace("'", "''")
     cur = db.insert("INSERT INTO archive(Name, DescribeText) "
                     "VALUES (%s, %s)", name, describe)
     if cur is None or cur.rowcount == 0:

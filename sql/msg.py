@@ -42,7 +42,6 @@ def create_msg(auth: int, content: str, secret: bool = False):
     delete_msg_count_from_cache()
     delete_user_msg_count_from_cache(auth)
 
-    content = content.replace("'", "''")
     cur = db.insert("INSERT INTO message(Auth, Content, Secret) "
                     "VALUES (%s, %s, %s)", auth, content, 1 if secret else 0)
     if cur is None or cur.rowcount != 1:

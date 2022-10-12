@@ -31,7 +31,6 @@ def read_user(email: str):
 
 def create_user(email: str, passwd: str):
     """ 创建用户 """
-    email = email.replace("'", "''")
     if len(email) == 0:
         return None
 
@@ -105,7 +104,6 @@ def __authority_to_sql(authority):
 
 
 def create_role(name: str, authority: List[str]):
-    name = name.replace("'", "''")
     cur = db.insert("INSERT INTO role(RoleName) VALUES (%s)", name)
     if cur is None or cur.rowcount == 0:
         return False

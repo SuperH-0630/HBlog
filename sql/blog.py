@@ -20,9 +20,6 @@ def create_blog(auth_id: int, title: str, subtitle: str, content: str,
     delete_user_blog_count_from_cache(auth_id)
     # archive cache 在下面循环删除
 
-    title = title.replace("'", "''")
-    subtitle = subtitle.replace("'", "''")
-    content = content.replace("'", "''")
     cur = db.insert("INSERT INTO blog(Auth, Title, SubTitle, Content) "
                     "VALUES (%s, %s, %s, %s)", auth_id, title, subtitle, content)
     if cur is None or cur.rowcount == 0:
@@ -41,7 +38,6 @@ def update_blog(blog_id: int, content: str) -> bool:
     """ 更新博客文章 """
     delete_blog_from_cache(blog_id)
 
-    content = content.replace("'", "''")
     cur = db.update("Update blog "
                     "SET UpdateTime=CURRENT_TIMESTAMP(), Content=%s "
                     "WHERE ID=%s", content, blog_id)
