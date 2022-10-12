@@ -10,6 +10,7 @@ from wtforms import (EmailField,
                      SubmitField,
                      ValidationError)
 from wtforms.validators import DataRequired, Length, Regexp, EqualTo
+from urllib.parse import urljoin
 
 import app
 from object.user import User
@@ -180,7 +181,7 @@ def register_page():
     form = RegisterForm()
     if form.validate_on_submit():
         token = User.creat_token(form.email.data, form.passwd.data)
-        register_url = conf["URL_NAME"] + url_for("auth.confirm_page", token=token)
+        register_url = urljoin(request.host_url, url_for("auth.confirm_page", token=token))
         hblog: app.Hblog = current_app
         send_msg("注册确认", hblog.mail, form.email.data, "register", register_url=register_url)
         flash("注册提交成功, 请进入邮箱点击确认注册链接")

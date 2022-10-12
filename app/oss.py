@@ -3,8 +3,9 @@ from flask_login import login_required
 from flask_wtf import FlaskForm
 from wtforms import FileField, StringField, SubmitField
 from wtforms.validators import DataRequired, Length
+from urllib.parse import urljoin
+import oss2
 
-import configure
 from aliyun import aliyun
 import app
 
@@ -53,9 +54,14 @@ def upload_page():
         if path.startswith('/'):
             path = path[1:]
         path += file.filename
-        aliyun.upload_file(path, file)
-        app.HBlogFlask.print_sys_opt_success_log(f"Upload file {path}")
-        flash(f"文件 {file.filename} 已上传: {configure.conf['URL_NAME'] + url_for('oss.get_page', name=path)}")
+        try:
+            aliyun.upload_file(path, file)
+        except oss2.exceptions.OssError:
+            app.HBlogFlask.print_sys_opt_success_log(f"Upload file {path} fail")
+            flash(f"文件 {file.filename} 上传失败")
+        else:
+            app.HBlogFlask.print_sys_opt_success_log(f"Upload file {path}")
+            flash(f"文件 {file.filename} 已上传: {urljoin(request.host_url, url_for('oss.get_page', name=path))}")
         return redirect(url_for("oss.upload_page"))
     app.HBlogFlask.print_load_page_log(f"OSS upload")
     return render_template("oss/upload.html", UploadForm=form)
