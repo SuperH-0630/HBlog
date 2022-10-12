@@ -27,6 +27,7 @@ conf = {
     "CACHE_REDIS_PASSWD": "123456",
     "CACHE_REDIS_DATABASE": 0,
     "CACHE_EXPIRE": 604800,  # 默认七天过期
+    "CACHE_PREFIX": "hblog_cache",
     "MAIL_SERVER": "",
     "MAIL_PORT": "",
     "MAIL_USE_TLS": False,
