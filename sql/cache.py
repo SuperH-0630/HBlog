@@ -234,6 +234,8 @@ def get_blog_archive_from_cache(blog_id: int):
     blog_archive = cache.lrange(f"{CACHE_PREFIX}:blog_archive:{blog_id}", 0, -1)
     if len(blog_archive) == 0:
         return None
+    elif blog_archive[0] == '-1':
+        return []
     return blog_archive
 
 
@@ -241,6 +243,8 @@ def get_blog_archive_from_cache(blog_id: int):
 def write_blog_archive_to_cache(blog_id: int, archive):
     cache_name = f"{CACHE_PREFIX}:blog_archive:{blog_id}"
     cache.delete(cache_name)
+    if len(archive) == 0:
+        cache.rpush(cache_name, -1)
     cache.rpush(cache_name, *archive)
     cache.expire(cache_name, CACHE_TIME)
 
@@ -259,7 +263,7 @@ def delete_all_blog_archive_from_cache():
 @__try_redis(None)
 def get_comment_from_cache(comment_id: int):
     comment = cache.hgetall(f"{CACHE_PREFIX}:comment:{comment_id}")
-    if len(comment) != 2:
+    if len(comment) != 4:
         return None
     return [comment.get("BlogID", ""),
             comment.get("Email", ""),
@@ -314,7 +318,7 @@ def delete_all_user_comment_count_from_cache():
 @__try_redis(None)
 def get_user_from_cache(email: str):
     user = cache.hgetall(f"{CACHE_PREFIX}:user:{email}")
-    if len(user) != 2:
+    if len(user) != 3:
         return None
     return [user.get("PasswdHash", ""),
             int(user.get("Role", "")),

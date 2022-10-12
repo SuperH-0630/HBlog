@@ -42,7 +42,7 @@ def get_blog_archive(blog_id: int):
     cur = db.search("SELECT ArchiveID FROM blog_archive_with_name "
                     "WHERE BlogID=%s "
                     "ORDER BY ArchiveName", blog_id)
-    if cur is None or cur.rowcount == 0:
+    if cur is None:
         return []
 
     res = [i[0] for i in cur.fetchall()]
