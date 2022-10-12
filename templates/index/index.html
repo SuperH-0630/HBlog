@@ -8,22 +8,28 @@
 {% endblock %}
 
 {% block content %}
-    {% cache conf["VIEW_CACHE_EXPIRE"], ":index" %}
-        <section id="base" class="container mt-3">
-            <div class="row">
-                <article class="col-12">
-                    <div class="introduce mx-lg-2">
-                        {% for info in conf['INTRODUCE'] %}
-                            <h2> {{ info[0] }} </h2>
-                            {{ info[1] | safe }}
-                        {% endfor %}
+    <section id="base" class="container mt-3">
+        <div class="row">
+            <article class="col-12">
+                <div class="introduce mx-lg-2">
+                    {% for info in conf['INTRODUCE'] %}
+                        <h2> {{ info[0] }} </h2>
+                        {{ info[1] | safe }}
+                    {% endfor %}
 
-                        {% for link in conf['INTRODUCE_LINK'] %}
-                            <a class="btn btn-outline-info mb-2" href="{{ conf['INTRODUCE_LINK'][link] }}"> {{ link }} </a>
-                        {% endfor %}
-                    </div>
-                </article>
-            </div>
+                    <hr>
+
+                    <p> 欢迎页点击量: {{ hello_clicks }} </p>
+                    <p> 首页点击量: {{ home_clicks }} </p>
+
+                    {% for link in conf['INTRODUCE_LINK'] %}
+                        <a class="btn btn-outline-info mb-2" href="{{ conf['INTRODUCE_LINK'][link] }}"> {{ link }} </a>
+                    {% endfor %}
+                </div>
+            </article>
+        </div>
+
+        {% cache conf["VIEW_CACHE_EXPIRE"], ":index" %}
             <div class="row">
                 {% if current_user.check_role("ReadBlog") %}  {# 检查是否具有读取权限 #}
                     {% if current_user.check_role("ReadMsg") %}
@@ -85,6 +91,6 @@
                     {% endif %}
                 {% endif %}
             </div>
-        </section>
-    {% endcache %}
+        {% endcache %}
+    </section>
 {% endblock %}

@@ -8,6 +8,7 @@ from sql.archive import (read_archive,
                          delete_archive,
                          add_blog_to_archive,
                          sub_blog_from_archive)
+from sql.statistics import get_archive_click
 
 
 class _Archive:
@@ -55,6 +56,10 @@ class Archive(_Archive):
     @property
     def count(self):
         return sql.blog.get_archive_blog_count(self.id)
+
+    @property
+    def clicks(self):
+        return get_archive_click(self.id)
 
     def is_delete(self):
         return len(self.name) != 0

@@ -7,6 +7,7 @@ from typing import Optional
 
 import app
 from sql.base import DBBit
+from sql.statistics import add_blog_click, add_archive_click
 from object.blog import BlogArticle
 from object.comment import Comment
 from object.archive import Archive
@@ -136,6 +137,7 @@ def archive_page():
     blog_list = BlogArticle.get_blog_list(archive_id=archive, limit=20, offset=(page - 1) * 20)
     max_page = app.HBlogFlask.get_max_page(BlogArticle.get_blog_count(archive_id=archive), 20)
     page_list = app.HBlogFlask.get_page("docx.archive_page", page, max_page)
+    add_archive_click(archive)
     app.HBlogFlask.print_load_page_log(f"archive-docx list (archive-id: {archive} page: {page})")
     return render_template("docx/docx.html",
                            page=page,
@@ -159,6 +161,7 @@ def __load_article_page(blog_id: int, form: WriteCommentForm,
         view = UpdateBlogForm(article)
     if archive is None:
         archive = UpdateBlogArchiveForm(article)
+    add_blog_click(article.id)
     return render_template("docx/article.html",
                            article=article,
                            cache_str=f":{article.id}",

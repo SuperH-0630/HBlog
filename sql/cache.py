@@ -409,5 +409,6 @@ def restart_clear_cache():
     包括Hblog-Cache和Flask-Cache
     """
 
-    # 删除inject_base, 重新载入conf作为缓存
-    cache.delete(f"flask_cache:inject_base")
+    # 删除全部Flask缓存
+    for i in cache.keys("flask_cache:*"):
+        cache.delete(i)

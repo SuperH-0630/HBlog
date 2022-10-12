@@ -12,6 +12,7 @@ from sql.blog import (get_blog_list,
                       delete_blog,
                       set_blog_top,
                       get_user_blog_count)
+from sql.statistics import get_blog_click
 from sql.archive import add_blog_to_archive, sub_blog_from_archive
 from sql.user import get_user_email
 from sql.base import DBBit
@@ -86,6 +87,10 @@ class BlogArticle(_BlogArticle):
     @property
     def create_time(self):
         return self.info.create_time
+
+    @property
+    def clicks(self):
+        return get_blog_click(self.id)
 
     @property
     def top(self):

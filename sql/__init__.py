@@ -14,3 +14,9 @@ cache = redis.RedisDB(host=conf["CACHE_REDIS_HOST"],
                       username=conf["CACHE_REDIS_NAME"],
                       passwd=conf["CACHE_REDIS_PASSWD"],
                       db=conf["CACHE_REDIS_DATABASE"])
+
+redis = redis.RedisDB(host=conf["REDIS_HOST"],
+                      port=conf["REDIS_PORT"],
+                      username=conf["REDIS_NAME"],
+                      passwd=conf["REDIS_PASSWD"],
+                      db=conf["REDIS_DATABASE"])
