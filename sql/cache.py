@@ -387,7 +387,7 @@ def get_role_operate_from_cache(role_id: int, operate: str):
 
 @__try_redis(None)
 def write_role_operate_to_cache(role_id: int, operate: str, res: bool):
-    cache_name = f"{CACHE_PREFIX}:operate:{role_id}:{operate}:"
+    cache_name = f"{CACHE_PREFIX}:operate:{role_id}:{operate}"
     cache.set(cache_name, str(res))
     cache.expire(cache_name, CACHE_TIME)
 
