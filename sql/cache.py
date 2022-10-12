@@ -396,3 +396,14 @@ def write_role_operate_to_cache(role_id: int, operate: str, res: bool):
 def delete_role_operate_from_cache(role_id: int):
     for i in cache.keys(f"{CACHE_PREFIX}:operate:{role_id}:*"):
         cache.delete(i)
+
+
+@__try_redis(None)
+def restart_clear_cache():
+    """
+    重启服务时必须要清理的缓存
+    包括Hblog-Cache和Flask-Cache
+    """
+
+    # 删除inject_base, 重新载入conf作为缓存
+    cache.delete(f"flask_cache:inject_base")

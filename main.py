@@ -1,4 +1,5 @@
 from configure import configure
+
 import os
 import logging
 
@@ -10,6 +11,9 @@ if hblog_conf is None:
 else:
     logging.info(f"Configure file {hblog_conf}")
     configure(hblog_conf)
+
+from sql.cache import restart_clear_cache
+restart_clear_cache()  # 清理缓存
 
 from app import HBlogFlask
 from waitress import serve
