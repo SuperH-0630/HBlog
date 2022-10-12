@@ -6,7 +6,6 @@ from wtforms.validators import DataRequired, Length, ValidationError
 
 import app
 from object.archive import Archive
-import main
 from configure import conf
 
 archive = Blueprint("archive", __name__)
@@ -74,7 +73,7 @@ def delete_archive_page():
 
 
 @archive.context_processor
-@main.app.cache.cached(timeout=conf["CACHE_EXPIRE"], key_prefix="inject_base:archive")
+@app.cache.cached(timeout=conf["CACHE_EXPIRE"], key_prefix="inject_base:archive")
 def inject():
     """ archive 默认模板变量 """
     return {"top_nav": ["", "active", "", "", "", ""]}

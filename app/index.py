@@ -5,13 +5,13 @@ from configure import conf
 import app
 from object.blog import BlogArticle
 from object.msg import Message
-import main  # 获得 app 对象
+
 
 index = Blueprint("base", __name__)
 
 
 @index.route('/')
-@main.app.cache.cached(timeout=conf["VIEW_CACHE_EXPIRE"])
+@app.cache.cached(timeout=conf["VIEW_CACHE_EXPIRE"])
 def hello_page():
     app.HBlogFlask.print_load_page_log(f"hello")
     return render_template("index/hello.html")
@@ -29,14 +29,14 @@ def index_page():
 
 
 @index.context_processor
-@main.app.cache.cached(timeout=conf["CACHE_EXPIRE"], key_prefix="inject_base:index")
+@app.cache.cached(timeout=conf["CACHE_EXPIRE"], key_prefix="inject_base:index")
 def inject_base():
     """ index默认模板变量, 覆盖app变量 """
     return {"top_nav": ["active", "", "", "", "", ""]}
 
 
 @index.app_context_processor
-@main.app.cache.cached(timeout=conf["CACHE_EXPIRE"], key_prefix="inject_base")
+@app.cache.cached(timeout=conf["CACHE_EXPIRE"], key_prefix="inject_base")
 def inject_base():
     """ app默认模板变量 """
     return {"blog_name": conf['BLOG_NAME'],

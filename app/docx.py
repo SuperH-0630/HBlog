@@ -10,7 +10,6 @@ from sql.base import DBBit
 from object.blog import BlogArticle
 from object.comment import Comment
 from object.archive import Archive
-import main
 from configure import conf
 
 docx = Blueprint("docx", __name__)
@@ -319,7 +318,7 @@ def delete_comment_page():
 
 
 @docx.context_processor
-@main.app.cache.cached(timeout=conf["CACHE_EXPIRE"], key_prefix="inject_base:docx")
+@app.cache.cached(timeout=conf["CACHE_EXPIRE"], key_prefix="inject_base:docx")
 def inject_base():
     """ docx 默认模板变量 """
     return {"top_nav": ["", "", "active", "", "", ""]}

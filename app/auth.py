@@ -15,7 +15,6 @@ import app
 from object.user import User
 from send_email import send_msg
 from configure import conf
-import main
 
 auth = Blueprint("auth", __name__)
 
@@ -324,7 +323,7 @@ def role_set_page():
 
 
 @auth.context_processor
-@main.app.cache.cached(timeout=conf["CACHE_EXPIRE"], key_prefix="inject_base:auth")
+@app.cache.cached(timeout=conf["CACHE_EXPIRE"], key_prefix="inject_base:auth")
 def inject_base():
     """ auth 默认模板变量 """
     return {"top_nav": ["", "", "", "", "", "active"]}

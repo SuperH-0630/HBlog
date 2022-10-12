@@ -7,7 +7,6 @@ from wtforms.validators import DataRequired, Length
 import app
 from sql.base import DBBit
 from object.msg import Message
-import main
 from configure import conf
 
 msg = Blueprint("msg", __name__)
@@ -85,7 +84,7 @@ def delete_msg_page():
 
 
 @msg.context_processor
-@main.app.cache.cached(timeout=conf["CACHE_EXPIRE"], key_prefix="inject_base:msg")
+@app.cache.cached(timeout=conf["CACHE_EXPIRE"], key_prefix="inject_base:msg")
 def inject_base():
     """ msg 默认模板变量 """
     return {"top_nav": ["", "", "", "active", "", ""]}

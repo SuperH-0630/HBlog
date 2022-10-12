@@ -5,7 +5,6 @@ from flask import Flask, url_for, request, current_app, render_template, Respons
 from flask_mail import Mail
 from flask_login import LoginManager, current_user
 from flask.logging import default_handler
-from flask_caching import Cache
 from typing import Optional, Union
 
 import logging.handlers
@@ -14,6 +13,7 @@ from bs4 import BeautifulSoup
 
 from configure import conf
 from object.user import AnonymousUser, User
+from app.cache import cache
 
 if conf["DEBUG_PROFILE"]:
     from werkzeug.middleware.profiler import ProfilerMiddleware
@@ -34,13 +34,7 @@ class HBlogFlask(Flask):
         self.login_manager.login_view = "auth.login_page"
 
         self.mail = Mail(self)
-
-        self.cache = Cache(config={
-            'CACHE_TYPE': 'RedisCache',
-            'CACHE_KEY_PREFIX': 'flask_cache:',
-            'CACHE_REDIS_URL': f'redis://{conf["CACHE_REDIS_NAME"]}:{conf["CACHE_REDIS_PASSWD"]}@'
-                               f'{conf["CACHE_REDIS_HOST"]}:{conf["CACHE_REDIS_PORT"]}/{conf["CACHE_REDIS_DATABASE"]}'
-        })
+        self.cache = cache
         self.cache.init_app(self)
 
         self.logger.removeHandler(default_handler)
@@ -72,21 +66,21 @@ class HBlogFlask(Flask):
             self.errorhandler(i)(func[f"error_{i}"])
 
     def register_all_blueprint(self):
-        from .index import index
-        from .archive import archive
-        from .docx import docx
-        from .msg import msg
-        from .oss import oss
-        from .auth import auth
-        from .about_me import about_me
+        import app.index as index
+        import app.archive as archive
+        import app.docx as docx
+        import app.msg as msg
+        import app.oss as oss
+        import app.auth as auth
+        import app.about_me as about_me
 
-        self.register_blueprint(index, url_prefix="/")
-        self.register_blueprint(archive, url_prefix="/archive")
-        self.register_blueprint(docx, url_prefix="/docx")
-        self.register_blueprint(msg, url_prefix="/msg")
-        self.register_blueprint(auth, url_prefix="/auth")
-        self.register_blueprint(about_me, url_prefix="/about")
-        self.register_blueprint(oss, url_prefix="/oss")
+        self.register_blueprint(index.index, url_prefix="/")
+        self.register_blueprint(archive.archive, url_prefix="/archive")
+        self.register_blueprint(docx.docx, url_prefix="/docx")
+        self.register_blueprint(msg.msg, url_prefix="/msg")
+        self.register_blueprint(auth.auth, url_prefix="/auth")
+        self.register_blueprint(about_me.about_me, url_prefix="/about")
+        self.register_blueprint(oss.oss, url_prefix="/oss")
 
     def update_configure(self):
         """ 更新配置 """
