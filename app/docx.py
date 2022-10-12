@@ -162,6 +162,7 @@ def __load_article_page(blog_id: int, form: WriteCommentForm,
         archive = UpdateBlogArchiveForm(article)
     return render_template("docx/article.html",
                            article=article,
+                           cache_str=f":{article.id}",
                            archive_list=article.archive,
                            form=form,
                            view=view,

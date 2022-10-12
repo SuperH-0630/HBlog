@@ -13,83 +13,85 @@
     <section id="base" class="container mt-3">
         {% if current_user.check_role("ReadBlog") %}
             {# 检查是否具有读取权限 #}
-            <div class="row">
-                <article class="col-12">
-                    <h1> {{ article.title }} <small> {{ article.subtitle }} <small> {{ article.update_time}} / {{ article.create_time}} </small> </small> </h1>
-                    {% for archive in article.archive %}
-                        <span class="badge bg-info"> {{ archive.name }} </span>
-                    {% endfor %}
-                    <a href="{{ url_for('docx.article_down_page', blog=article.id) }}"> 下载 </a>
-                    <hr>
-
-                    <form method="post" action="{{ url_for('docx.update_docx_page') }}" class="was-validated">
-                        {% if can_update %}
-                            {{ view.hidden_tag() }}
-                            {{ view.blog_id() }}
-                        {% endif %}
-                        <div id="markdown-view">
-                            {{ view.content(class="form-control mb-2", style="display:none;") }}
-                        </div>
-                        {% for error in view.content.errors %}
-                            <div class="invalid-feedback"> {{ error }} </div>
+            {% cache conf["LIST_CACHE_EXPIRE"], ":blog", ":docx", cache_str %}
+                <div class="row">
+                    <article class="col-12">
+                        <h1> {{ article.title }} <small> {{ article.subtitle }} <small> {{ article.update_time}} / {{ article.create_time}} </small> </small> </h1>
+                        {% for archive in article.archive %}
+                            <span class="badge bg-info"> {{ archive.name }} </span>
                         {% endfor %}
+                        <a href="{{ url_for('docx.article_down_page', blog=article.id) }}"> 下载 </a>
+                        <hr>
 
-                        {% if can_update %}
-                            <div id="UpdateModal" class="modal fade" role="dialog" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content text-start">
-                                        <div class="modal-header">
-                                            <h4 class="modal-title"> 确认更新博文吗？ </h4>
-                                        </div>
-                                        <div class="modal-body">
-                                            <p> 是否确认更新博文？请注意校对文本。 </p>
-                                        </div>
-                                        <div class="modal-footer">
-                                            {{ view.submit(class="btn btn-danger", value="确认") }}
-                                            <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">取消</button>
-                                        </div>
-                                    </div>
-                                </div>
+                        <form method="post" action="{{ url_for('docx.update_docx_page') }}" class="was-validated">
+                            {% if can_update %}
+                                {{ view.hidden_tag() }}
+                                {{ view.blog_id() }}
+                            {% endif %}
+                            <div id="markdown-view">
+                                {{ view.content(class="form-control mb-2", style="display:none;") }}
                             </div>
-                        {% endif %}
-                    </form>
-                        {% if can_update %}
-                            <div id="UpdateArchiveModal" class="modal fade" role="dialog" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content text-start">
-                                        <div class="modal-header">
-                                            <h4 class="modal-title"> 更新博客归档信息？ </h4>
-                                        </div>
-                                        <form method="post" class="was-validated">
+                            {% for error in view.content.errors %}
+                                <div class="invalid-feedback"> {{ error }} </div>
+                            {% endfor %}
+
+                            {% if can_update %}
+                                <div id="UpdateModal" class="modal fade" role="dialog" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content text-start">
+                                            <div class="modal-header">
+                                                <h4 class="modal-title"> 确认更新博文吗？ </h4>
+                                            </div>
                                             <div class="modal-body">
-                                                {{ archive.hidden_tag() }}
-                                                {{ archive.blog_id() }}
-                                                {{ macro.render_select_field(archive.archive) }}
+                                                <p> 是否确认更新博文？请注意校对文本。 </p>
                                             </div>
                                             <div class="modal-footer">
-                                                {{ archive.add(class="btn btn-outline-danger", formaction=url_for("docx.update_archive_page", add='1')) }}
-                                                {{ archive.sub(class="btn btn-outline-danger", formaction=url_for("docx.update_archive_page", add='0')) }}
+                                                {{ view.submit(class="btn btn-danger", value="确认") }}
                                                 <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">取消</button>
                                             </div>
-                                        </form>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-
-                            <div class="text-end mb-2">
-                                <div class="btn-group">
-                                    <a type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#UpdateModal"> 更新博文 </a>
-                                    {% if article.top %}
-                                        <a class="btn btn-danger" href="{{ url_for("docx.set_blog_top_page", blog=article.id, top='0') }}"> 取消置顶 </a>
-                                    {% else %}
-                                        <a class="btn btn-danger" href="{{ url_for("docx.set_blog_top_page", blog=article.id, top='1') }}"> 置顶文章 </a>
-                                    {% endif %}
-                                    <a type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#UpdateArchiveModal"> 更新归档 </a>
+                            {% endif %}
+                        </form>
+                            {% if can_update %}
+                                <div id="UpdateArchiveModal" class="modal fade" role="dialog" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content text-start">
+                                            <div class="modal-header">
+                                                <h4 class="modal-title"> 更新博客归档信息？ </h4>
+                                            </div>
+                                            <form method="post" class="was-validated">
+                                                <div class="modal-body">
+                                                    {{ archive.hidden_tag() }}
+                                                    {{ archive.blog_id() }}
+                                                    {{ macro.render_select_field(archive.archive) }}
+                                                </div>
+                                                <div class="modal-footer">
+                                                    {{ archive.add(class="btn btn-outline-danger", formaction=url_for("docx.update_archive_page", add='1')) }}
+                                                    {{ archive.sub(class="btn btn-outline-danger", formaction=url_for("docx.update_archive_page", add='0')) }}
+                                                    <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">取消</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        {% endif %}
-                </article>
-            </div>
+
+                                <div class="text-end mb-2">
+                                    <div class="btn-group">
+                                        <a type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#UpdateModal"> 更新博文 </a>
+                                        {% if article.top %}
+                                            <a class="btn btn-danger" href="{{ url_for("docx.set_blog_top_page", blog=article.id, top='0') }}"> 取消置顶 </a>
+                                        {% else %}
+                                            <a class="btn btn-danger" href="{{ url_for("docx.set_blog_top_page", blog=article.id, top='1') }}"> 置顶文章 </a>
+                                        {% endif %}
+                                        <a type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#UpdateArchiveModal"> 更新归档 </a>
+                                    </div>
+                                </div>
+                            {% endif %}
+                    </article>
+                </div>
+            {% endcache %}
         {% endif %}
 
         {% if current_user.check_role("ReadComment") %}
@@ -129,49 +131,51 @@
                     </section>
                     <hr>
 
-                    {% for comment in article.comment %}
+                    {% cache conf["LIST_CACHE_EXPIRE"], ":blog", ":comment", cache_str %}
+                        {% for comment in article.comment %}
 
-                        {% if show_delete %}
-                            <div id="DeleteModal{{comment.id }}" class="modal fade" role="dialog" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content text-start">
-                                        <div class="modal-header">
-                                            <h4 class="modal-title"> 确认删除评论？ </h4>
-                                        </div>
-                                        <div class="modal-body">
-                                            <p> 是否确认删除评论？ </p>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <a class="btn btn-danger"
-                                               href="{{ url_for("docx.delete_comment_page", comment=comment.id) }}"> 删除 </a>
-                                            <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal"> 取消 </button>
+                            {% if show_delete %}
+                                <div id="DeleteModal{{comment.id }}" class="modal fade" role="dialog" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content text-start">
+                                            <div class="modal-header">
+                                                <h4 class="modal-title"> 确认删除评论？ </h4>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p> 是否确认删除评论？ </p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <a class="btn btn-danger"
+                                                   href="{{ url_for("docx.delete_comment_page", comment=comment.id) }}"> 删除 </a>
+                                                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal"> 取消 </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        {% endif %}
+                            {% endif %}
 
-                        <section class="col-12">
-                            <div class="comment">
-                                <p class="comment-title h5">
-                                    {% if show_email %}  {# 判断是否可读取用户信息 #}
-                                        {{ comment.auth.email }}
-                                    {% else %}
-                                        {{ comment.auth.s_email }}
-                                    {% endif %}
+                            <section class="col-12">
+                                <div class="comment">
+                                    <p class="comment-title h5">
+                                        {% if show_email %}  {# 判断是否可读取用户信息 #}
+                                            {{ comment.auth.email }}
+                                        {% else %}
+                                            {{ comment.auth.s_email }}
+                                        {% endif %}
 
-                                    {% if show_delete %}
-                                        <a class="mb-2"
-                                            data-bs-toggle="modal" data-bs-target="#DeleteModal{{comment.id }}"> &times; </a>
-                                    {% endif %}
+                                        {% if show_delete %}
+                                            <a class="mb-2"
+                                                data-bs-toggle="modal" data-bs-target="#DeleteModal{{comment.id }}"> &times; </a>
+                                        {% endif %}
 
-                                    <br>
-                                    <small> {{ comment.update_time }} </small>
-                                </p>
-                                <p> {{ comment.content.replace('\n', '<br>') | safe  }} </p>
-                            </div>
-                        </section>
-                    {% endfor %}
+                                        <br>
+                                        <small> {{ comment.update_time }} </small>
+                                    </p>
+                                    <p> {{ comment.content.replace('\n', '<br>') | safe  }} </p>
+                                </div>
+                            </section>
+                        {% endfor %}
+                    {% endcache %}
                 </article>
             </div>
         {% endif %}
