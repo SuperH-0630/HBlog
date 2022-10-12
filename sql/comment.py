@@ -1,5 +1,5 @@
 from sql import db
-from sql.cache import (read_comment_from_cache, write_comment_to_cache, delete_comment_from_cache,
+from sql.cache import (get_comment_from_cache, write_comment_to_cache, delete_comment_from_cache,
                        get_user_comment_count_from_cache, write_user_comment_count_to_cache,
                        delete_all_user_comment_count_from_cache, delete_user_comment_count_from_cache)
 
@@ -29,7 +29,7 @@ def create_comment(blog_id: int, user_id: int, content: str):
 
 def read_comment(comment_id: int):
     """ 读取 comment """
-    res = read_comment_from_cache(comment_id)
+    res = get_comment_from_cache(comment_id)
     if res is not None:
         return res
 

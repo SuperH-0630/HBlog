@@ -1,6 +1,6 @@
 from sql import db
 from sql.base import DBBit
-from sql.cache import (read_user_from_cache, write_user_to_cache, delete_user_from_cache,
+from sql.cache import (get_user_from_cache, write_user_to_cache, delete_user_from_cache,
                        get_user_email_from_cache, write_user_email_to_cache, delete_user_email_from_cache,
                        get_role_name_from_cache, write_role_name_to_cache, delete_role_name_from_cache,
                        get_role_operate_from_cache, write_role_operate_to_cache, delete_role_operate_from_cache)
@@ -16,7 +16,7 @@ role_authority = ["WriteBlog", "WriteComment", "WriteMsg", "CreateUser",
 
 def read_user(email: str):
     """ 读取用户 """
-    res = read_user_from_cache(email)
+    res = get_user_from_cache(email)
     if res is not None:
         return res
 

@@ -1,6 +1,6 @@
 from sql import db
 from sql.archive import add_blog_to_archive
-from sql.cache import (write_blog_to_cache, read_blog_from_cache, delete_blog_from_cache,
+from sql.cache import (write_blog_to_cache, get_blog_from_cache, delete_blog_from_cache,
                        write_blog_count_to_cache, get_blog_count_from_cache, delete_blog_count_from_cache,
                        write_archive_blog_count_to_cache, get_archive_blog_count_from_cache,
                        delete_all_archive_blog_count_from_cache, delete_archive_blog_count_from_cache,
@@ -52,7 +52,7 @@ def update_blog(blog_id: int, content: str) -> bool:
 
 def read_blog(blog_id: int) -> list:
     """ 读取blog内容 """
-    res = read_blog_from_cache(blog_id)
+    res = get_blog_from_cache(blog_id)
     if res is not None:
         return res
 

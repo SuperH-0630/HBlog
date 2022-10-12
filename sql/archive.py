@@ -1,5 +1,5 @@
 from sql import db
-from sql.cache import (read_archive_from_cache, write_archive_to_cache, delete_archive_from_cache,
+from sql.cache import (get_archive_from_cache, write_archive_to_cache, delete_archive_from_cache,
                        get_blog_archive_from_cache, write_blog_archive_to_cache, delete_blog_archive_from_cache,
                        delete_all_blog_archive_from_cache)
 from typing import Optional
@@ -18,7 +18,7 @@ def create_archive(name: str, describe: str):
 
 def read_archive(archive_id: int):
     """ 获取归档 ID """
-    res = read_archive_from_cache(archive_id)
+    res = get_archive_from_cache(archive_id)
     if res is not None:
         return res
 

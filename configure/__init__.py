@@ -21,7 +21,12 @@ conf = {
     "REDIS_NAME": "localhost",
     "REDIS_PASSWD": "123456",
     "REDIS_DATABASE": 0,
-    "REDIS_EXPIRE": 604800,  # 默认七天过期
+    "CACHE_REDIS_HOST": "localhost",
+    "CACHE_REDIS_PORT": 6379,
+    "CACHE_REDIS_NAME": "localhost",
+    "CACHE_REDIS_PASSWD": "123456",
+    "CACHE_REDIS_DATABASE": 0,
+    "CACHE_EXPIRE": 604800,  # 默认七天过期
     "MAIL_SERVER": "",
     "MAIL_PORT": "",
     "MAIL_USE_TLS": False,

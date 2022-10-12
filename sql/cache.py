@@ -6,7 +6,7 @@ from functools import wraps
 from datetime import datetime
 
 
-CACHE_TIME = int(conf["REDIS_EXPIRE"])
+CACHE_TIME = int(conf["CACHE_EXPIRE"])
 
 
 def __try_redis(ret=None):
@@ -24,7 +24,7 @@ def __try_redis(ret=None):
 
 
 @__try_redis(None)
-def read_msg_from_cache(msg_id: int):
+def get_msg_from_cache(msg_id: int):
     msg = cache.hgetall(f"cache:msg:{msg_id}")
     if len(msg) != 4:
         return None
@@ -98,7 +98,7 @@ def delete_all_user_msg_count_from_cache():
 
 
 @__try_redis(None)
-def read_blog_from_cache(blog_id: int):
+def get_blog_from_cache(blog_id: int):
     blog = cache.hgetall(f"cache:blog:{blog_id}")
     if len(blog) != 7:
         return None
@@ -138,7 +138,6 @@ def get_blog_count_from_cache():
     count = cache.get("cache:blog_count")
     if count is not None:
         return int(count)
-    return
 
 
 @__try_redis(None)
@@ -206,7 +205,7 @@ def delete_user_blog_count_from_cache(user_id: int):
 
 
 @__try_redis(None)
-def read_archive_from_cache(archive_id: int):
+def get_archive_from_cache(archive_id: int):
     archive = cache.hgetall(f"cache:archive:{archive_id}")
     if len(archive) != 2:
         return None
@@ -257,7 +256,7 @@ def delete_all_blog_archive_from_cache():
 
 
 @__try_redis(None)
-def read_comment_from_cache(comment_id: int):
+def get_comment_from_cache(comment_id: int):
     comment = cache.hgetall(f"cache:comment:{comment_id}")
     if len(comment) != 2:
         return None
@@ -312,7 +311,7 @@ def delete_all_user_comment_count_from_cache():
 
 
 @__try_redis(None)
-def read_user_from_cache(email: str):
+def get_user_from_cache(email: str):
     user = cache.hgetall(f"cache:user:{email}")
     if len(user) != 2:
         return None
