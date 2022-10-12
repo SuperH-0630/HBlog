@@ -1,7 +1,6 @@
 import json
 import logging
 import os
-
 conf = {
     "DEBUG_PROFILE": False,
     "SECRET_KEY": "HBlog-R-Salt",
@@ -27,6 +26,8 @@ conf = {
     "CACHE_REDIS_PASSWD": "123456",
     "CACHE_REDIS_DATABASE": 0,
     "CACHE_EXPIRE": 604800,  # 默认七天过期
+    "VIEW_CACHE_EXPIRE": 60,  # 视图函数
+    "LIST_CACHE_EXPIRE": 5,  # 列表 排行
     "CACHE_PREFIX": "hblog_cache",
     "MAIL_SERVER": "",
     "MAIL_PORT": "",
@@ -54,6 +55,7 @@ conf = {
     "ICP": None,
     "GONG_AN": None,
 }
+
 
 
 def configure(conf_file: str, encoding="utf-8"):

@@ -57,60 +57,64 @@
 
         {% if current_user.check_role("ReadBlog") %}
             {# 检查是否具有读取权限 #}
-            <div id="ReadBlogList" class="row">
-                <article class="col-12">
-                {% for blog in blog_list %}
-                    {% if show_delete %}
-                        {# 判断是否显示删除模态框 #}
-                        <div id="DeleteModal{{blog.id}}" class="modal fade" role="dialog" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content text-start">
-                                    <div class="modal-header">
-                                        <h4 class="modal-title"> 确认删除博文？ </h4>
-                                    </div>
-                                    <div class="modal-body">
-                                        <p> 是否确认删除博文 {{ blog.title }}？ </p>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <a class="btn btn-danger"
-                                           href="{{ url_for("docx.delete_blog_page", blog=blog.id) }}"> 删除 </a>
-                                        <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal"> 取消 </button>
+            {% cache conf["LIST_CACHE_EXPIRE"], ":blog", ":page", cache_str %}
+                <div id="ReadBlogList" class="row">
+                    <article class="col-12">
+                    {% for blog in blog_list %}
+                        {% if show_delete %}
+                            {# 判断是否显示删除模态框 #}
+                            <div id="DeleteModal{{blog.id}}" class="modal fade" role="dialog" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content text-start">
+                                        <div class="modal-header">
+                                            <h4 class="modal-title"> 确认删除博文？ </h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p> 是否确认删除博文 {{ blog.title }}？ </p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <a class="btn btn-danger"
+                                               href="{{ url_for("docx.delete_blog_page", blog=blog.id) }}"> 删除 </a>
+                                            <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal"> 取消 </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    {% endif %}
+                        {% endif %}
 
-                    {% if blog.top %}
-                        <div class="docx-top">
-                            <a class="h4 my-auto" href="{{ url_for("docx.article_page", blog=blog.id) }}">
-                            {{ blog.title }}
-                                <small> {{ blog.subtitle }}
-                                    <small> {{ blog.update_time }} / {{ blog.create_time }} </small> </small> </a>
-                            {% if show_delete %}
-                                <button type="button" class="btn btn-sm btn-danger my-auto btn-close float-end"
-                                    data-bs-toggle="modal" data-bs-target="#DeleteModal{{blog.id}}"> </button>
-                            {% endif %}
-                        </div>
-                    {% else %}
-                        <div class="docx">
-                            <a class="h4 my-auto" href="{{ url_for("docx.article_page", blog=blog.id) }}">
-                            {{ blog.title }}
-                                <small> {{ blog.subtitle }}
-                                    <small> {{ blog.update_time }} / {{ blog.create_time }} </small> </small> </a>
-                            {% if show_delete %}
-                                <button type="button" class="btn btn-sm btn-danger my-auto btn-close float-end"
-                                    data-bs-toggle="modal" data-bs-target="#DeleteModal{{blog.id}}"> </button>
-                            {% endif %}
-                        </div>
-                    {% endif %}
-                {% endfor %}
-                </article>
-            </div>
+                        {% if blog.top %}
+                            <div class="docx-top">
+                                <a class="h4 my-auto" href="{{ url_for("docx.article_page", blog=blog.id) }}">
+                                {{ blog.title }}
+                                    <small> {{ blog.subtitle }}
+                                        <small> {{ blog.update_time }} / {{ blog.create_time }} </small> </small> </a>
+                                {% if show_delete %}
+                                    <button type="button" class="btn btn-sm btn-danger my-auto btn-close float-end"
+                                        data-bs-toggle="modal" data-bs-target="#DeleteModal{{blog.id}}"> </button>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <div class="docx">
+                                <a class="h4 my-auto" href="{{ url_for("docx.article_page", blog=blog.id) }}">
+                                {{ blog.title }}
+                                    <small> {{ blog.subtitle }}
+                                        <small> {{ blog.update_time }} / {{ blog.create_time }} </small> </small> </a>
+                                {% if show_delete %}
+                                    <button type="button" class="btn btn-sm btn-danger my-auto btn-close float-end"
+                                        data-bs-toggle="modal" data-bs-target="#DeleteModal{{blog.id}}"> </button>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                    </article>
+                </div>
 
-            <ul id="ReadBlogPageList" class="pagination col-12 justify-content-center">
-                {{ macro.get_page_list(page_list, page) }}
-            </ul>
+
+                <ul id="ReadBlogPageList" class="pagination col-12 justify-content-center">
+                    {{ macro.get_page_list(page_list, page) }}
+                </ul>
+
+            {% endcache %}
 
         {% endif %}
     </section>

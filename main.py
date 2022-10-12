@@ -15,6 +15,7 @@ from app import HBlogFlask
 from waitress import serve
 
 app = HBlogFlask(__name__)
+app.register_all_blueprint()
 
 if __name__ == '__main__':
     logging.info("Server start on 127.0.0.1:8080")

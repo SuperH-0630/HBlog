@@ -10,6 +10,8 @@ from sql.base import DBBit
 from object.blog import BlogArticle
 from object.comment import Comment
 from object.archive import Archive
+import main
+from configure import conf
 
 docx = Blueprint("docx", __name__)
 
@@ -110,6 +112,7 @@ def __load_docx_page(page: int, form: WriteBlogForm):
     app.HBlogFlask.print_load_page_log(f"docx list (page: {page})")
     return render_template("docx/docx.html",
                            page=page,
+                           cache_str=f":{page}",
                            blog_list=blog_list,
                            page_list=page_list,
                            form=form,
@@ -137,6 +140,7 @@ def archive_page():
     app.HBlogFlask.print_load_page_log(f"archive-docx list (archive-id: {archive} page: {page})")
     return render_template("docx/docx.html",
                            page=page,
+                           cache_str=f":{page}",
                            blog_list=blog_list,
                            is_top=DBBit.BIT_1,
                            page_list=page_list,
@@ -314,6 +318,7 @@ def delete_comment_page():
 
 
 @docx.context_processor
+@main.app.cache.cached(timeout=conf["CACHE_EXPIRE"], key_prefix="inject_base:docx")
 def inject_base():
     """ docx 默认模板变量 """
     return {"top_nav": ["", "", "active", "", "", ""]}

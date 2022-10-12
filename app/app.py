@@ -5,6 +5,7 @@ from flask import Flask, url_for, request, current_app, render_template, Respons
 from flask_mail import Mail
 from flask_login import LoginManager, current_user
 from flask.logging import default_handler
+from flask_caching import Cache
 from typing import Optional, Union
 
 import logging.handlers
@@ -13,14 +14,6 @@ from bs4 import BeautifulSoup
 
 from configure import conf
 from object.user import AnonymousUser, User
-
-from .index import index
-from .archive import archive
-from .docx import docx
-from .msg import msg
-from .oss import oss
-from .auth import auth
-from .about_me import about_me
 
 if conf["DEBUG_PROFILE"]:
     from werkzeug.middleware.profiler import ProfilerMiddleware
@@ -35,20 +28,20 @@ class HBlogFlask(Flask):
         if conf["DEBUG_PROFILE"]:
             self.wsgi_app = ProfilerMiddleware(self.wsgi_app, sort_by=("cumtime",))
 
-        self.register_blueprint(index, url_prefix="/")
-        self.register_blueprint(archive, url_prefix="/archive")
-        self.register_blueprint(docx, url_prefix="/docx")
-        self.register_blueprint(msg, url_prefix="/msg")
-        self.register_blueprint(auth, url_prefix="/auth")
-        self.register_blueprint(about_me, url_prefix="/about")
-        self.register_blueprint(oss, url_prefix="/oss")
-
         self.login_manager = LoginManager()
         self.login_manager.init_app(self)
         self.login_manager.anonymous_user = AnonymousUser  # 设置未登录的匿名对象
         self.login_manager.login_view = "auth.login_page"
 
         self.mail = Mail(self)
+
+        self.cache = Cache(config={
+            'CACHE_TYPE': 'RedisCache',
+            'CACHE_KEY_PREFIX': 'flask_cache:',
+            'CACHE_REDIS_URL': f'redis://{conf["CACHE_REDIS_NAME"]}:{conf["CACHE_REDIS_PASSWD"]}@'
+                               f'{conf["CACHE_REDIS_HOST"]}:{conf["CACHE_REDIS_PORT"]}/{conf["CACHE_REDIS_DATABASE"]}'
+        })
+        self.cache.init_app(self)
 
         self.logger.removeHandler(default_handler)
         self.logger.setLevel(conf["LOG_LEVEL"])
@@ -77,6 +70,23 @@ class HBlogFlask(Flask):
                  f"\tdata = render_template('error.html', error_code='{i}', error_info=e)\n"
                  f"\treturn Response(response=data, status={i})", func)
             self.errorhandler(i)(func[f"error_{i}"])
+
+    def register_all_blueprint(self):
+        from .index import index
+        from .archive import archive
+        from .docx import docx
+        from .msg import msg
+        from .oss import oss
+        from .auth import auth
+        from .about_me import about_me
+
+        self.register_blueprint(index, url_prefix="/")
+        self.register_blueprint(archive, url_prefix="/archive")
+        self.register_blueprint(docx, url_prefix="/docx")
+        self.register_blueprint(msg, url_prefix="/msg")
+        self.register_blueprint(auth, url_prefix="/auth")
+        self.register_blueprint(about_me, url_prefix="/about")
+        self.register_blueprint(oss, url_prefix="/oss")
 
     def update_configure(self):
         """ 更新配置 """
