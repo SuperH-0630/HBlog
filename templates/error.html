@@ -8,14 +8,12 @@
 {% endblock %}
 
 {% block content %}
-    {% cache conf["CACHE_EXPIRE"], ":error" %}
-        <section id="base" class="container mt-3">
-            <div class="row">
-                <div class="col-12 text-center">
-                    <p><strong> {{ error_info }} </strong></p>
-                    <a class="btn btn-warning" href="{{ url_for("base.index_page") }}"> 回到主页 </a>
-                </div>
+    <section id="base" class="container mt-3">
+        <div class="row">
+            <div class="col-12 text-center">
+                <p><strong> {{ error_info }} </strong></p>
+                <a class="btn btn-warning" href="{{ url_for("base.index_page") }}"> 回到主页 </a>
             </div>
-        </section>
-    {% endcache %}
+        </div>
+    </section>
 {% endblock %}
