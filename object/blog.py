@@ -95,7 +95,7 @@ class BlogArticle(_BlogArticle):
 
     @property
     def top(self):
-        return self.info.top == DBBit.BIT_1
+        return self.info.top
 
     @top.setter
     def top(self, top: bool):

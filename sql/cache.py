@@ -1,4 +1,5 @@
 from sql import cache
+from sql.base import DBBit
 from configure import conf
 
 from redis import RedisError
@@ -32,18 +33,19 @@ def get_msg_from_cache(msg_id: int):
     return [msg.get("Email", ""),
             msg.get("Content"),
             datetime.fromtimestamp(float(msg.get("UpdateTime", 0.0))),
-            bool(msg.get("Secret", False))]
+            msg.get("Secret", "False") == "True"]
 
 
 @__try_redis(None)
-def write_msg_to_cache(msg_id: int, email: str, content: str, update_time: str | datetime, secret: bool):
+def write_msg_to_cache(msg_id: int, email: str, content: str, update_time: str | datetime, secret: bool,
+                       is_db_bit=False):
     cache_name = f"{CACHE_PREFIX}:msg:{msg_id}"
     cache.delete(cache_name)
     cache.hset(cache_name, mapping={
         "Email": email,
         "Content": content,
         "UpdateTime": datetime.timestamp(update_time),
-        "Secret": str(secret)
+        "Secret": str(secret == DBBit.BIT_1 if is_db_bit else secret)
     })
     cache.expire(cache_name, CACHE_TIME)
 
@@ -109,12 +111,12 @@ def get_blog_from_cache(blog_id: int):
             blog.get("Content"),
             datetime.fromtimestamp(float(blog.get("UpdateTime", 0.0))),
             datetime.fromtimestamp(float(blog.get("CreateTime", 0.0))),
-            bool(blog.get("Top", False))]
+            blog.get("Top", "False") == "True"]
 
 
 @__try_redis(None)
 def write_blog_to_cache(blog_id: int, auth_id: str, title: str, subtitle: str, content: str,
-                        update_time: str | datetime, create_time: str | datetime, top: bool):
+                        update_time: str | datetime, create_time: str | datetime, top: bool, is_db_bit=False):
     cache_name = f"{CACHE_PREFIX}:blog:{blog_id}"
     cache.delete(cache_name)
     cache.hset(cache_name, mapping={
@@ -124,7 +126,7 @@ def write_blog_to_cache(blog_id: int, auth_id: str, title: str, subtitle: str, c
         "Content": content,
         "UpdateTime": datetime.timestamp(update_time),
         "CreateTime": datetime.timestamp(create_time),
-        "Top": str(top)
+        "Top": str(top == DBBit.BIT_1 if is_db_bit else top)
     })
     cache.expire(cache_name, CACHE_TIME)
 

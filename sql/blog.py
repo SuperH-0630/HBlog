@@ -1,4 +1,5 @@
 from sql import db
+from sql.base import DBBit
 from sql.archive import add_blog_to_archive
 from sql.cache import (write_blog_to_cache, get_blog_from_cache, delete_blog_from_cache,
                        write_blog_count_to_cache, get_blog_count_from_cache, delete_blog_count_from_cache,
@@ -58,8 +59,8 @@ def read_blog(blog_id: int) -> list:
     if cur is None or cur.rowcount == 0:
         return [-1, "", "", "", 0, -1, False]
     res = cur.fetchone()
-    write_blog_to_cache(blog_id, *res)
-    return res
+    write_blog_to_cache(blog_id, *res, is_db_bit=True)
+    return [*res[:6], res[-1] == DBBit.BIT_1]
 
 
 def delete_blog(blog_id: int):
