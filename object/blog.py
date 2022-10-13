@@ -1,5 +1,6 @@
-from typing import List, Optional
+from typing import List
 from collections import namedtuple
+from datetime import datetime
 
 from sql.blog import (get_blog_list,
                       get_blog_count,
@@ -82,11 +83,11 @@ class BlogArticle(_BlogArticle):
 
     @property
     def update_time(self):
-        return self.info.update_time
+        return datetime.utcfromtimestamp(datetime.timestamp(self.info.update_time))
 
     @property
     def create_time(self):
-        return self.info.create_time
+        return datetime.utcfromtimestamp(datetime.timestamp(self.info.create_time))
 
     @property
     def clicks(self):

@@ -87,7 +87,7 @@
                                 <a class="h4 my-auto" href="{{ url_for("docx.article_page", blog=blog.id) }}">
                                 {{ blog.title }}
                                     <small> {{ blog.subtitle }}
-                                        <small> {{ blog.update_time }} / {{ blog.create_time }} </small> </small> </a>
+                                        <small> {{ moment(blog.update_time).format('YYYY-MM-DD HH:mm:ss') }} / {{ moment(blog.create_time).format('YYYY-MM-DD HH:mm:ss') }} </small> </small> </a>
                                 {% if show_delete %}
                                     <button type="button" class="btn btn-sm btn-danger my-auto btn-close float-end"
                                         data-bs-toggle="modal" data-bs-target="#DeleteModal{{blog.id}}"> </button>
@@ -98,7 +98,7 @@
                                 <a class="h4 my-auto" href="{{ url_for("docx.article_page", blog=blog.id) }}">
                                 {{ blog.title }}
                                     <small> {{ blog.subtitle }}
-                                        <small> {{ blog.update_time }} / {{ blog.create_time }} </small> </small> </a>
+                                        <small> {{ moment(blog.update_time).format('YYYY-MM-DD HH:mm:ss') }} / {{ moment(blog.create_time).format('YYYY-MM-DD HH:mm:ss') }} </small> </small> </a>
                                 {% if show_delete %}
                                     <button type="button" class="btn btn-sm btn-danger my-auto btn-close float-end"
                                         data-bs-toggle="modal" data-bs-target="#DeleteModal{{blog.id}}"> </button>

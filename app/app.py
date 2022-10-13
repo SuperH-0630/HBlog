@@ -4,6 +4,7 @@ import sys
 from flask import Flask, url_for, request, current_app, render_template, Response
 from flask_mail import Mail
 from flask_login import LoginManager, current_user
+from flask_moment import Moment
 from flask.logging import default_handler
 from typing import Optional, Union
 
@@ -34,6 +35,7 @@ class HBlogFlask(Flask):
         self.login_manager.login_view = "auth.login_page"
 
         self.mail = Mail(self)
+        self.moment = Moment(self)
         self.cache = cache
         self.cache.init_app(self)
 

@@ -1,4 +1,5 @@
 from collections import namedtuple
+from datetime import datetime
 
 from sql.comment import read_comment_list, create_comment, get_user_comment_count, delete_comment, read_comment
 import object.user
@@ -46,7 +47,7 @@ class Comment(_Comment):
 
     @property
     def update_time(self):
-        return self.info.update_time
+        return datetime.utcfromtimestamp(datetime.timestamp(self.info.update_time))
 
     def is_delete(self):
         return not self.auth.is_authenticated and self.blog.is_delete  and len(self.content) != 0

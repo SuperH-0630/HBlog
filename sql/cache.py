@@ -31,7 +31,7 @@ def get_msg_from_cache(msg_id: int):
         return None
     return [msg.get("Email", ""),
             msg.get("Content"),
-            datetime.fromisoformat(msg.get("UpdateTime", "2022-1-1 00:00:00")),
+            datetime.fromtimestamp(float(msg.get("UpdateTime", 0.0))),
             bool(msg.get("Secret", False))]
 
 
@@ -42,7 +42,7 @@ def write_msg_to_cache(msg_id: int, email: str, content: str, update_time: str |
     cache.hset(cache_name, mapping={
         "Email": email,
         "Content": content,
-        "UpdateTime": str(update_time),
+        "UpdateTime": datetime.timestamp(update_time),
         "Secret": str(secret)
     })
     cache.expire(cache_name, CACHE_TIME)
@@ -107,8 +107,8 @@ def get_blog_from_cache(blog_id: int):
             blog.get("Title"),
             blog.get("SubTitle"),
             blog.get("Content"),
-            datetime.fromisoformat(blog.get("UpdateTime", "2022-1-1 00:00:00")),
-            datetime.fromisoformat(blog.get("CreateTime", "2022-1-1 00:00:00")),
+            datetime.fromtimestamp(float(blog.get("UpdateTime", 0.0))),
+            datetime.fromtimestamp(float(blog.get("CreateTime", 0.0))),
             bool(blog.get("Top", False))]
 
 
@@ -122,8 +122,8 @@ def write_blog_to_cache(blog_id: int, auth_id: str, title: str, subtitle: str, c
         "Title": title,
         "SubTitle": subtitle,
         "Content": content,
-        "UpdateTime": str(update_time),
-        "CreateTime": str(create_time),
+        "UpdateTime": datetime.timestamp(update_time),
+        "CreateTime": datetime.timestamp(create_time),
         "Top": str(top)
     })
     cache.expire(cache_name, CACHE_TIME)
@@ -268,7 +268,7 @@ def get_comment_from_cache(comment_id: int):
     return [comment.get("BlogID", ""),
             comment.get("Email", ""),
             comment.get("Content", ""),
-            datetime.fromisoformat(comment.get("UpdateTime", "2022-1-1 00:00:00"))]
+            datetime.fromtimestamp(float(comment.get("UpdateTime", 0.0)))]
 
 
 @__try_redis(None)
@@ -279,7 +279,7 @@ def write_comment_to_cache(comment_id: int, blog_id: str, email: str, content: s
         "BlogID": blog_id,
         "Email": email,
         "Content": content,
-        "UpdateTime": str(update_time)
+        "UpdateTime": datetime.timestamp(update_time)
     })
     cache.expire(cache_name, CACHE_TIME)
 

@@ -1,5 +1,6 @@
 from typing import Optional
 from collections import namedtuple
+from datetime import datetime
 
 from sql.msg import read_msg_list, get_msg_count, create_msg, read_msg, get_user_msg_count, delete_msg
 import object.user
@@ -47,7 +48,7 @@ class Message(_Message):
 
     @property
     def update_time(self):
-        return self.info.update_time
+        return datetime.utcfromtimestamp(datetime.timestamp(self.info.update_time))
 
     @property
     def secret(self):

@@ -15,7 +15,7 @@
             {# 检查是否具有读取权限 #}
             <div class="row">
                 <article class="col-12">
-                    <h1> {{ article.title }} <small> {{ article.subtitle }} <small> {{ article.update_time}} / {{ article.create_time}} </small> </small> </h1>
+                    <h1> {{ article.title }} <small> {{ article.subtitle }} <small> {{ moment(article.update_time).format('YYYY-MM-DD HH:mm:ss') }} / {{ moment(article.create_time).format('YYYY-MM-DD HH:mm:ss') }} </small> </small> </h1>
                     <span class="me-1 badge bg-secondary"> 点击量: {{ article.clicks }} </span>
 
                     {% for archive in article.archive %}
@@ -131,51 +131,48 @@
                     </section>
                     <hr>
 
-                    {% cache conf["LIST_CACHE_EXPIRE"], ":blog", ":comment", cache_str %}
-                        {% for comment in article.comment %}
-
-                            {% if show_delete %}
-                                <div id="DeleteModal{{comment.id }}" class="modal fade" role="dialog" aria-hidden="true">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content text-start">
-                                            <div class="modal-header">
-                                                <h4 class="modal-title"> 确认删除评论？ </h4>
-                                            </div>
-                                            <div class="modal-body">
-                                                <p> 是否确认删除评论？ </p>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <a class="btn btn-danger"
-                                                   href="{{ url_for("docx.delete_comment_page", comment=comment.id) }}"> 删除 </a>
-                                                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal"> 取消 </button>
-                                            </div>
+                    {% for comment in article.comment %}
+                        {% if show_delete %}
+                            <div id="DeleteModal{{comment.id }}" class="modal fade" role="dialog" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content text-start">
+                                        <div class="modal-header">
+                                            <h4 class="modal-title"> 确认删除评论？ </h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p> 是否确认删除评论？ </p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <a class="btn btn-danger"
+                                               href="{{ url_for("docx.delete_comment_page", comment=comment.id) }}"> 删除 </a>
+                                            <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal"> 取消 </button>
                                         </div>
                                     </div>
                                 </div>
-                            {% endif %}
+                            </div>
+                        {% endif %}
 
-                            <section class="col-12">
-                                <div class="comment">
-                                    <p class="comment-title h5">
-                                        {% if show_email %}  {# 判断是否可读取用户信息 #}
-                                            {{ comment.auth.email }}
-                                        {% else %}
-                                            {{ comment.auth.s_email }}
-                                        {% endif %}
+                        <section class="col-12">
+                            <div class="comment">
+                                <p class="comment-title h5">
+                                    {% if show_email %}  {# 判断是否可读取用户信息 #}
+                                        {{ comment.auth.email }}
+                                    {% else %}
+                                        {{ comment.auth.s_email }}
+                                    {% endif %}
 
-                                        {% if show_delete %}
-                                            <a class="mb-2"
-                                                data-bs-toggle="modal" data-bs-target="#DeleteModal{{comment.id }}"> &times; </a>
-                                        {% endif %}
+                                    {% if show_delete %}
+                                        <a class="mb-2"
+                                            data-bs-toggle="modal" data-bs-target="#DeleteModal{{comment.id }}"> &times; </a>
+                                    {% endif %}
 
-                                        <br>
-                                        <small> {{ comment.update_time }} </small>
-                                    </p>
-                                    <p> {{ comment.content.replace('\n', '<br>') | safe  }} </p>
-                                </div>
-                            </section>
-                        {% endfor %}
-                    {% endcache %}
+                                    <br>
+                                    <small style="font-size: 0.8rem"> {{ moment(comment.update_time).fromNow(refresh=True) }} </small>
+                                </p>
+                                <p> {{ comment.content.replace('\n', '<br>') | safe  }} </p>
+                            </div>
+                        </section>
+                    {% endfor %}
                 </article>
             </div>
         {% endif %}

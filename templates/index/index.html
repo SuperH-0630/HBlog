@@ -29,68 +29,66 @@
             </article>
         </div>
 
-        {% cache conf["VIEW_CACHE_EXPIRE"], ":index" %}
-            <div class="row">
-                {% if current_user.check_role("ReadBlog") %}  {# 检查是否具有读取权限 #}
-                    {% if current_user.check_role("ReadMsg") %}
-                        <article class="col-12 col-lg-8">
-                        {% for blog in blog_list %}
-                            <div class="docx ms-lg-2"> <a class="h4"
-                                                          href="{{ url_for("docx.article_page", blog=blog.id) }}">
-                                {{ blog.title }}
-                                    <small> {{ blog.subtitle }}
-                                        <small> {{ blog.update_time }} / {{ blog.create_time }} </small> </small> </a></div>
-                        {% endfor %}
-                        </article>
-                    {% else %}
-                        <article class="col-12">
-                        {% for blog in blog_list %}
-                            <div class="docx"> <a class="h4"
-                                                  href="{{ url_for("docx.article_page", blog=blog.id) }}">
-                                {{ blog.title }}
-                                    <small> {{ blog.subtitle }}
-                                        <small> {{ blog.update_time }} / {{ blog.create_time }} </small> </small> </a></div>
-                        {% endfor %}
-                        </article>
-                    {% endif %}
+        `<div class="row">
+            {% if current_user.check_role("ReadBlog") %}  {# 检查是否具有读取权限 #}
+                {% if current_user.check_role("ReadMsg") %}
+                    <article class="col-12 col-lg-8">
+                    {% for blog in blog_list %}
+                        <div class="docx ms-lg-2"> <a class="h4"
+                                                      href="{{ url_for("docx.article_page", blog=blog.id) }}">
+                            {{ blog.title }}
+                                <small> {{ blog.subtitle }}
+                                    <small> {{ moment(blog.update_time).format('YYYY-MM-DD HH:mm:ss') }} / {{ moment(blog.create_time).format('YYYY-MM-DD HH:mm:ss') }} </small> </small> </a></div>
+                    {% endfor %}
+                    </article>
+                {% else %}
+                    <article class="col-12">
+                    {% for blog in blog_list %}
+                        <div class="docx"> <a class="h4"
+                                              href="{{ url_for("docx.article_page", blog=blog.id) }}">
+                            {{ blog.title }}
+                                <small> {{ blog.subtitle }}
+                                    <small> {{ moment(blog.update_time).format('YYYY-MM-DD HH:mm:ss') }} / {{ moment(blog.create_time).format('YYYY-MM-DD HH:mm:ss') }} </small> </small> </a></div>
+                    {% endfor %}
+                    </article>
                 {% endif %}
+            {% endif %}
 
-                {% if current_user.check_role("ReadMsg") %}  {# 检查是否具有读取权限 #}
-                    {% if current_user.check_role("ReadBlog") %}
-                        <aside class="col-12 col-lg-4">
-                        {% for msg in msg_list %}
-                            <div class="msg me-0 me-lg-2">
-                                <p class="msg-title h5">
-                                    {% if show_email %}  {# 判断是否可读取用户信息 #}
-                                        {{ msg.auth.email }}
-                                    {% else %}
-                                        {{ msg.auth.star_email }}
-                                    {% endif %}
-                                    <br> <small>
-                                    {{ msg.update_time }} </small> </p>
-                                <p> {{ msg.content.replace('\n', '<br>') | safe }} </p>
-                            </div>
-                        {% endfor %}
-                        </aside>
-                    {% else %}
-                        <aside class="col-12">
-                        {% for msg in msg_list %}
-                            <div class="msg">
-                                <p class="msg-title h5">
-                                    {% if show_email %}  {# 判断是否可读取用户信息 #}
-                                        {{ msg.auth.email }}
-                                    {% else %}
-                                        {{ msg.auth.star_email }}
-                                    {% endif %}
-                                    <br> <small>
-                                    {{ msg.update_time }} </small> </p>
-                                <p> {{ msg.content.replace('\n', '<br>') | safe }} </p>
-                            </div>
-                        {% endfor %}
-                        </aside>
-                    {% endif %}
+            {% if current_user.check_role("ReadMsg") %}  {# 检查是否具有读取权限 #}
+                {% if current_user.check_role("ReadBlog") %}
+                    <aside class="col-12 col-lg-4">
+                    {% for msg in msg_list %}
+                        <div class="msg me-0 me-lg-2">
+                            <p class="msg-title h5">
+                                {% if show_email %}  {# 判断是否可读取用户信息 #}
+                                    {{ msg.auth.email }}
+                                {% else %}
+                                    {{ msg.auth.star_email }}
+                                {% endif %}
+                                <br> <small style="font-size: 0.8rem"> {{ moment(msg.update_time).fromNow(refresh=True) }} </small>
+                            </p>
+                            <p> {{ msg.content.replace('\n', '<br>') | safe }} </p>
+                        </div>
+                    {% endfor %}
+                    </aside>
+                {% else %}
+                    <aside class="col-12">
+                    {% for msg in msg_list %}
+                        <div class="msg">
+                            <p class="msg-title h5">
+                                {% if show_email %}  {# 判断是否可读取用户信息 #}
+                                    {{ msg.auth.email }}
+                                {% else %}
+                                    {{ msg.auth.star_email }}
+                                {% endif %}
+                                <br> <small style="font-size: 0.8rem"> {{ moment(msg.update_time).fromNow(refresh=True) }} </small>
+                            </p>
+                            <p> {{ msg.content.replace('\n', '<br>') | safe }} </p>
+                        </div>
+                    {% endfor %}
+                    </aside>
                 {% endif %}
-            </div>
-        {% endcache %}
+            {% endif %}
+        </div>
     </section>
 {% endblock %}
