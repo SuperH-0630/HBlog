@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request
 from flask_login import current_user
 
 from configure import conf
@@ -39,6 +39,18 @@ def inject_base():
     return {"top_nav": ["active", "", "", "", "", ""]}
 
 
+def get_icp():
+    for i in conf["ICP"]:
+        if i in request.host:
+            return conf["ICP"][i]
+
+
+def get_gongan():
+    for i in conf["GONG_AN"]:
+        if i in request.host:
+            return conf["GONG_AN"][i]
+
+
 @index.app_context_processor
 @app.cache.cached(timeout=conf["CACHE_EXPIRE"], key_prefix="inject_base")
 def inject_base():
@@ -46,4 +58,6 @@ def inject_base():
     return {"blog_name": conf['BLOG_NAME'],
             "top_nav": ["", "", "", "", "", ""],
             "blog_describe": conf['BLOG_DESCRIBE'],
-            "conf": conf}
+            "conf": conf,
+            "get_icp": get_icp,
+            "get_gongan": get_gongan}

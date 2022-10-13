@@ -108,16 +108,16 @@
     <footer id="foot">
         <hr>
         {{ conf['FOOT'] }}
-        {% if conf["ICP"] %}
+        {% if get_icp() %}
             <br> <a id="ICP2" href="https://beian.miit.gov.cn" target="_blank"
                 style="display:inline-block;text-decoration:none;height:20px;line-height:20px;" >
-                {{ conf['ICP'] }} </a>
-            {% if conf["GONG_AN"] %}
+                {{ get_icp() }} </a>
+            {% if get_gongan() %}
                 <br> <a id="GONG_AN2" target="_blank"
                    href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=44011402000783"
                    style="display:inline-block;text-decoration:none;height:20px;line-height:20px;">
                     <img src="{{ url_for('static', filename='wangan.png') }}" style="float:left;" alt="wangan"/>
-                    {{ conf["GONG_AN"] }}
+                    {{ get_gongan() }}
                 </a>
             {% endif %}
         {% endif %}

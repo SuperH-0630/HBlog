@@ -54,8 +54,8 @@ conf = {
     "LOG_LEVEL": logging.INFO,
     "LOG_STDERR": True,
     "LOGO": "logo.jpg",
-    "ICP": None,
-    "GONG_AN": None,
+    "ICP": {},
+    "GONG_AN": {},
 }
 
 
