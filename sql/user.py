@@ -89,7 +89,7 @@ def get_user_email(user_id):
         return None
 
     res = cur.fetchone()[0]
-    write_user_email_to_cache(res)
+    write_user_email_to_cache(user_id, res)
     return res
 
 

@@ -15,7 +15,8 @@ from sql.user import (read_user,
                       delete_role,
                       set_user_role,
                       get_role_list,
-                      role_authority)
+                      role_authority,
+                      get_user_email)
 import object.blog
 import object.comment
 import object.msg
@@ -79,8 +80,11 @@ class _User(UserMixin):
 class User(_User):
     RoleAuthorize = role_authority
 
-    def __init__(self, email):
-        self.email = email
+    def __init__(self, email, is_id=False):
+        if is_id:
+            self.email = get_user_email(email)
+        else:
+            self.email = email
 
     def get_id(self):
         """Flask要求的方法"""

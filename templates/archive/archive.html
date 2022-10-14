@@ -47,38 +47,40 @@
         </div>
     {% endif %}
 
-    <section id="base" class="d-flex mt-3 container justify-content-center flex-wrap">
-        {% for archive in archive_list %}
-            <div class="archive mb-3 mx-2">
-                <h3> {{ archive.name }} </h3>
-                <hr>
-                <p class="archive_describe"> {{ archive.describe }} </p>
-                <p> 篇数: {{ archive.count }} </p>
-                <p> 点击量: {{ archive.clicks }} </p>
-                <a class="btn btn-primary" href="{{ url_for("docx.archive_page", archive=archive.id, page=1) }}"> 进入 </a>
-                {% if show_delete %}
-                    <div id="DeleteModal{{archive.id}}" class="modal fade" role="dialog" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content text-start">
-                                <div class="modal-header">
-                                    <h4 class="modal-title"> 确认删除归档？ </h4>
-                                </div>
-                                <div class="modal-body">
-                                    <p> 是否确认删除归档 {{ archive.name }}？ </p>
-                                </div>
-                                <div class="modal-footer">
-                                    <a class="btn btn-danger"
-                                       href="{{ url_for("archive.delete_archive_page", archive=archive.id) }}"> 删除 </a>
-                                    <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal"> 取消 </button>
+    {% if current_user.check_role("ReadBlog") %}
+        <section id="base" class="d-flex mt-3 container justify-content-center flex-wrap">
+            {% for archive in archive_list %}
+                <div class="archive mb-3 mx-2">
+                    <h3> {{ archive.name }} </h3>
+                    <hr>
+                    <p class="archive_describe"> {{ archive.describe }} </p>
+                    <p> 篇数: {{ archive.count }} </p>
+                    <p> 点击量: {{ archive.clicks }} </p>
+                    <a class="btn btn-primary" href="{{ url_for("docx.archive_page", archive=archive.id, page=1) }}"> 进入 </a>
+                    {% if show_delete %}
+                        <div id="DeleteModal{{archive.id}}" class="modal fade" role="dialog" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content text-start">
+                                    <div class="modal-header">
+                                        <h4 class="modal-title"> 确认删除归档？ </h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p> 是否确认删除归档 {{ archive.name }}？ </p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <a class="btn btn-danger"
+                                           href="{{ url_for("archive.delete_archive_page", archive=archive.id) }}"> 删除 </a>
+                                        <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal"> 取消 </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <button type="button" class="btn btn-danger"
-                            data-bs-toggle="modal" data-bs-target="#DeleteModal{{archive.id}}"> 删除归档 </button>
-                {% endif %}
-            </div>
-        {% endfor %}
-    </section>
+                        <button type="button" class="btn btn-danger"
+                                data-bs-toggle="modal" data-bs-target="#DeleteModal{{archive.id}}"> 删除归档 </button>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </section>
+    {% endif %}
 {% endblock %}

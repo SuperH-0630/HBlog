@@ -67,7 +67,7 @@ class BlogArticle(_BlogArticle):
 
     @property
     def user(self):
-        return object.user.User(get_user_email(self.info.auth))
+        return object.user.User(self.info.auth, is_id=True)
 
     @property
     def title(self):

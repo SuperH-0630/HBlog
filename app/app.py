@@ -15,6 +15,7 @@ from bs4 import BeautifulSoup
 from configure import conf
 from object.user import AnonymousUser, User
 from app.cache import cache
+from app.http_auth import http_auth
 
 if conf["DEBUG_PROFILE"]:
     from werkzeug.middleware.profiler import ProfilerMiddleware
@@ -38,6 +39,7 @@ class HBlogFlask(Flask):
         self.moment = Moment(self)
         self.cache = cache
         self.cache.init_app(self)
+        self.http_auth = http_auth
 
         self.logger.removeHandler(default_handler)
         self.logger.setLevel(conf["LOG_LEVEL"])
@@ -59,7 +61,6 @@ class HBlogFlask(Flask):
                 return None
             return user
 
-        res = []
         for i in [400, 401, 403, 404, 405, 408, 410, 413, 414, 423, 500, 501, 502]:
             def create_error_handle(status):
                 def error_handle(e):
