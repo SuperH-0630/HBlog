@@ -1,7 +1,7 @@
 import os
 import sys
 
-from flask import Flask, url_for, request, current_app, render_template, Response
+from flask import Flask, url_for, request, current_app, render_template, Response, jsonify
 from flask_mail import Mail
 from flask_login import LoginManager, current_user
 from flask_moment import Moment
@@ -59,13 +59,20 @@ class HBlogFlask(Flask):
                 return None
             return user
 
-        func = {"render_template": render_template, "Response": Response, "self": self}
+        res = []
         for i in [400, 401, 403, 404, 405, 408, 410, 413, 414, 423, 500, 501, 502]:
-            exec(f"def error_{i}(e):\n"
-                 f"\tself.print_load_page_log('{i}')\n"
-                 f"\tdata = render_template('error.html', error_code='{i}', error_info=e)\n"
-                 f"\treturn Response(response=data, status={i})", func)
-            self.errorhandler(i)(func[f"error_{i}"])
+            def create_error_handle(status):
+                def error_handle(e):
+                    self.print_load_page_log(status)
+                    if "/api" in request.base_url:
+                        rsp = jsonify({"status": status, "error": str(e)})
+                        rsp.status_code = status
+                        return rsp
+                    data = render_template('error.html', error_code=status, error_info=e)
+                    return Response(response=data, status=status)
+                return error_handle
+
+            self.errorhandler(i)(create_error_handle(i))
 
     def register_all_blueprint(self):
         import app.index as index
@@ -75,6 +82,7 @@ class HBlogFlask(Flask):
         import app.oss as oss
         import app.auth as auth
         import app.about_me as about_me
+        import app.api as api
 
         self.register_blueprint(index.index, url_prefix="/")
         self.register_blueprint(archive.archive, url_prefix="/archive")
@@ -83,6 +91,7 @@ class HBlogFlask(Flask):
         self.register_blueprint(auth.auth, url_prefix="/auth")
         self.register_blueprint(about_me.about_me, url_prefix="/about")
         self.register_blueprint(oss.oss, url_prefix="/oss")
+        self.register_blueprint(api.api, url_prefix="/api")
 
     def update_configure(self):
         """ 更新配置 """
