@@ -67,11 +67,6 @@ class RegisterForm(EmailPasswd):
         if User(field.data).info[2] != -1:
             raise ValidationError("邮箱已被注册")
 
-    def validate_passwd_again(self, field):
-        """ 检验两次输入的密码是否相同 """
-        if field.data != self.passwd.data:
-            raise ValidationError("两次输入的密码不一样")
-
 
 class ChangePasswdForm(AuthField):
     old_passwd = AuthField.passwd_field("旧密码", "用户原密码")
