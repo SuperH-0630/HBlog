@@ -13,8 +13,13 @@
 {% endmacro %}
 
 {% macro render_field(field) %}
-    <div class="form-floating my-3">
-        {{ field(class="form-control", placeholder=field.label.text, **kwargs) | safe }}
+    <div class="form-group form-floating my-3">
+        {% if not field.errors %}
+            {{ field(class="form-control", placeholder=field.label.text) | safe }}
+        {% else %}
+            {{ field(class="form-control", placeholder=field.label.text, value="") | safe }}
+        {% endif %}
+
         {{ field.label }}
         {% for error in field.errors %}
             <div class="invalid-feedback"> {{ error }} </div>
@@ -23,10 +28,10 @@
 {% endmacro %}
 
 {% macro render_select_field(field) %}
-    <div class="my-3">
-        {{ field(class="form-select", **kwargs) | safe }}
+    <div class="form-group my-3">
+        {{ field(class="form-select") | safe }}
         {% for error in field.errors %}
-            <div class="invalid-feedback"> {{ error }} </div>
+            <div class="invalid-feedback d-block"> {{ error }} </div>
         {% endfor %}
     </div>
 {% endmacro %}
