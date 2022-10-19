@@ -22,7 +22,7 @@
     </div>
 {% endmacro %}
 
-{% macro render_select_field(field, height) %}
+{% macro render_select_field(field) %}
     <div class="my-3">
         {{ field(class="form-select", **kwargs) | safe }}
         {% for error in field.errors %}
