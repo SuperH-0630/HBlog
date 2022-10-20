@@ -154,7 +154,7 @@ def login_page():
         user = User(form.email.data)
         if user.info[2] != -1 and user.check_passwd(form.passwd.data):
             login_user(user, form.remember.data)
-            next_page = request.args.get("next")
+            next_page = request.args.get("next", None, type=str)
             if next_page is None or not next_page.startswith('/'):
                 next_page = url_for('base.index_page')
             flash("登陆成功")
@@ -188,7 +188,7 @@ def register_page():
 
 @auth.route('/user/confirm')
 def confirm_page():
-    token = request.args.get("token", None)
+    token = request.args.get("token", None, type=str)
     if token is None:
         app.HBlogFlask.print_user_opt_fail_log(f"Confirm (bad token)")
         abort(404)

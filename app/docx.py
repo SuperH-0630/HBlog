@@ -121,14 +121,14 @@ def __load_docx_page(page: int, form: WriteBlogForm):
 
 @docx.route('/')
 def docx_page():
-    page = int(request.args.get("page", 1))
+    page = request.args.get("page", 1, type=int)
     return __load_docx_page(page, WriteBlogForm(True))
 
 
 @docx.route('/archive')
 def archive_page():
-    page = int(request.args.get("page", 1))
-    archive = int(request.args.get("archive", 1))
+    page = request.args.get("page", 1, type=int)
+    archive = request.args.get("archive", 1, type=int)
     if page < 1:
         app.HBlogFlask.print_user_opt_fail_log(f"Load archive-docx list with error page({page}) archive: {archive}")
         abort(404)
@@ -176,13 +176,13 @@ def __load_article_page(blog_id: int, form: WriteCommentForm,
 
 @docx.route('/article')
 def article_page():
-    blog_id = int(request.args.get("blog", 1))
+    blog_id = request.args.get("blog", 1, type=int)
     return __load_article_page(blog_id, WriteCommentForm())
 
 
 @docx.route('/article/download')
 def article_down_page():
-    blog_id = int(request.args.get("blog", 1))
+    blog_id = request.args.get("blog", 1, type=int)
     article = BlogArticle(blog_id)
     if article is None:
         app.HBlogFlask.print_user_opt_fail_log(f"Download article with error id({blog_id})")
@@ -197,7 +197,9 @@ def article_down_page():
 
 @docx.route('/article/create', methods=["POST"])
 @login_required
-@app.form_required(WriteBlogForm, "write blog", lambda form: __load_docx_page(int(request.args.get("page", 1)), form))
+@app.form_required(WriteBlogForm,
+                   "write blog",
+                   lambda form: __load_docx_page(request.args.get("page", 1, type=int), form))
 @app.role_required("WriteBlog", "write blog")
 def create_docx_page():
     form: WriteBlogForm = g.form
@@ -239,8 +241,8 @@ def update_docx_page():
 @login_required
 @app.role_required("DeleteBlog", "delete blog")
 def delete_blog_page():
-    blog_id = int(request.args.get("blog", -1))
-    if blog_id == -1:
+    blog_id = request.args.get("blog", None, type=int)
+    if not blog_id:
         return abort(400)
     if BlogArticle(blog_id).delete():
         app.HBlogFlask.print_sys_opt_success_log("delete blog")
@@ -255,9 +257,9 @@ def delete_blog_page():
 @login_required
 @app.role_required("WriteBlog", "set blog top")
 def set_blog_top_page():
-    blog_id = int(request.args.get("blog", -1))
-    top = request.args.get("top", '0') != '0'
-    if blog_id == -1:
+    blog_id = request.args.get("blog", None, type=int)
+    top = request.args.get("top", 0, type=int) != 0
+    if not blog_id:
         return abort(400)
     blog = BlogArticle(blog_id)
     blog.top = top
@@ -278,7 +280,7 @@ def set_blog_top_page():
 def update_archive_page():
     form: UpdateBlogArchiveForm = g.form
     article = BlogArticle(form.blog_id.data)
-    add = request.args.get("add", '0') != '0'
+    add = request.args.get("add", 0, type=int) != 0
     for i in form.archive.data:
         if add:
             article.add_to_archive(i)
@@ -291,10 +293,10 @@ def update_archive_page():
 @docx.route('/comment/create', methods=["POST"])
 @login_required
 @app.form_required(WriteCommentForm, "write comment",
-                   lambda form: __load_article_page(int(request.args.get("blog", 1)), form))
+                   lambda form: __load_article_page(request.args.get("blog", 1, type=int), form))
 @app.role_required("WriteComment", "write comment")
 def comment_page():
-    blog_id = int(request.args.get("blog", 1))
+    blog_id = request.args.get("blog", 1, type=int)
     form: WriteCommentForm = g.form
     content = form.content.data
     if Comment.create(BlogArticle(blog_id), current_user, content):
@@ -310,7 +312,7 @@ def comment_page():
 @login_required
 @app.role_required("DeleteComment", "delete comment")
 def delete_comment_page():
-    comment_id = int(request.args.get("comment", 1))
+    comment_id = request.args.get("comment", 1, type=int)
     if Comment(comment_id).delete():
         app.HBlogFlask.print_sys_opt_success_log("delete comment")
         flash("博文评论成功")

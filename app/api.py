@@ -29,7 +29,7 @@ def api_say_hello():
 @api.route("/get_introduce")
 @http_auth.login_required
 def api_get_introduce():
-    title = request.args.get("title").lower()
+    title = request.args.get("title", "", type=str).lower()
 
     res = {"status": 200, "introduce": {}}
     have_found = False
@@ -46,7 +46,7 @@ def api_get_introduce():
 @api.route("/find_me")
 @http_auth.login_required
 def api_get_find_me():
-    where = request.args.get("where")
+    where = request.args.get("where", None, type=str)
     if where:
         where = where.lower()
 
@@ -202,11 +202,12 @@ def api_get_comment(comment_id: int):
 @http_auth.login_required
 @api_role_required("ReadMsg", "api get msg list")
 def api_get_not_secret_msg_list(page: int):
-    msg_list = Message.get_message_list(20, (page - 1) * 20, request.args.get("secret", False))
+    msg_list = Message.get_message_list(20, (page - 1) * 20, False)
     res = {"status": 200}
     res_list = []
     for i in msg_list:
         res_list.append({
+            "secret": i.secret,
             "auth": i.auth.id,
             "update_time": datetime.timestamp(i.update_time),
             "id": i.id,
@@ -221,11 +222,12 @@ def api_get_not_secret_msg_list(page: int):
 @api_role_required("ReadMsg", "api get all msg secret list")
 @api_role_required("ReadSecretMsg", "api get all secret list")
 def api_get_secret_msg_list(page: int):
-    msg_list = Message.get_message_list(20, (page - 1) * 20, request.args.get("secret", True))
+    msg_list = Message.get_message_list(20, (page - 1) * 20, request.args.get("secret", 1, type=int) != 0)
     res = {"status": 200}
     res_list = []
     for i in msg_list:
         res_list.append({
+            "secret": i.secret,
             "auth": i.auth.id,
             "update_time": datetime.timestamp(i.update_time),
             "id": i.id,

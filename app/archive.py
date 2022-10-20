@@ -62,7 +62,7 @@ def create_archive_page():
 @login_required
 @app.role_required("DeleteBlog", "delete archive")
 def delete_archive_page():
-    archive_id = int(request.args.get("archive", 1))
+    archive_id = int(request.args.get("archive", 1, type=int))
     if Archive(archive_id).delete():
         app.HBlogFlask.print_sys_opt_success_log(f"Delete archive {archive_id}")
         flash("归档删除成功")
