@@ -19,40 +19,34 @@ if len(conf["LOG_HOME"]) > 0:
 
 
 def refresh():
-    mysql = DB(host=conf["MYSQL_URL"],
-               name=conf["MYSQL_NAME"],
-               passwd=conf["MYSQL_PASSWD"],
-               port=conf["MYSQL_PORT"],
-               database=conf["MYSQL_DATABASE"])
-
     refresh_logger.info("refresh redis cache started.")
 
     for i in get_archive_list_iter():
-        read_archive(i[0], mysql, not_cache=True)
-        get_archive_blog_count(i[0], mysql, not_cache=True)
+        read_archive(i[0], not_cache=True)
+        get_archive_blog_count(i[0], not_cache=True)
 
     for i in get_blog_list_iter():
-        read_blog(i[0], mysql, not_cache=True)
-        get_blog_archive(i[0], mysql, not_cache=True)
-    get_blog_count(mysql, not_cache=True)
+        read_blog(i[0], not_cache=True)
+        get_blog_archive(i[0], not_cache=True)
+    get_blog_count(not_cache=True)
 
     for i in read_comment_list_iter():
-        read_comment(i[0], mysql, not_cache=True)
+        read_comment(i[0], not_cache=True)
 
     for i in read_msg_list_iter():
-        read_msg(i[0], mysql, not_cache=True)
-    get_msg_count(mysql, not_cache=True)
+        read_msg(i[0], not_cache=True)
+    get_msg_count(not_cache=True)
 
     for i in get_user_list_iter():
-        email = get_user_email(i[0], mysql, not_cache=True)
-        get_user_blog_count(i[0], mysql, not_cache=True)
-        get_user_comment_count(i[0], mysql, not_cache=True)
-        get_user_msg_count(i[0], mysql, not_cache=True)
-        read_user(email, mysql, not_cache=True)
+        email = get_user_email(i[0], not_cache=True)
+        get_user_blog_count(i[0], not_cache=True)
+        get_user_comment_count(i[0], not_cache=True)
+        get_user_msg_count(i[0], not_cache=True)
+        read_user(email, not_cache=True)
 
     for i in get_role_list_iter():
-        get_role_name(i[0], mysql, not_cache=True)
+        get_role_name(i[0], not_cache=True)
         for a in role_authority:
-            check_role(i[0], a, mysql, not_cache=True)
+            check_role(i[0], a, not_cache=True)
 
     refresh_logger.info("refresh redis cache finished.")
