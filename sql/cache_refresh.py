@@ -38,11 +38,9 @@ def refresh():
 
     for i in read_comment_list_iter():
         read_comment(i[0], mysql, not_cache=True)
-        print(f"comment {i}")
 
     for i in read_msg_list_iter():
         read_msg(i[0], mysql, not_cache=True)
-        print(f"msg {i}")
     get_msg_count(mysql, not_cache=True)
 
     for i in get_user_list_iter():
@@ -51,12 +49,10 @@ def refresh():
         get_user_comment_count(i[0], mysql, not_cache=True)
         get_user_msg_count(i[0], mysql, not_cache=True)
         read_user(email, mysql, not_cache=True)
-        print(f"user: {i}")
 
     for i in get_role_list_iter():
         get_role_name(i[0], mysql, not_cache=True)
         for a in role_authority:
             check_role(i[0], a, mysql, not_cache=True)
-        print(f"role {i}")
 
     refresh_logger.info("refresh redis cache finished.")
