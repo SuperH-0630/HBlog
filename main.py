@@ -27,13 +27,20 @@ restart_clear_cache()  # 清理缓存
 @app.before_first_request
 def before_first_requests():
     class FirstRefresh(threading.Thread):
+        def __init__(self):
+            super(FirstRefresh, self).__init__()
+            self.daemon = True  # 设置为守护进程
+
         def run(self):
             refresh()
 
-    first_refresh_th = FirstRefresh()
-    first_refresh_th.start()
-    refresh_th = threading.Timer(conf["CACHE_REFRESH_INTERVAL"], refresh)
-    refresh_th.start()
+    class TimerRefresh(threading.Timer):
+        def __init__(self):
+            super(TimerRefresh, self).__init__(conf["CACHE_REFRESH_INTERVAL"], refresh)
+            self.daemon = True  # 设置为守护进程
+
+    FirstRefresh().start()
+    TimerRefresh().start()
 
 
 if __name__ == '__main__':
