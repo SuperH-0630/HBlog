@@ -42,28 +42,6 @@ class Database(metaclass=abc.ABCMeta):
             self.logger.addHandler(handle)
 
     @abc.abstractmethod
-    def close(self):
-        """
-        关闭数据库, 此代码执行后任何成员函数再被调用其行为是未定义的
-        :return:
-        """
-        ...
-
-    @abc.abstractmethod
-    def is_connect(self) -> bool:
-        """
-        :return: 是否处于连接状态
-        """
-        ...
-
-    @abc.abstractmethod
-    def get_cursor(self) -> any:
-        """
-        :return: 返回数据库游标
-        """
-        ...
-
-    @abc.abstractmethod
     def search(self, sql: str, *args, not_commit: bool = False):
         """
         执行 查询 SQL语句
