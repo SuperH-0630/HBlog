@@ -1,7 +1,6 @@
-import pymysql.cursors
 import pymysql
 from dbutils.pooled_db import PooledDB
-import threading
+from dbutils.steady_db import SteadyDBCursor
 from sql.base import Database, DBException, DBCloseException
 from typing import Optional, Union
 import inspect
@@ -13,7 +12,7 @@ class MysqlConnectException(DBCloseException):
 
 class MysqlDB(Database):
     class Result:
-        def __init__(self, cur: pymysql.cursors):
+        def __init__(self, cur: SteadyDBCursor):
             self.res: list = cur.fetchall()
             self.lastrowid: int = cur.lastrowid
             self.rowcount: int = cur.rowcount
@@ -26,6 +25,25 @@ class MysqlDB(Database):
 
         def __iter__(self):
             return self.res.__iter__()
+
+    class Connection:
+        def __init__(self, conn):
+            self.conn = conn
+            self.cur = conn.cursor()
+
+        def get_cursor(self):
+            return self.cur
+
+        def commit(self):
+            self.conn.commit()
+
+        def rollback(self):
+            self.conn.rollback()
+
+        def close(self):
+            self.cur.close()
+            self.conn.close()
+
 
     def __init__(self,
                  host: Optional[str],
@@ -52,17 +70,20 @@ class MysqlDB(Database):
 
         self.logger.info(f"MySQL({self._name}@{self._host}) connect")
 
+    def get_connection(self):
+        return MysqlDB.Connection(self.pool.connection())
+
     def search(self, sql: str, *args) -> Union[None, Result]:
         return self.__search(sql, args)
 
-    def insert(self, sql: str, *args) -> Union[None, Result]:
-        return self.__done(sql, args)
+    def insert(self, sql: str, *args, connection: Connection = None) -> Union[None, Result]:
+        return self.__done(sql, args, connection)
 
-    def delete(self, sql: str, *args) -> Union[None, Result]:
-        return self.__done(sql, args)
+    def delete(self, sql: str, *args, connection: Connection = None) -> Union[None, Result]:
+        return self.__done(sql, args, connection)
 
-    def update(self, sql: str, *args) -> Union[None, Result]:
-        return self.__done(sql, args)
+    def update(self, sql: str, *args, connection: Connection = None) -> Union[None, Result]:
+        return self.__done(sql, args, connection)
 
     def __search(self, sql, args) -> Union[None, Result]:
         conn = self.pool.connection()
@@ -80,20 +101,27 @@ class MysqlDB(Database):
             cur.close()
             conn.close()
 
-    def __done(self, sql, args) -> Union[None, Result]:
-        conn = self.pool.connection()
-        cur = conn.cursor()
+    def __done(self, sql, args, connection: Connection = None) -> Union[None, Result]:
+        if connection:
+            cur = connection.get_cursor()
+            conn = None
+        else:
+            conn = self.pool.connection()
+            cur = conn.cursor()
 
         try:
             cur.execute(query=sql, args=args)
-            conn.commit()
+            if conn:
+                conn.commit()
         except pymysql.MySQLError:
-            conn.rollback()
+            if conn:
+                conn.rollback()
             self.logger.error(f"MySQL({self._name}@{self._host}) SQL {sql} error {inspect.stack()[2][2]} "
                               f"{inspect.stack()[2][1]} {inspect.stack()[2][3]}", exc_info=True, stack_info=True)
             return None
         else:
             return MysqlDB.Result(cur)
         finally:
-            cur.close()
-            conn.close()
+            if not connection:
+                cur.close()
+                conn.close()

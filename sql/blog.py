@@ -71,15 +71,27 @@ def delete_blog(blog_id: int, mysql: DB = db):
     delete_blog_from_cache(blog_id)
     delete_blog_archive_from_cache(blog_id)
 
-    cur = mysql.delete("DELETE FROM blog_archive WHERE BlogID=%s", blog_id)
+    conn = mysql.get_connection()
+    cur = mysql.delete("DELETE FROM blog_archive WHERE BlogID=%s", blog_id, connection=conn)
     if cur is None:
+        conn.rollback()
+        conn.close()
         return False
-    cur = mysql.delete("DELETE FROM comment WHERE BlogID=%s", blog_id)
+
+    cur = mysql.delete("DELETE FROM comment WHERE BlogID=%s", blog_id, connection=conn)
     if cur is None:
+        conn.rollback()
+        conn.close()
         return False
-    cur = mysql.delete("DELETE FROM blog WHERE ID=%s", blog_id)
+
+    cur = mysql.delete("DELETE FROM blog WHERE ID=%s", blog_id, connection=conn)
     if cur is None or cur.rowcount == 0:
+        conn.rollback()
+        conn.close()
         return False
+
+    conn.commit()
+    conn.close()
     return True
 
 

@@ -55,18 +55,33 @@ def delete_user(user_id: int, mysql: DB = db):
     delete_user_from_cache(get_user_email(user_id))
     delete_user_email_from_cache(user_id)
 
-    cur = mysql.delete("DELETE FROM message WHERE Auth=%s", user_id)
+    conn = mysql.get_connection()
+    cur = mysql.delete("DELETE FROM message WHERE Auth=%s", user_id, connection=conn)
     if cur is None:
+        conn.rollback()
+        conn.close()
         return False
-    cur = mysql.delete("DELETE FROM comment WHERE Auth=%s", user_id)
+
+    cur = mysql.delete("DELETE FROM comment WHERE Auth=%s", user_id, connection=conn)
     if cur is None:
+        conn.rollback()
+        conn.close()
         return False
-    cur = mysql.delete("DELETE FROM blog WHERE Auth=%s", user_id)
+
+    cur = mysql.delete("DELETE FROM blog WHERE Auth=%s", user_id, connection=conn)
     if cur is None:
+        conn.rollback()
+        conn.close()
         return False
-    cur = mysql.delete("DELETE FROM user WHERE ID=%s", user_id)
+
+    cur = mysql.delete("DELETE FROM user WHERE ID=%s", user_id, connection=conn)
     if cur is None or cur.rowcount == 0:
+        conn.rollback()
+        conn.close()
         return False
+
+    conn.commit()
+    conn.close()
     return True
 
 
@@ -108,16 +123,24 @@ def __authority_to_sql(authority):
 
 
 def create_role(name: str, authority: List[str], mysql: DB = db):
-    cur = db.insert("INSERT INTO role(RoleName) VALUES (%s)", name)
+    conn = mysql.get_connection()
+    cur = mysql.insert("INSERT INTO role(RoleName) VALUES (%s)", name, connection=conn)
     if cur is None or cur.rowcount == 0:
+        conn.rollback()
+        conn.close()
         return False
 
     sql, args = __authority_to_sql({i: (1 if i in authority else 0) for i in role_authority})
     cur = mysql.update(f"UPDATE role "
                        f"SET {sql} "
-                       f"WHERE RoleName=%s", *args, name)
+                       f"WHERE RoleName=%s", *args, name, connection=conn)
     if cur is None or cur.rowcount == 0:
+        conn.rollback()
+        conn.close()
         return False
+
+    conn.commit()
+    conn.close()
     return True
 
 

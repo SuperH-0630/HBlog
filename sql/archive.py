@@ -54,12 +54,22 @@ def get_blog_archive(blog_id: int, mysql: DB = db, not_cache=False):
 def delete_archive(archive_id: int, mysql: DB = db):
     delete_archive_from_cache(archive_id)
     delete_all_blog_archive_from_cache()
-    cur = mysql.delete("DELETE FROM blog_archive WHERE ArchiveID=%s", archive_id)
+    conn = mysql.get_connection()
+
+    cur = mysql.delete("DELETE FROM blog_archive WHERE ArchiveID=%s", archive_id, connection=conn)
     if cur is None:
+        conn.rollback()
+        conn.close()
         return False
-    cur = mysql.delete("DELETE FROM archive WHERE ID=%s", archive_id)
+
+    cur = mysql.delete("DELETE FROM archive WHERE ID=%s", archive_id, connection=conn)
     if cur is None or cur.rowcount == 0:
+        conn.rollback()
+        conn.close()
         return False
+
+    conn.commit()
+    conn.close()
     return True
 
 
