@@ -5,7 +5,7 @@ import logging
 import threading
 
 env_dict = os.environ
-hblog_conf = env_dict.get("hblog_conf")
+hblog_conf = env_dict.get("HBLOG_CONF")
 if hblog_conf is None:
     logging.info("Configure file ./etc/conf.json")
     configure("./etc/conf.json")
