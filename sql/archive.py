@@ -11,6 +11,7 @@ def create_archive(name: str, describe: str):
                     "VALUES (%s, %s)", name, describe)
     if cur is None or cur.rowcount == 0:
         return None
+    read_archive(cur.lastrowid)
     return cur.lastrowid
 
 

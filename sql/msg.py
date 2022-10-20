@@ -47,6 +47,7 @@ def create_msg(auth: int, content: str, secret: bool = False):
                     "VALUES (%s, %s, %s)", auth, content, 1 if secret else 0)
     if cur is None or cur.rowcount != 1:
         return None
+    read_msg(cur.lastrowid)  # 刷新缓存
     return cur.lastrowid
 
 

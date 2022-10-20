@@ -28,10 +28,10 @@ def create_blog(auth_id: int, title: str, subtitle: str, content: str,
 
     blog_id = cur.lastrowid
     for archive in archive_list:
-        delete_archive_blog_count_from_cache(archive.id)
         if not add_blog_to_archive(blog_id, archive.id):
             return False
-
+        delete_archive_blog_count_from_cache(archive.id)
+    read_blog(blog_id)  # 刷新缓存
     return True
 
 
@@ -44,6 +44,7 @@ def update_blog(blog_id: int, content: str) -> bool:
                     "WHERE ID=%s", content, blog_id)
     if cur is None or cur.rowcount != 1:
         return False
+    read_blog(blog_id)  # 刷新缓存
     return True
 
 
@@ -89,6 +90,7 @@ def set_blog_top(blog_id: int, top: bool = True):
                     "WHERE ID=%s", 1 if top else 0, blog_id)
     if cur is None or cur.rowcount != 1:
         return False
+    read_blog(blog_id)  # 刷新缓存
     return True
 
 

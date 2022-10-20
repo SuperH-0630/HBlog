@@ -23,6 +23,7 @@ def create_comment(blog_id: int, user_id: int, content: str):
                     "VALUES (%s, %s, %s)", blog_id, user_id, content)
     if cur is None or cur.rowcount == 0:
         return False
+    read_comment(cur.lastrowid)  # 刷新缓存
     return True
 
 

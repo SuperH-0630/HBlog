@@ -45,6 +45,7 @@ def create_user(email: str, passwd: str):
                         "VALUES (%s, %s)", email, passwd)
     if cur is None or cur.rowcount != 1:
         return None
+    read_user(cur.lastrowid)  # 刷新缓存
     return cur.lastrowid
 
 
