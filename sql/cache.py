@@ -1,11 +1,10 @@
-from sql import cache
+from sql import cache, DB
 from sql.base import DBBit
 from configure import conf
 
 from redis import RedisError
 from functools import wraps
 from datetime import datetime
-
 
 CACHE_TIME = int(conf["CACHE_EXPIRE"])
 CACHE_PREFIX = conf["CACHE_PREFIX"]
@@ -21,7 +20,9 @@ def __try_redis(ret=None):
                 cache.logger.error(f"Redis error with {args} {kwargs}", exc_info=True, stack_info=True)
                 return ret
             return res
+
         return try_func
+
     return try_redis
 
 
@@ -247,7 +248,8 @@ def write_blog_archive_to_cache(blog_id: int, archive):
     cache.delete(cache_name)
     if len(archive) == 0:
         cache.rpush(cache_name, -1)
-    cache.rpush(cache_name, *archive)
+    else:
+        cache.rpush(cache_name, *archive)
     cache.expire(cache_name, CACHE_TIME)
 
 

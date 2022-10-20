@@ -1,4 +1,4 @@
-from sql import db
+from sql import db, DB
 from sql.base import DBBit
 from sql.archive import add_blog_to_archive
 from sql.cache import (write_blog_to_cache, get_blog_from_cache, delete_blog_from_cache,
@@ -10,19 +10,18 @@ from sql.cache import (write_blog_to_cache, get_blog_from_cache, delete_blog_fro
                        delete_blog_archive_from_cache)
 import object.archive
 
-
 from typing import Optional, List
 
 
 def create_blog(auth_id: int, title: str, subtitle: str, content: str,
-                archive_list: List[object.archive.Archive]) -> bool:
+                archive_list: List[object.archive.Archive], mysql: DB = db) -> bool:
     """ 写入新的blog """
     delete_blog_count_from_cache()
     delete_user_blog_count_from_cache(auth_id)
     # archive cache 在下面循环删除
 
-    cur = db.insert("INSERT INTO blog(Auth, Title, SubTitle, Content) "
-                    "VALUES (%s, %s, %s, %s)", auth_id, title, subtitle, content)
+    cur = mysql.insert("INSERT INTO blog(Auth, Title, SubTitle, Content) "
+                       "VALUES (%s, %s, %s, %s)", auth_id, title, subtitle, content)
     if cur is None or cur.rowcount == 0:
         return False
 
@@ -31,32 +30,33 @@ def create_blog(auth_id: int, title: str, subtitle: str, content: str,
         if not add_blog_to_archive(blog_id, archive.id):
             return False
         delete_archive_blog_count_from_cache(archive.id)
-    read_blog(blog_id)  # 刷新缓存
+    read_blog(blog_id, mysql)  # 刷新缓存
     return True
 
 
-def update_blog(blog_id: int, content: str) -> bool:
+def update_blog(blog_id: int, content: str, mysql: DB = db) -> bool:
     """ 更新博客文章 """
     delete_blog_from_cache(blog_id)
 
-    cur = db.update("Update blog "
-                    "SET UpdateTime=CURRENT_TIMESTAMP(), Content=%s "
-                    "WHERE ID=%s", content, blog_id)
+    cur = mysql.update("Update blog "
+                       "SET UpdateTime=CURRENT_TIMESTAMP(), Content=%s "
+                       "WHERE ID=%s", content, blog_id)
     if cur is None or cur.rowcount != 1:
         return False
-    read_blog(blog_id)  # 刷新缓存
+    read_blog(blog_id, mysql)  # 刷新缓存
     return True
 
 
-def read_blog(blog_id: int) -> list:
+def read_blog(blog_id: int, mysql: DB = db, not_cache=False) -> list:
     """ 读取blog内容 """
-    res = get_blog_from_cache(blog_id)
-    if res is not None:
-        return res
+    if not not_cache:
+        res = get_blog_from_cache(blog_id)
+        if res is not None:
+            return res
 
-    cur = db.search("SELECT Auth, Title, SubTitle, Content, UpdateTime, CreateTime, Top "
-                    "FROM blog "
-                    "WHERE ID=%s", blog_id)
+    cur = mysql.search("SELECT Auth, Title, SubTitle, Content, UpdateTime, CreateTime, Top "
+                       "FROM blog "
+                       "WHERE ID=%s", blog_id)
     if cur is None or cur.rowcount == 0:
         return [-1, "", "", "", 0, -1, False]
     res = cur.fetchone()
@@ -64,93 +64,106 @@ def read_blog(blog_id: int) -> list:
     return [*res[:6], res[-1] == DBBit.BIT_1]
 
 
-def delete_blog(blog_id: int):
+def delete_blog(blog_id: int, mysql: DB = db):
     delete_blog_count_from_cache()
     delete_all_archive_blog_count_from_cache()
     delete_all_user_blog_count_from_cache()
     delete_blog_from_cache(blog_id)
     delete_blog_archive_from_cache(blog_id)
 
-    cur = db.delete("DELETE FROM blog_archive WHERE BlogID=%s", blog_id)
+    cur = mysql.delete("DELETE FROM blog_archive WHERE BlogID=%s", blog_id)
     if cur is None:
         return False
-    cur = db.delete("DELETE FROM comment WHERE BlogID=%s", blog_id)
+    cur = mysql.delete("DELETE FROM comment WHERE BlogID=%s", blog_id)
     if cur is None:
         return False
-    cur = db.delete("DELETE FROM blog WHERE ID=%s", blog_id)
+    cur = mysql.delete("DELETE FROM blog WHERE ID=%s", blog_id)
     if cur is None or cur.rowcount == 0:
         return False
     return True
 
 
-def set_blog_top(blog_id: int, top: bool = True):
+def set_blog_top(blog_id: int, top: bool = True, mysql: DB = db):
     delete_blog_from_cache(blog_id)
-    cur = db.update("UPDATE blog "
-                    "SET Top=%s "
-                    "WHERE ID=%s", 1 if top else 0, blog_id)
+    cur = mysql.update("UPDATE blog "
+                       "SET Top=%s "
+                       "WHERE ID=%s", 1 if top else 0, blog_id)
     if cur is None or cur.rowcount != 1:
         return False
-    read_blog(blog_id)  # 刷新缓存
+    read_blog(blog_id, mysql)  # 刷新缓存
     return True
 
 
-def get_blog_list(limit: Optional[int] = None, offset: Optional[int] = None) -> list:
+def get_blog_list(limit: Optional[int] = None, offset: Optional[int] = None, mysql: DB = db) -> list:
     """ 获得 blog 列表 """
     if limit is not None and offset is not None:
-        cur = db.search("SELECT ID "
-                        "FROM blog "
-                        "ORDER BY Top DESC, CreateTime DESC, Title, SubTitle "
-                        "LIMIT %s OFFSET %s", limit, offset)
+        cur = mysql.search("SELECT ID "
+                           "FROM blog "
+                           "ORDER BY Top DESC, CreateTime DESC, Title, SubTitle "
+                           "LIMIT %s OFFSET %s", limit, offset)
     else:
-        cur = db.search("SELECT ID "
-                        "FROM blog "
-                        "ORDER BY Top DESC, CreateTime DESC, Title, SubTitle")
+        cur = mysql.search("SELECT ID "
+                           "FROM blog "
+                           "ORDER BY Top DESC, CreateTime DESC, Title, SubTitle")
     if cur is None or cur.rowcount == 0:
         return []
     return [i[0] for i in cur.fetchall()]
 
 
-def get_blog_list_not_top(limit: Optional[int] = None, offset: Optional[int] = None) -> list:
+def get_blog_list_iter(mysql: DB = db):
+    """ 获得 blog 列表 """
+    cur = mysql.search("SELECT ID "
+                       "FROM blog "
+                       "ORDER BY Top DESC, CreateTime DESC, Title, SubTitle")
+    if cur is None or cur.rowcount == 0:
+        return []
+    return cur
+
+
+def get_blog_list_not_top(limit: Optional[int] = None, offset: Optional[int] = None, mysql: DB = db) -> list:
     """ 获得blog列表 忽略置顶 """
     if limit is not None and offset is not None:
-        cur = db.search("SELECT ID "
-                        "FROM blog "
-                        "ORDER BY CreateTime DESC, Title, SubTitle "
-                        "LIMIT %s OFFSET %s", limit, offset)
+        cur = mysql.search("SELECT ID "
+                           "FROM blog "
+                           "ORDER BY CreateTime DESC, Title, SubTitle "
+                           "LIMIT %s OFFSET %s", limit, offset)
     else:
-        cur = db.search("SELECT ID "
-                        "FROM blog "
-                        "ORDER BY CreateTime DESC, Title, SubTitle")
+        cur = mysql.search("SELECT ID "
+                           "FROM blog "
+                           "ORDER BY CreateTime DESC, Title, SubTitle")
     if cur is None or cur.rowcount == 0:
         return []
     return [i[0] for i in cur.fetchall()]
 
 
-def get_archive_blog_list(archive_id, limit: Optional[int] = None, offset: Optional[int] = None) -> list:
+def get_archive_blog_list(archive_id, limit: Optional[int] = None,
+                          offset: Optional[int] = None,
+                          mysql: DB = db) -> list:
     """ 获得指定归档的 blog 列表 """
     if limit is not None and offset is not None:
-        cur = db.search("SELECT BlogID "
-                        "FROM blog_with_archive "
-                        "WHERE ArchiveID=%s "
-                        "ORDER BY Top DESC, CreateTime DESC, Title, SubTitle "
-                        "LIMIT %s OFFSET %s", archive_id, limit, offset)
+        cur = mysql.search("SELECT BlogID "
+                           "FROM blog_with_archive "
+                           "WHERE ArchiveID=%s "
+                           "ORDER BY Top DESC, CreateTime DESC, Title, SubTitle "
+                           "LIMIT %s OFFSET %s", archive_id, limit, offset)
     else:
-        cur = db.search("SELECT BlogID "
-                        "FROM blog_with_archive "
-                        "WHERE ArchiveID=%s "
-                        "ORDER BY Top DESC, CreateTime DESC, Title, SubTitle")
+        cur = mysql.search("SELECT BlogID "
+                           "FROM blog_with_archive "
+                           "WHERE ArchiveID=%s "
+                           "ORDER BY Top DESC, CreateTime DESC, Title, SubTitle")
     if cur is None or cur.rowcount == 0:
         return []
     return [i[0] for i in cur.fetchall()]
 
 
-def get_blog_count() -> int:
+def get_blog_count(mysql: DB = db, not_cache=False) -> int:
     """ 统计 blog 个数 """
-    res = get_blog_count_from_cache()
-    if res is not None:
-        return res
+    if not not_cache:
+        res = get_blog_count_from_cache()
+        if res is not None:
+            return res
 
-    cur = db.search("SELECT COUNT(*) FROM blog")
+    cur = mysql.search("SELECT COUNT(*) FROM blog")
     if cur is None or cur.rowcount == 0:
         return 0
 
@@ -159,13 +172,14 @@ def get_blog_count() -> int:
     return res
 
 
-def get_archive_blog_count(archive_id) -> int:
+def get_archive_blog_count(archive_id, mysql: DB = db, not_cache=False) -> int:
     """ 统计指定归档的 blog 个数 """
-    res = get_archive_blog_count_from_cache(archive_id)
-    if res is not None:
-        return res
+    if not not_cache:
+        res = get_archive_blog_count_from_cache(archive_id)
+        if res is not None:
+            return res
 
-    cur = db.search("SELECT COUNT(*) FROM blog_with_archive WHERE ArchiveID=%s", archive_id)
+    cur = mysql.search("SELECT COUNT(*) FROM blog_with_archive WHERE ArchiveID=%s", archive_id)
     if cur is None or cur.rowcount == 0:
         return 0
 
@@ -174,13 +188,14 @@ def get_archive_blog_count(archive_id) -> int:
     return res
 
 
-def get_user_blog_count(user_id: int) -> int:
+def get_user_blog_count(user_id: int, mysql: DB = db, not_cache=False) -> int:
     """ 获得指定用户的 blog 个数 """
-    res = get_user_blog_count_from_cache(user_id)
-    if res is not None:
-        return res
+    if not not_cache:
+        res = get_user_blog_count_from_cache(user_id)
+        if res is not None:
+            return res
 
-    cur = db.search("SELECT COUNT(*) FROM blog WHERE Auth=%s", user_id)
+    cur = mysql.search("SELECT COUNT(*) FROM blog WHERE Auth=%s", user_id)
     if cur is None or cur.rowcount == 0:
         return 0
 

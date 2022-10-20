@@ -26,6 +26,7 @@ conf = {
     "CACHE_REDIS_PASSWD": "123456",
     "CACHE_REDIS_DATABASE": 0,
     "CACHE_EXPIRE": 604800,  # 默认七天过期
+    "CACHE_REFRESH_INTERVAL": 432000,  # 缓存刷新时间  默认五天刷新一次
     "VIEW_CACHE_EXPIRE": 60,  # 视图函数
     "LIST_CACHE_EXPIRE": 5,  # 列表 排行
     "REDIS_EXPIRE": "statistics",
