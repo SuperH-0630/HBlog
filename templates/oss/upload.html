@@ -18,7 +18,7 @@
                 <div class="pb-2">
                     {{ UploadForm.file(class="form-control") }}
                     {% for error in UploadForm.file.errors %}
-                        <div class="invalid-feedback"> {{ error }} </div>
+                        <div class="invalid-feedback d-block"> {{ error }} </div>
                     {% endfor %}
                 </div>
 
