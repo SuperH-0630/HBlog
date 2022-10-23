@@ -17,11 +17,11 @@
 
             <div class="text-end">
                 {% if show_delete %}
-                    <a type="button" class="card-link"
+                    <a type="button" class="card-link ms-2"
                         data-bs-toggle="modal" data-bs-target="#DeleteModal{{blog.id}}"> 删除 </a>
                 {% endif %}
 
-                <a class="card-link" href="{{ url_for("docx.article_page", blog=blog.id) }}"> 前往 </a>
+                <a class="card-link ms-2" href="{{ url_for("docx.article_page", blog=blog.id) }}"> 前往 </a>
             </div>
         </div>
     </div>
@@ -34,10 +34,10 @@
 
 {% macro render_docx_top(blog, show_delete) %}
     {# 使用到moment, 不能放进macro #}
-    {{ render_docx_color(blog, "bg-success", show_delete) }}
+    {{ render_docx_color(blog, "bg-dark", show_delete) }}
 {% endmacro %}
 
-{% macro render_msg(msg)%}
+{% macro render_msg(msg, shod_delete)%}
     {# 使用到moment, 不能放进macro #}
     <div class="card mb-3">
         <div class="card-header bg-success text-white">
@@ -50,7 +50,16 @@
         <div class="card-body">
             <p> {{ msg.content.replace('\n', '<br>') | safe }} </p>
             <div class="text-end">
-                <small style="font-size: 0.8rem"> {{ moment(msg.update_time).fromNow(refresh=True) }} </small>
+                {% if show_delete %}
+                    <a class="card-link mb-2 ms-2"
+                        data-bs-toggle="modal" data-bs-target="#DeleteModal{{msg.id }}"> 删除 </a>
+                {% endif %}
+
+                {% if msg.secret == is_secret %}
+                    <span class="ms-2"> [私] </span>
+                {% endif %}
+
+                <span class="ms-2"> {{ moment(msg.update_time).fromNow(refresh=True) }} </span>
             </div>
         </div>
     </div>

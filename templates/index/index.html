@@ -51,13 +51,13 @@
                 {% if current_user.check_role("ReadBlog") %}
                     <aside class="col-12 col-lg-4">
                         {% for msg in msg_list %}
-                            {{ render_msg(msg) }}
+                            {{ render_msg(msg, False) }}
                         {% endfor %}
                     </aside>
                 {% else %}
                     <aside class="col-12">
                         {% for msg in msg_list %}
-                            {{ render_msg(msg) }}
+                            {{ render_msg(msg, False) }}
                         {% endfor %}
                     </aside>
                 {% endif %}
