@@ -1,5 +1,46 @@
 {% import "macro.html" as macro %}
 
+{% macro render_docx(blog) %}
+    {# 使用到moment, 不能放进macro #}
+    <div class="card mb-3">
+        <div class="card-header bg-primary text-white">
+            {{ blog.title }}
+            {% if blog.subtitle %}
+                <br>
+                {{ blog.subtitle }}
+            {% endif %}
+        </div>
+        <div class="card-body">
+            Update Date: {{ moment(blog.update_time).format('YYYY-MM-DD HH:mm:ss') }}
+            <br>
+            Create Date: {{ moment(blog.create_time).format('YYYY-MM-DD HH:mm:ss') }}
+
+            <div class="text-end">
+                <a class="card-link" href="{{ url_for("docx.article_page", blog=blog.id) }}"> 前往 </a>
+            </div>
+
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro render_msg(msg)%}
+    <div class="card mb-3">
+        <div class="card-header bg-success text-white">
+            {% if show_email %}  {# 判断是否可读取用户信息 #}
+                {{ msg.auth.email }}
+            {% else %}
+                {{ msg.auth.star_email }}
+            {% endif %}
+        </div>
+        <div class="card-body">
+            <p> {{ msg.content.replace('\n', '<br>') | safe }} </p>
+            <div class="text-end">
+                <small style="font-size: 0.8rem"> {{ moment(msg.update_time).fromNow(refresh=True) }} </small>
+            </div>
+        </div>
+    </div>
+{% endmacro %}
+
 <!DOCTYPE html>
 <html lang="zh">
 <head>
