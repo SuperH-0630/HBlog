@@ -1,9 +1,9 @@
 {% import "macro.html" as macro %}
 
-{% macro render_docx(blog) %}
+{% macro render_docx_color(blog, color, show_delete) %}
     {# 使用到moment, 不能放进macro #}
     <div class="card mb-3">
-        <div class="card-header bg-primary text-white">
+        <div class="card-header {{ color }} text-white">
             {{ blog.title }}
             {% if blog.subtitle %}
                 <br>
@@ -16,14 +16,29 @@
             Create Date: {{ moment(blog.create_time).format('YYYY-MM-DD HH:mm:ss') }}
 
             <div class="text-end">
+                {% if show_delete %}
+                    <a type="button" class="card-link"
+                        data-bs-toggle="modal" data-bs-target="#DeleteModal{{blog.id}}"> 删除 </a>
+                {% endif %}
+
                 <a class="card-link" href="{{ url_for("docx.article_page", blog=blog.id) }}"> 前往 </a>
             </div>
-
         </div>
     </div>
 {% endmacro %}
 
+{% macro render_docx(blog, show_delete) %}
+    {# 使用到moment, 不能放进macro #}
+    {{ render_docx_color(blog, "bg-primary", show_delete) }}
+{% endmacro %}
+
+{% macro render_docx_top(blog, show_delete) %}
+    {# 使用到moment, 不能放进macro #}
+    {{ render_docx_color(blog, "bg-success", show_delete) }}
+{% endmacro %}
+
 {% macro render_msg(msg)%}
+    {# 使用到moment, 不能放进macro #}
     <div class="card mb-3">
         <div class="card-header bg-success text-white">
             {% if show_email %}  {# 判断是否可读取用户信息 #}

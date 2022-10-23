@@ -83,27 +83,9 @@
                         {% endif %}
 
                         {% if blog.top %}
-                            <div class="docx-top">
-                                <a class="h4 my-auto" href="{{ url_for("docx.article_page", blog=blog.id) }}">
-                                {{ blog.title }}
-                                    <small> {{ blog.subtitle }}
-                                        <small> {{ moment(blog.update_time).format('YYYY-MM-DD HH:mm:ss') }} / {{ moment(blog.create_time).format('YYYY-MM-DD HH:mm:ss') }} </small> </small> </a>
-                                {% if show_delete %}
-                                    <button type="button" class="btn btn-sm btn-danger my-auto btn-close float-end"
-                                        data-bs-toggle="modal" data-bs-target="#DeleteModal{{blog.id}}"> </button>
-                                {% endif %}
-                            </div>
+                            {{ render_docx_top(blog, show_delete) }}
                         {% else %}
-                            <div class="docx">
-                                <a class="h4 my-auto" href="{{ url_for("docx.article_page", blog=blog.id) }}">
-                                {{ blog.title }}
-                                    <small> {{ blog.subtitle }}
-                                        <small> {{ moment(blog.update_time).format('YYYY-MM-DD HH:mm:ss') }} / {{ moment(blog.create_time).format('YYYY-MM-DD HH:mm:ss') }} </small> </small> </a>
-                                {% if show_delete %}
-                                    <button type="button" class="btn btn-sm btn-danger my-auto btn-close float-end"
-                                        data-bs-toggle="modal" data-bs-target="#DeleteModal{{blog.id}}"> </button>
-                                {% endif %}
-                            </div>
+                            {{ render_docx(blog, show_delete) }}
                         {% endif %}
                     {% endfor %}
                     </article>

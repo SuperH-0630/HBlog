@@ -35,13 +35,13 @@
                 {% if current_user.check_role("ReadMsg") %}
                     <article class="col-12 col-lg-8">
                         {% for blog in blog_list %}
-                            {{ render_docx(blog) }}
+                            {{ render_docx(blog, False) }}
                         {% endfor %}
                     </article>
                 {% else %}
                     <article class="col-12">
                         {% for blog in blog_list %}
-                            {{ render_docx(blog) }}
+                            {{ render_docx(blog, False) }}
                         {% endfor %}
                     </article>
                 {% endif %}
