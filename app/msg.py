@@ -41,7 +41,6 @@ def __load_msg_page(page: int, form: WriteForm):
                            cache_str=f":{page}",
                            page_list=page_list,
                            form=form,
-                           is_secret=DBBit.BIT_1,
                            show_delete=current_user.check_role("DeleteMsg"),
                            show_email=current_user.check_role("ReadUserInfo"))
 

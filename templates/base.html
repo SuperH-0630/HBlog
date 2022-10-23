@@ -2,6 +2,26 @@
 
 {% macro render_docx_color(blog, color, show_delete) %}
     {# 使用到moment, 不能放进macro #}
+    {% if show_delete %}
+        <div id="DeleteModal{{blog.id}}" class="modal fade" role="dialog" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content text-start">
+                    <div class="modal-header">
+                        <h4 class="modal-title"> 确认删除博文？ </h4>
+                    </div>
+                    <div class="modal-body">
+                        <p> 是否确认删除博文 {{ blog.title }}？ </p>
+                    </div>
+                    <div class="modal-footer">
+                        <a class="btn btn-danger"
+                           href="{{ url_for("docx.delete_blog_page", blog=blog.id) }}"> 删除 </a>
+                        <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal"> 取消 </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
     <div class="card mb-3">
         <div class="card-header {{ color }} text-white">
             {{ blog.title }}
@@ -39,6 +59,26 @@
 
 {% macro render_msg(msg, shod_delete)%}
     {# 使用到moment, 不能放进macro #}
+    {% if show_delete %}
+        <div id="DeleteModal{{msg.id }}" class="modal fade" role="dialog" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content text-start">
+                    <div class="modal-header">
+                        <h4 class="modal-title"> 确认删除留言？ </h4>
+                    </div>
+                    <div class="modal-body">
+                        <p> 是否确认删除留言？ </p>
+                    </div>
+                    <div class="modal-footer">
+                        <a class="btn btn-danger"
+                           href="{{ url_for("msg.delete_msg_page", msg=msg.id) }}"> 删除 </a>
+                        <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal"> 取消 </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
     <div class="card mb-3">
         <div class="card-header bg-success text-white">
             {% if show_email %}  {# 判断是否可读取用户信息 #}
@@ -55,11 +95,54 @@
                         data-bs-toggle="modal" data-bs-target="#DeleteModal{{msg.id }}"> 删除 </a>
                 {% endif %}
 
-                {% if msg.secret == is_secret %}
+                {% if msg.secret %}
                     <span class="ms-2"> [私] </span>
                 {% endif %}
 
                 <span class="ms-2"> {{ moment(msg.update_time).fromNow(refresh=True) }} </span>
+            </div>
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro render_comment(comment, shod_delete)%}
+    {# 使用到moment, 不能放进macro #}
+    {% if show_delete %}
+        <div id="DeleteModal{{comment.id }}" class="modal fade" role="dialog" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content text-start">
+                    <div class="modal-header">
+                        <h4 class="modal-title"> 确认删除评论？ </h4>
+                    </div>
+                    <div class="modal-body">
+                        <p> 是否确认删除评论？ </p>
+                    </div>
+                    <div class="modal-footer">
+                        <a class="btn btn-danger"
+                           href="{{ url_for("docx.delete_comment_page", comment=comment.id) }}"> 删除 </a>
+                        <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal"> 取消 </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="card mb-3">
+        <div class="card-header bg-secondary text-white">
+            {% if show_email %}  {# 判断是否可读取用户信息 #}
+                {{ comment.auth.email }}
+            {% else %}
+                {{ comment.auth.star_email }}
+            {% endif %}
+        </div>
+        <div class="card-body">
+            <p> {{ comment.content.replace('\n', '<br>') | safe }} </p>
+            <div class="text-end">
+                {% if show_delete %}
+                    <a class="card-link mb-2 ms-2"
+                        data-bs-toggle="modal" data-bs-target="#DeleteModal{{comment.id }}"> 删除 </a>
+                {% endif %}
+                <span class="ms-2"> {{ moment(comment.update_time).fromNow(refresh=True) }} </span>
             </div>
         </div>
     </div>

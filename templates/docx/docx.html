@@ -61,27 +61,6 @@
                 <div id="ReadBlogList" class="row">
                     <article class="col-12">
                     {% for blog in blog_list %}
-                        {% if show_delete %}
-                            {# 判断是否显示删除模态框 #}
-                            <div id="DeleteModal{{blog.id}}" class="modal fade" role="dialog" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content text-start">
-                                        <div class="modal-header">
-                                            <h4 class="modal-title"> 确认删除博文？ </h4>
-                                        </div>
-                                        <div class="modal-body">
-                                            <p> 是否确认删除博文 {{ blog.title }}？ </p>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <a class="btn btn-danger"
-                                               href="{{ url_for("docx.delete_blog_page", blog=blog.id) }}"> 删除 </a>
-                                            <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal"> 取消 </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endif %}
-
                         {% if blog.top %}
                             {{ render_docx_top(blog, show_delete) }}
                         {% else %}

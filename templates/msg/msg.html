@@ -51,26 +51,6 @@
             <div class="row">
                 <section class="col-12">
                     {% for msg in msg_list %}
-                        {% if show_delete %}
-                            <div id="DeleteModal{{msg.id }}" class="modal fade" role="dialog" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content text-start">
-                                        <div class="modal-header">
-                                            <h4 class="modal-title"> 确认删除留言？ </h4>
-                                        </div>
-                                        <div class="modal-body">
-                                            <p> 是否确认删除留言？ </p>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <a class="btn btn-danger"
-                                               href="{{ url_for("msg.delete_msg_page", msg=msg.id) }}"> 删除 </a>
-                                            <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal"> 取消 </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endif %}
-
                         {{ render_msg(msg, show_delete) }}
                     {% endfor %}
                 </section>

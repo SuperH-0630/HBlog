@@ -143,7 +143,6 @@ def archive_page():
                            page=page,
                            cache_str=f":{page}",
                            blog_list=blog_list,
-                           is_top=DBBit.BIT_1,
                            page_list=page_list,
                            form=None)
 
