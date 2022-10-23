@@ -95,11 +95,7 @@
         {% endif %}
 
         <div id="CommentList" class="row">
-            <article class="col-12">
-                {% if current_user.check_role("WriteComment") or current_user.check_role("ReadComment") %}
-                    <h1 class="mt-3"> 评论 </h1>
-                {% endif %}
-
+            <article class="col-12 mt-3">
                 {% if current_user.check_role("WriteComment") %}
                     <section class="col-12 text-end">
                         <form action="{{ url_for('docx.comment_page', blog=article.id) }}" method="post" class="was-validated">

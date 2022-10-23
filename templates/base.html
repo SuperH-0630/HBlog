@@ -127,7 +127,7 @@
         </div>
     {% endif %}
 
-    <div class="card mb-3">
+    <div class="card my-3">  {# 此处使用上下间距 #}
         <div class="card-header bg-secondary text-white">
             {% if show_email %}  {# 判断是否可读取用户信息 #}
                 {{ comment.auth.email }}
