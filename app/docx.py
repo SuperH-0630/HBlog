@@ -312,13 +312,18 @@ def comment_page():
 @app.role_required("DeleteComment", "delete comment")
 def delete_comment_page():
     comment_id = request.args.get("comment", 1, type=int)
-    if Comment(comment_id).delete():
+    comment = Comment(comment_id)
+    blog_id = comment.blog.id
+    if blog_id == -1:
+        abort(404)
+
+    if comment.delete():
         app.HBlogFlask.print_sys_opt_success_log("delete comment")
-        flash("博文评论成功")
+        flash("博文评论删除成功")
     else:
         app.HBlogFlask.print_sys_opt_fail_log("delete comment")
-        flash("博文评论失败")
-    return redirect(url_for("docx.docx_page", page=1))
+        flash("博文评论删除失败")
+    return redirect(url_for("docx.article_page", blog=blog_id))
 
 
 @docx.context_processor
