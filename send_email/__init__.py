@@ -5,7 +5,7 @@ from configure import conf
 
 def send_msg(title: str, mail: Mail, to, template, **kwargs):
     """ 邮件发送 """
-    sender = f"HBlog Admin <{conf['MAIL_SENDER']}>"
+    sender = conf['MAIL_SENDER']
     message = Message(conf['MAIL_PREFIX'] + title, sender=sender, recipients=[to])
     message.body = render_template("email-msg/" + template + ".txt", **kwargs)
     message.html = render_template("email-msg/" + template + ".html", **kwargs)
